@@ -23,12 +23,12 @@
                 <?php if (!empty($data['ringkasan'])): ?>
                     <?php foreach ($data['ringkasan'] as $row): ?>
                         <tr>
-                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= escape($row['nama_ruang']) ?></td>
-                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= (int)$row['total_item'] ?></td>
-                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= (int)$row['total_unit'] ?></td>
-                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= (int)$row['aset_baik'] ?></td>
-                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= (int)$row['aset_maintenance'] ?></td>
-                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= (int)$row['aset_bermasalah'] ?></td>
+                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= escape($row->nama_ruang) ?></td>
+                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= (int)$row->total_item ?></td>
+                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= (int)$row->total_unit ?></td>
+                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= (int)$row->aset_baik ?></td>
+                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= (int)$row->aset_maintenance ?></td>
+                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= (int)$row->aset_bermasalah ?></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
