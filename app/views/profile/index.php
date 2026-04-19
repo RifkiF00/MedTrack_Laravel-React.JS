@@ -10,18 +10,17 @@
     <div style="text-align: center; margin-bottom: 32px;">
         <!-- PROFILE IMAGE: Clickable for upload -->
         <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 16px; cursor: pointer;">
-            <img src="<?= BASEURL; ?>/uploads/profiles/<?= $_SESSION['id_user'] ?? '0'; ?>.png"
-                 onerror="this.src='<?= BASEURL; ?>/uploads/assets/default-avatar.png'"
+            <img src="<?= BASEURL; ?>/uploads/profiles/<?= $_SESSION['id_user'] ?? '0'; ?>.png?t=<?= time(); ?>"
+                 onerror="this.src='<?= BASEURL; ?>/uploads/assets/default-avatar.png?t=<?= time(); ?>'"
                  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid #3d6aff;"
                  title="<?= escape($_SESSION['nama_lengkap'] ?? 'User'); ?>"
                  onclick="document.getElementById('photoInput').click();">
 
             <!-- UPLOAD OVERLAY -->
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0); transition: all 0.2s; display: flex; align-items: center; justify-content: center; cursor: pointer;"
-                 onmouseover="this.style.background='rgba(0,0,0,0.3)'; this.style.color='white'; this.innerHTML='📷';"
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0); transition: all 0.2s; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 28px; font-weight: bold;"
+                 onmouseover="this.style.background='rgba(0,0,0,0.3)'; this.innerHTML='📷';"
                  onmouseout="this.style.background='rgba(0,0,0,0)'; this.innerHTML='';"
-                 onclick="document.getElementById('photoInput').click();"
-                 style="font-size: 28px; font-weight: bold;">
+                 onclick="document.getElementById('photoInput').click();">
             </div>
 
             <!-- HIDDEN FILE INPUT -->
@@ -78,14 +77,20 @@
         </p>
     </div>
 
-    <!-- LOGOUT BUTTON -->
+    <!-- ACTION BUTTONS -->
     <div style="margin-top: 24px; display: flex; gap: 12px;">
+        <button onclick="alert('Fitur Update Profile akan segera tersedia'); return false;"
+           style="flex: 1; padding: 12px; background: #3d6aff; color: #fff; text-align: center; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Nunito', sans-serif; transition: all 0.2s; cursor: pointer;"
+           onmouseover="this.style.background='#2952cc'"
+           onmouseout="this.style.background='#3d6aff'">
+            ⚙️ Update Profile
+        </button>
         <a href="<?= BASEURL; ?>/auth/logout"
            onclick="return confirm('Apakah Anda yakin ingin keluar?')"
            style="flex: 1; padding: 12px; background: #ef4444; color: #fff; text-align: center; text-decoration: none; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Nunito', sans-serif; transition: all 0.2s;"
            onmouseover="this.style.background='#dc2626'"
            onmouseout="this.style.background='#ef4444'">
-            Keluar Sistem
+            🚪 Keluar Sistem
         </a>
     </div>
 </div>
