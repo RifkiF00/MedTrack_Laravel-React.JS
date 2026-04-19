@@ -35,19 +35,19 @@ $namaRuang = $data['nama_ruang'] ?? 'Ruangan';
                         // Warna status
                         $statusColor = '#4b5563';
                         $statusBgColor = '#f3f4f6';
-                        if ($a['status_kondisi'] === 'Baik') {
+                        if ($a->status_kondisi === 'Baik') {
                             $statusColor = '#047857';
                             $statusBgColor = '#d1fae5';
-                        } elseif ($a['status_kondisi'] === 'Rusak Ringan') {
+                        } elseif ($a->status_kondisi === 'Rusak Ringan') {
                             $statusColor = '#c2410c';
                             $statusBgColor = '#fed7aa';
-                        } elseif ($a['status_kondisi'] === 'Rusak Berat') {
+                        } elseif ($a->status_kondisi === 'Rusak Berat') {
                             $statusColor = '#991b1b';
                             $statusBgColor = '#fee2e2';
-                        } elseif ($a['status_kondisi'] === 'Maintenance') {
+                        } elseif ($a->status_kondisi === 'Maintenance') {
                             $statusColor = '#0369a1';
                             $statusBgColor = '#dbeafe';
-                        } elseif ($a['status_kondisi'] === 'Gudang') {
+                        } elseif ($a->status_kondisi === 'Gudang') {
                             $statusColor = '#6b21a8';
                             $statusBgColor = '#f3e8ff';
                         }
@@ -55,27 +55,27 @@ $namaRuang = $data['nama_ruang'] ?? 'Ruangan';
                         <tr style="border-bottom: 1px solid #e5e7eb;">
                             <td style="padding: 12px; color: #1a2b56; font-size: 13px;"><?= $no++; ?></td>
                             <td style="padding: 12px; font-weight: 600; color: #1a2b56; font-size: 13px;">
-                                <?= escape($a['kode_label'] ?? '-'); ?>
+                                <?= escape($a->kode_label ?? '-'); ?>
                             </td>
                             <td style="padding: 12px; color: #1a2b56; font-size: 13px;">
-                                <?= escape($a['nama_alat'] ?? '-'); ?>
+                                <?= escape($a->nama_alat ?? '-'); ?>
                             </td>
                             <td style="padding: 12px;">
                                 <span style="display: inline-block; padding: 4px 10px; background: #eff6ff; color: #0369a1; border-radius: 8px; font-size: 12px; font-weight: 600;">
-                                    <?= escape($a['kategori_aset'] ?? 'Umum'); ?>
+                                    <?= escape($a->kategori_aset ?? 'Umum'); ?>
                                 </span>
                             </td>
                             <td style="padding: 12px; font-size: 13px; color: #1a2b56;">
-                                <div><?= escape($a['merk'] ?? '-'); ?></div>
-                                <div style="color: #8e9bb0; font-size: 12px;"><?= escape($a['model'] ?? '-'); ?></div>
+                                <div><?= escape($a->merk ?? '-'); ?></div>
+                                <div style="color: #8e9bb0; font-size: 12px;"><?= escape($a->model ?? '-'); ?></div>
                             </td>
                             <td style="padding: 12px;">
                                 <span style="display: inline-block; padding: 6px 12px; background: <?= $statusBgColor; ?>; color: <?= $statusColor; ?>; border-radius: 8px; font-size: 12px; font-weight: 600;">
-                                    <?= escape($a['status_kondisi'] ?? 'Tidak Diketahui'); ?>
+                                    <?= escape($a->status_kondisi ?? 'Tidak Diketahui'); ?>
                                 </span>
                             </td>
                             <td style="padding: 12px;">
-                                <a href="<?= BASEURL; ?>/aset/detail/<?= $a['id_aset']; ?>"
+                                <a href="<?= BASEURL; ?>/aset/detail/<?= $a->id_aset; ?>"
                                    style="display: inline-block; padding: 6px 12px; background: #3d6aff; color: white; text-decoration: none; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif; transition: all 0.2s;"
                                    onmouseover="this.style.background='#2952cc'"
                                    onmouseout="this.style.background='#3d6aff'">
@@ -91,9 +91,9 @@ $namaRuang = $data['nama_ruang'] ?? 'Ruangan';
         <!-- SUMMARY -->
         <div style="margin-top: 20px; padding: 16px; background: #f9fafb; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 14px; color: #1a2b56;">
             <strong>Total Aset:</strong> <?= count($aset); ?> unit
-            | <strong>Baik:</strong> <?php echo count(array_filter($aset, fn($a) => $a['status_kondisi'] === 'Baik')); ?>
-            | <strong>Rusak:</strong> <?php echo count(array_filter($aset, fn($a) => in_array($a['status_kondisi'], ['Rusak Ringan', 'Rusak Berat']))); ?>
-            | <strong>Maintenance:</strong> <?php echo count(array_filter($aset, fn($a) => $a['status_kondisi'] === 'Maintenance')); ?>
+            | <strong>Baik:</strong> <?php echo count(array_filter($aset, fn($a) => $a->status_kondisi === 'Baik')); ?>
+            | <strong>Rusak:</strong> <?php echo count(array_filter($aset, fn($a) => in_array($a->status_kondisi, ['Rusak Ringan', 'Rusak Berat']))); ?>
+            | <strong>Maintenance:</strong> <?php echo count(array_filter($aset, fn($a) => $a->status_kondisi === 'Maintenance')); ?>
         </div>
 
     <?php else: ?>
