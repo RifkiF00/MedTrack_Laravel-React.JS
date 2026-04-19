@@ -25,6 +25,7 @@
 
             <!-- HIDDEN FILE INPUT -->
             <form id="photoForm" method="POST" action="<?= BASEURL; ?>/profile/uploadPhoto" enctype="multipart/form-data" style="display: none;">
+                <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
                 <input type="file" id="photoInput" name="profile_photo" accept="image/jpeg,image/png,image/jpg" onchange="document.getElementById('photoForm').submit();">
             </form>
         </div>

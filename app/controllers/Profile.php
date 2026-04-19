@@ -27,16 +27,23 @@ class Profile extends Controller {
         $this->guard();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . BASEURL . '/profile');
-            exit;
+            redirectWithMessage(BASEURL . '/profile', 'Metode request tidak valid.', 'danger');
+            return;
+        }
+
+        if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
+            redirectWithMessage(BASEURL . '/profile', 'Token keamanan tidak valid.', 'danger');
+            return;
         }
 
         if (!isset($_FILES['profile_photo']) || $_FILES['profile_photo']['error'] === UPLOAD_ERR_NO_FILE) {
             redirectWithMessage(BASEURL . '/profile', 'Pilih file gambar terlebih dahulu.', 'danger');
+            return;
         }
 
         if ($_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK) {
             redirectWithMessage(BASEURL . '/profile', 'Terjadi kesalahan saat upload. Coba lagi.', 'danger');
+            return;
         }
 
         $allowedExt = ['jpg', 'jpeg', 'png'];
@@ -49,10 +56,12 @@ class Profile extends Controller {
 
         if (!in_array($ext, $allowedExt)) {
             redirectWithMessage(BASEURL . '/profile', 'Format file harus JPG, JPEG, atau PNG.', 'danger');
+            return;
         }
 
         if ($fileSize > $maxSize) {
             redirectWithMessage(BASEURL . '/profile', 'Ukuran file terlalu besar (maks 5MB).', 'danger');
+            return;
         }
 
         $uploadDir = '../public/uploads/profiles/';
@@ -60,11 +69,18 @@ class Profile extends Controller {
             mkdir($uploadDir, 0777, true);
         }
 
+        // Save with user ID and .png extension
         $newName = $_SESSION['id_user'] . '.png';
         $targetPath = $uploadDir . $newName;
 
+        // Delete old file if exists
+        if (file_exists($targetPath)) {
+            @unlink($targetPath);
+        }
+
         if (!move_uploaded_file($tmpName, $targetPath)) {
             redirectWithMessage(BASEURL . '/profile', 'Gagal menyimpan file gambar.', 'danger');
+            return;
         }
 
         redirectWithMessage(BASEURL . '/profile', 'Foto profil berhasil diupload! 📸', 'success');
