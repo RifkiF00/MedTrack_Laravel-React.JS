@@ -29,12 +29,12 @@ class Auth extends Controller {
 
             $user = $this->model('User_model')->getUserByUsername($username);
 
-            if ($user && password_verify($password, $user['password_hash'])) {
-                $_SESSION['user_id'] = $user['id_user'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
-                $_SESSION['nama_lengkap'] = $user['nama_lengkap'];
-                $_SESSION['id_ruang'] = $user['id_ruang'] ?? null;
+            if ($user && password_verify($password, $user->password_hash)) {
+                $_SESSION['user_id'] = $user->id_user;
+                $_SESSION['username'] = $user->username;
+                $_SESSION['role'] = $user->role;
+                $_SESSION['nama_lengkap'] = $user->nama_lengkap;
+                $_SESSION['id_ruang'] = $user->id_ruang ?? null;
 
                 // Update last login
                 $userModel = $this->model('User_model');
