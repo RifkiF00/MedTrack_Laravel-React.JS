@@ -67,7 +67,7 @@ $isUnit = ($role === 'Unit_RS');
             <?php endif; ?>
 
             <!-- PREVENTIVE -->
-            <?php if ($isIPSRS): ?>
+            <?php if ($role === 'Staf_IPSRS'): ?>
                 <li>
                     <a href="<?= BASEURL; ?>/maintenance">
                         <i class="bi bi-tools"></i> Preventive Maintenance
