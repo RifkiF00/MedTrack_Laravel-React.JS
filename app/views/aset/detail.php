@@ -1,6 +1,6 @@
 <?php
-$aset = $data['aset ?? null;
-$role = $data['role ?? 'Guest';
+$aset = $data['aset'] ?? null;
+$role = $data['role'] ?? 'Guest';
 $backLink = ($role === 'Unit_RS') ? BASEURL . '/aset/listunit' : BASEURL . '/aset';
 ?>
 
