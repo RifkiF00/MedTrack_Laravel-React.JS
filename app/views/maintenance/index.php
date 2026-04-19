@@ -1,144 +1,160 @@
-<div class="card" style="padding: 24px;">
+<style>
+body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+</style>
+
+<div class="card" style="padding: 24px; border-radius: 16px; background: #ffffff;">
+    <!-- HEADER -->
     <div style="margin-bottom: 24px;">
-        <h3 style="margin: 0 0 8px 0;">Preventive Maintenance</h3>
-        <p style="margin: 0; color: #666; font-size: 14px;">
-            Jadwal dan log pemeliharaan rutin aset untuk menjaga kondisi optimal
+        <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: 700; color: #1a2b56; font-family: 'Nunito', sans-serif;">
+            Preventive Maintenance
+        </h1>
+        <p style="margin: 0; font-size: 15px; color: #8e9bb0; font-family: 'Nunito', sans-serif;">
+            Jadwal dan log pemeliharaan rutin aset
         </p>
     </div>
 
     <!-- FLASH MESSAGE -->
     <?php if (!empty($data['flash'])): ?>
-        <div style="margin-bottom: 20px; padding: 14px; border-radius: 8px; background: #eaf7ee; color: #1f7a3d;">
-            <?= escape($data['flash']['message']); ?>
+        <div style="margin-bottom: 20px; padding: 12px 16px; border-radius: 12px; background: #ecfdf5; color: #047857; font-size: 14px; font-family: 'Nunito', sans-serif;">
+            ✓ <?= escape($data['flash']['message']); ?>
         </div>
     <?php endif; ?>
 
-    <!-- STATISTICS -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        <div style="padding: 16px; background: #f0f4ff; border-radius: 8px; border-left: 4px solid #0d6efd;">
-            <div style="font-size: 12px; color: #666; margin-bottom: 4px;">Total Item</div>
-            <div style="font-size: 28px; font-weight: 600; color: #0d6efd;">
+    <!-- STATISTICS CARDS -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px;">
+        <div style="padding: 16px; background: #eff6ff; border-radius: 12px; border-left: 4px solid #3d6aff;">
+            <div style="font-size: 12px; color: #8e9bb0; margin-bottom: 6px; font-family: 'Nunito', sans-serif; font-weight: 500;">Total Item</div>
+            <div style="font-size: 28px; font-weight: 700; color: #1a2b56; font-family: 'Nunito', sans-serif;">
                 <?= $data['statistik']->total_items ?? 0; ?>
             </div>
         </div>
-        <div style="padding: 16px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
-            <div style="font-size: 12px; color: #666; margin-bottom: 4px;">Jadwal Hari Ini</div>
-            <div style="font-size: 28px; font-weight: 600; color: #ffc107;">
+
+        <div style="padding: 16px; background: #fef3c7; border-radius: 12px; border-left: 4px solid #f59e0b;">
+            <div style="font-size: 12px; color: #8e9bb0; margin-bottom: 6px; font-family: 'Nunito', sans-serif; font-weight: 500;">Hari Ini</div>
+            <div style="font-size: 28px; font-weight: 700; color: #1a2b56; font-family: 'Nunito', sans-serif;">
                 <?= $data['statistik']->hari_ini ?? 0; ?>
             </div>
         </div>
-        <div style="padding: 16px; background: #d1ecf1; border-radius: 8px; border-left: 4px solid #17a2b8;">
-            <div style="font-size: 12px; color: #666; margin-bottom: 4px;">Sudah Selesai Hari Ini</div>
-            <div style="font-size: 28px; font-weight: 600; color: #17a2b8;">
+
+        <div style="padding: 16px; background: #dbeafe; border-radius: 12px; border-left: 4px solid #0ea5e9;">
+            <div style="font-size: 12px; color: #8e9bb0; margin-bottom: 6px; font-family: 'Nunito', sans-serif; font-weight: 500;">Selesai Hari Ini</div>
+            <div style="font-size: 28px; font-weight: 700; color: #1a2b56; font-family: 'Nunito', sans-serif;">
                 <?= $data['statistik']->sudah_selesai_hari_ini ?? 0; ?>
             </div>
         </div>
-        <div style="padding: 16px; background: #e2e3e5; border-radius: 8px; border-left: 4px solid #6c757d;">
-            <div style="font-size: 12px; color: #666; margin-bottom: 4px;">Bulan Ini</div>
-            <div style="font-size: 28px; font-weight: 600; color: #6c757d;">
+
+        <div style="padding: 16px; background: #f3f4f6; border-radius: 12px; border-left: 4px solid #6b7280;">
+            <div style="font-size: 12px; color: #8e9bb0; margin-bottom: 6px; font-family: 'Nunito', sans-serif; font-weight: 500;">Bulan Ini</div>
+            <div style="font-size: 28px; font-weight: 700; color: #1a2b56; font-family: 'Nunito', sans-serif;">
                 <?= $data['statistik']->bulan_ini ?? 0; ?>
             </div>
         </div>
     </div>
 
-    <!-- BUTTONS -->
-    <div style="margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
-        <a href="<?= BASEURL; ?>/maintenance/log" style="padding: 10px 16px; background: #0d6efd; color: #fff; text-decoration: none; border-radius: 8px;">
-            + Input Log Maintenance
+    <!-- ACTION BUTTONS -->
+    <div style="margin-bottom: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="<?= BASEURL; ?>/maintenance/log" style="padding: 11px 18px; background: #3d6aff; color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Nunito', sans-serif; transition: all 0.2s; display: inline-block;" onmouseover="this.style.background='#2952cc'" onmouseout="this.style.background='#3d6aff'">
+            + Input Log
         </a>
-        <a href="<?= BASEURL; ?>/maintenance/history" style="padding: 10px 16px; background: #6c757d; color: #fff; text-decoration: none; border-radius: 8px;">
+        <a href="<?= BASEURL; ?>/maintenance/history" style="padding: 11px 18px; background: #e5e7eb; color: #1a2b56; text-decoration: none; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Nunito', sans-serif; transition: all 0.2s; display: inline-block;" onmouseover="this.style.background='#d1d5db'" onmouseout="this.style.background='#e5e7eb'">
             📋 Riwayat
         </a>
     </div>
 
-    <!-- PENDING TODAY -->
+    <!-- JADWAL HARI INI -->
     <div style="margin-bottom: 24px;">
-        <h4 style="margin: 0 0 16px 0; color: #333;">📅 Jadwal Hari Ini</h4>
+        <h2 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1a2b56; font-family: 'Nunito', sans-serif;">
+            📅 Jadwal Hari Ini
+        </h2>
+
         <?php if (!empty($data['pending_hari_ini'])): ?>
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                <thead>
-                    <tr style="background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
-                        <th style="padding: 12px; text-align: left; font-weight: 600;">Item Maintenance</th>
-                        <th style="padding: 12px; text-align: left; font-weight: 600;">Frekuensi</th>
-                        <th style="padding: 12px; text-align: left; font-weight: 600;">Lokasi</th>
-                        <th style="padding: 12px; text-align: center; font-weight: 600;">Sudah Dikerjakan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($data['pending_hari_ini'] as $item): ?>
-                        <tr style="border-bottom: 1px solid #dee2e6;">
-                            <td style="padding: 12px; color: #333;"><?= escape($item->nama_item); ?></td>
-                            <td style="padding: 12px; color: #666;">
-                                <?= str_replace('_', ' ', escape($item->frekuensi)); ?>
-                            </td>
-                            <td style="padding: 12px; color: #666;"><?= escape($item->lokasi ?? '-'); ?></td>
-                            <td style="padding: 12px; text-align: center;">
-                                <?php if ($item->sudah_dikerjakan > 0): ?>
-                                    <span style="display: inline-block; padding: 4px 8px; background: #d4edda; color: #155724; border-radius: 4px; font-size: 12px;">
-                                        ✓ <?= $item->sudah_dikerjakan; ?>x
-                                    </span>
-                                <?php else: ?>
-                                    <span style="display: inline-block; padding: 4px 8px; background: #f8d7da; color: #721c24; border-radius: 4px; font-size: 12px;">
-                                        ⏱ Pending
-                                    </span>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+            <div style="border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb;">
+                <?php foreach ($data['pending_hari_ini'] as $i => $item): ?>
+                    <div style="padding: 14px 16px; border-bottom: <?= ($i < count($data['pending_hari_ini']) - 1) ? '1px solid #e5e7eb' : 'none'; ?>; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 14px; font-weight: 600; color: #1a2b56; margin-bottom: 4px; font-family: 'Nunito', sans-serif;">
+                                <?= escape($item->nama_item); ?>
+                            </div>
+                            <div style="font-size: 12px; color: #8e9bb0; font-family: 'Nunito', sans-serif;">
+                                <?= str_replace('_', ' ', escape($item->frekuensi)); ?> • <?= escape($item->lokasi ?? 'Lokasi umum'); ?>
+                            </div>
+                        </div>
+                        <div>
+                            <?php if ($item->sudah_dikerjakan > 0): ?>
+                                <div style="padding: 6px 10px; background: #ecfdf5; color: #047857; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif;">
+                                    ✓ <?= $item->sudah_dikerjakan; ?>x
+                                </div>
+                            <?php else: ?>
+                                <div style="padding: 6px 10px; background: #fef2f2; color: #991b1b; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif;">
+                                    ⏱ Pending
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         <?php else: ?>
-            <div style="padding: 40px 20px; text-align: center; color: #999;">
-                <p style="margin: 0;">Tidak ada jadwal maintenance hari ini</p>
+            <div style="padding: 32px 16px; text-align: center; color: #8e9bb0; border-radius: 12px; background: #f9fafb;">
+                <div style="font-size: 14px; font-family: 'Nunito', sans-serif;">Tidak ada jadwal maintenance hari ini</div>
             </div>
         <?php endif; ?>
     </div>
 
-    <!-- RECENT LOGS -->
+    <!-- LOG TERBARU -->
     <div>
-        <h4 style="margin: 0 0 16px 0; color: #333;">📝 Log Terbaru</h4>
+        <h2 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1a2b56; font-family: 'Nunito', sans-serif;">
+            📝 Log Terbaru
+        </h2>
+
         <?php if (!empty($data['recent_logs'])): ?>
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                <thead>
-                    <tr style="background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
-                        <th style="padding: 12px; text-align: left; font-weight: 600;">Item</th>
-                        <th style="padding: 12px; text-align: left; font-weight: 600;">Tanggal</th>
-                        <th style="padding: 12px; text-align: left; font-weight: 600;">Pelaksana</th>
-                        <th style="padding: 12px; text-align: left; font-weight: 600;">Status</th>
-                        <th style="padding: 12px; text-align: left; font-weight: 600;">Kondisi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($data['recent_logs'] as $log): ?>
-                        <tr style="border-bottom: 1px solid #dee2e6;">
-                            <td style="padding: 12px; color: #333;"><?= escape($log->nama_item); ?></td>
-                            <td style="padding: 12px; color: #666;">
-                                <?= date('d/m/Y H:i', strtotime($log->tgl_rencana)); ?>
-                            </td>
-                            <td style="padding: 12px; color: #666;"><?= escape($log->nama_lengkap ?? 'System'); ?></td>
-                            <td style="padding: 12px;">
-                                <?php
-                                $statusColors = [
-                                    'Terselesaikan' => ['bg' => '#d4edda', 'color' => '#155724', 'label' => '✓ Selesai'],
-                                    'Terjadwal' => ['bg' => '#fff3cd', 'color' => '#856404', 'label' => '⏳ Terjadwal'],
-                                    'Tertunda' => ['bg' => '#f8d7da', 'color' => '#721c24', 'label' => '⚠ Tertunda'],
-                                    'Dibatalkan' => ['bg' => '#e2e3e5', 'color' => '#383d41', 'label' => '✕ Dibatalkan']
-                                ];
-                                $status = $statusColors[$log->status_pelaksanaan] ?? $statusColors['Terjadwal'];
-                                ?>
-                                <span style="display: inline-block; padding: 4px 8px; background: <?= $status['bg']; ?>; color: <?= $status['color']; ?>; border-radius: 4px; font-size: 12px;">
-                                    <?= $status['label']; ?>
-                                </span>
-                            </td>
-                            <td style="padding: 12px; color: #666;"><?= escape($log->kondisi_laporan ?? 'Normal'); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+            <div style="border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb;">
+                <?php foreach ($data['recent_logs'] as $i => $log): ?>
+                    <div style="padding: 14px 16px; border-bottom: <?= ($i < count($data['recent_logs']) - 1) ? '1px solid #e5e7eb' : 'none'; ?>;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; gap: 12px; margin-bottom: 8px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; font-weight: 600; color: #1a2b56; font-family: 'Nunito', sans-serif;">
+                                    <?= escape($log->nama_item); ?>
+                                </div>
+                                <div style="font-size: 12px; color: #8e9bb0; margin-top: 2px; font-family: 'Nunito', sans-serif;">
+                                    <?= date('d/m/Y H:i', strtotime($log->tgl_rencana)); ?> • <?= escape($log->nama_lengkap ?? 'System'); ?>
+                                </div>
+                            </div>
+                            <?php
+                            $statusBg = [
+                                'Terselesaikan' => '#ecfdf5',
+                                'Terjadwal' => '#fef3c7',
+                                'Tertunda' => '#fef2f2',
+                                'Dibatalkan' => '#f3f4f6'
+                            ];
+                            $statusColor = [
+                                'Terselesaikan' => '#047857',
+                                'Terjadwal' => '#b45309',
+                                'Tertunda' => '#991b1b',
+                                'Dibatalkan' => '#4b5563'
+                            ];
+                            $statusLabel = [
+                                'Terselesaikan' => '✓ Selesai',
+                                'Terjadwal' => '⏳ Terjadwal',
+                                'Tertunda' => '⚠ Tertunda',
+                                'Dibatalkan' => '✕ Dibatalkan'
+                            ];
+                            $status = $log->status_pelaksanaan;
+                            ?>
+                            <div style="padding: 5px 10px; background: <?= $statusBg[$status] ?? '#f3f4f6'; ?>; color: <?= $statusColor[$status] ?? '#4b5563'; ?>; border-radius: 6px; font-size: 11px; font-weight: 600; font-family: 'Nunito', sans-serif; white-space: nowrap;">
+                                <?= $statusLabel[$status] ?? 'Unknown'; ?>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #8e9bb0; font-family: 'Nunito', sans-serif;">
+                            Kondisi: <strong style="color: #1a2b56;"><?= escape($log->kondisi_laporan ?? 'Normal'); ?></strong>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         <?php else: ?>
-            <div style="padding: 40px 20px; text-align: center; color: #999;">
-                <i class="bi bi-file-earmark-text" style="font-size: 48px; display: block; margin-bottom: 16px;"></i>
-                <p style="margin: 0;">Belum ada log maintenance</p>
+            <div style="padding: 32px 16px; text-align: center; color: #8e9bb0; border-radius: 12px; background: #f9fafb;">
+                <div style="font-size: 14px; font-family: 'Nunito', sans-serif;">Belum ada log maintenance</div>
             </div>
         <?php endif; ?>
     </div>

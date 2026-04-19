@@ -1,21 +1,24 @@
-<div class="card" style="padding: 24px;">
+<div class="card" style="padding: 24px; border-radius: 16px; background: #ffffff;">
+    <!-- HEADER -->
     <div style="margin-bottom: 24px;">
-        <h3 style="margin: 0 0 8px 0;">Riwayat Pemeliharaan</h3>
-        <p style="margin: 0; color: #666; font-size: 14px;">
+        <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: 700; color: #1a2b56; font-family: 'Nunito', sans-serif;">
+            Riwayat Pemeliharaan
+        </h1>
+        <p style="margin: 0; font-size: 15px; color: #8e9bb0; font-family: 'Nunito', sans-serif;">
             Histori lengkap pelaksanaan maintenance rutin
         </p>
     </div>
 
     <!-- FLASH MESSAGE -->
     <?php if (!empty($data['flash'])): ?>
-        <div style="margin-bottom: 20px; padding: 14px; border-radius: 8px; background: #eaf7ee; color: #1f7a3d;">
-            <?= escape($data['flash']['message']); ?>
+        <div style="margin-bottom: 20px; padding: 12px 16px; border-radius: 12px; background: #ecfdf5; color: #047857; font-size: 14px; font-family: 'Nunito', sans-serif;">
+            ✓ <?= escape($data['flash']['message']); ?>
         </div>
     <?php endif; ?>
 
-    <!-- FILTER & SEARCH -->
-    <div style="margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
-        <select id="filterItem" style="padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; background: #fff; font-size: 14px;">
+    <!-- FILTER & BUTTON -->
+    <div style="margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <select id="filterItem" style="padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; background: #ffffff; font-size: 14px; font-family: 'Nunito', sans-serif; color: #1a2b56; transition: all 0.2s;" onfocus="this.style.borderColor='#3d6aff'" onblur="this.style.borderColor='#e5e7eb'">
             <option value="">-- Semua Item --</option>
             <?php foreach ($data['items'] as $item): ?>
                 <option value="<?= $item->id_pemeliharaan; ?>">
@@ -24,7 +27,7 @@
             <?php endforeach; ?>
         </select>
 
-        <select id="filterStatus" style="padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; background: #fff; font-size: 14px;">
+        <select id="filterStatus" style="padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; background: #ffffff; font-size: 14px; font-family: 'Nunito', sans-serif; color: #1a2b56; transition: all 0.2s;" onfocus="this.style.borderColor='#3d6aff'" onblur="this.style.borderColor='#e5e7eb'">
             <option value="">-- Semua Status --</option>
             <option value="Terselesaikan">✓ Terselesaikan</option>
             <option value="Terjadwal">⏳ Terjadwal</option>
@@ -32,109 +35,94 @@
             <option value="Dibatalkan">✕ Dibatalkan</option>
         </select>
 
-        <a href="<?= BASEURL; ?>/maintenance/log" style="padding: 10px 16px; background: #0d6efd; color: #fff; text-decoration: none; border-radius: 6px; font-size: 14px;">
-            + Input Log Baru
+        <a href="<?= BASEURL; ?>/maintenance/log" style="margin-left: auto; padding: 10px 16px; background: #3d6aff; color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Nunito', sans-serif; transition: all 0.2s; display: inline-block;" onmouseover="this.style.background='#2952cc'" onmouseout="this.style.background='#3d6aff'">
+            + Input Baru
         </a>
     </div>
 
-    <!-- TABLE -->
+    <!-- TABLE / LIST -->
     <?php if (!empty($data['logs'])): ?>
-        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-            <thead>
-                <tr style="background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
-                    <th style="padding: 12px; text-align: left; font-weight: 600;">Item Maintenance</th>
-                    <th style="padding: 12px; text-align: left; font-weight: 600;">Tanggal</th>
-                    <th style="padding: 12px; text-align: left; font-weight: 600;">Pelaksana</th>
-                    <th style="padding: 12px; text-align: left; font-weight: 600;">Status</th>
-                    <th style="padding: 12px; text-align: left; font-weight: 600;">Kondisi</th>
-                    <th style="padding: 12px; text-align: left; font-weight: 600;">Catatan</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($data['logs'] as $log): ?>
-                    <tr style="border-bottom: 1px solid #dee2e6; hover-background: #f9f9f9;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''">
-                        <td style="padding: 12px; color: #333; font-weight: 500;">
-                            <?= escape($log->nama_item); ?>
-                        </td>
-                        <td style="padding: 12px; color: #666;">
-                            <?= date('d/m/Y H:i', strtotime($log->tgl_rencana)); ?>
-                        </td>
-                        <td style="padding: 12px; color: #666;">
-                            <?= escape($log->nama_lengkap ?? 'System'); ?>
-                        </td>
-                        <td style="padding: 12px;">
+        <div style="border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb;">
+            <?php foreach ($data['logs'] as $i => $log): ?>
+                <div data-item="<?= $log->id_pemeliharaan; ?>" data-status="<?= $log->status_pelaksanaan; ?>" style="padding: 14px 16px; border-bottom: <?= ($i < count($data['logs']) - 1) ? '1px solid #e5e7eb' : 'none'; ?>; transition: background 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background=''">
+                    <div style="display: flex; justify-content: space-between; align-items: start; gap: 12px; margin-bottom: 8px;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 14px; font-weight: 600; color: #1a2b56; margin-bottom: 2px; font-family: 'Nunito', sans-serif;">
+                                <?= escape($log->nama_item); ?>
+                            </div>
+                            <div style="font-size: 12px; color: #8e9bb0; font-family: 'Nunito', sans-serif;">
+                                <?= date('d/m/Y H:i', strtotime($log->tgl_rencana)); ?> • <?= escape($log->nama_lengkap ?? 'System'); ?>
+                            </div>
+                        </div>
+                        <?php
+                        $statusConfig = [
+                            'Terselesaikan' => ['bg' => '#ecfdf5', 'color' => '#047857', 'label' => '✓ Selesai'],
+                            'Terjadwal' => ['bg' => '#fef3c7', 'color' => '#b45309', 'label' => '⏳ Terjadwal'],
+                            'Tertunda' => ['bg' => '#fef2f2', 'color' => '#991b1b', 'label' => '⚠ Tertunda'],
+                            'Dibatalkan' => ['bg' => '#f3f4f6', 'color' => '#4b5563', 'label' => '✕ Dibatalkan']
+                        ];
+                        $config = $statusConfig[$log->status_pelaksanaan] ?? $statusConfig['Terjadwal'];
+                        ?>
+                        <div style="padding: 5px 10px; background: <?= $config['bg']; ?>; color: <?= $config['color']; ?>; border-radius: 6px; font-size: 11px; font-weight: 600; font-family: 'Nunito', sans-serif; white-space: nowrap;">
+                            <?= $config['label']; ?>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 16px; font-size: 12px;">
+                        <div>
+                            <span style="color: #8e9bb0; font-family: 'Nunito', sans-serif;">Kondisi:</span>
                             <?php
-                            $statusColors = [
-                                'Terselesaikan' => ['bg' => '#d4edda', 'color' => '#155724', 'label' => '✓ Selesai'],
-                                'Terjadwal' => ['bg' => '#fff3cd', 'color' => '#856404', 'label' => '⏳ Terjadwal'],
-                                'Tertunda' => ['bg' => '#f8d7da', 'color' => '#721c24', 'label' => '⚠ Tertunda'],
-                                'Dibatalkan' => ['bg' => '#e2e3e5', 'color' => '#383d41', 'label' => '✕ Dibatalkan']
+                            $kondisiConfig = [
+                                'Normal' => ['bg' => '#ecfdf5', 'color' => '#047857'],
+                                'Perlu Perbaikan' => ['bg' => '#fef3c7', 'color' => '#b45309'],
+                                'Rusak' => ['bg' => '#fef2f2', 'color' => '#991b1b'],
+                                'Penggantian Part' => ['bg' => '#dbeafe', 'color' => '#0369a1']
                             ];
-                            $status = $statusColors[$log->status_pelaksanaan] ?? $statusColors['Terjadwal'];
+                            $kconfig = $kondisiConfig[$log->kondisi_laporan] ?? $kondisiConfig['Normal'];
                             ?>
-                            <span style="display: inline-block; padding: 4px 8px; background: <?= $status['bg']; ?>; color: <?= $status['color']; ?>; border-radius: 4px; font-size: 12px; font-weight: 500;">
-                                <?= $status['label']; ?>
-                            </span>
-                        </td>
-                        <td style="padding: 12px;">
-                            <?php
-                            $kondisiColors = [
-                                'Normal' => ['bg' => '#d4edda', 'color' => '#155724'],
-                                'Perlu Perbaikan' => ['bg' => '#fff3cd', 'color' => '#856404'],
-                                'Rusak' => ['bg' => '#f8d7da', 'color' => '#721c24'],
-                                'Penggantian Part' => ['bg' => '#cfe2ff', 'color' => '#084298']
-                            ];
-                            $kondisi = $kondisiColors[$log->kondisi_laporan] ?? $kondisiColors['Normal'];
-                            ?>
-                            <span style="display: inline-block; padding: 4px 8px; background: <?= $kondisi['bg']; ?>; color: <?= $kondisi['color']; ?>; border-radius: 4px; font-size: 12px;">
+                            <span style="display: inline-block; margin-left: 4px; padding: 3px 8px; background: <?= $kconfig['bg']; ?>; color: <?= $kconfig['color']; ?>; border-radius: 5px; font-weight: 600; font-family: 'Nunito', sans-serif;">
                                 <?= escape($log->kondisi_laporan ?? 'Normal'); ?>
                             </span>
-                        </td>
-                        <td style="padding: 12px; color: #666; font-size: 13px;">
-                            <?php
-                            $catatan = $log->hasil_pengecekan ?? $log->catatan_khusus ?? '-';
-                            $preview = strlen($catatan) > 50 ? substr($catatan, 0, 50) . '...' : $catatan;
-                            echo escape($preview);
-                            ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                        </div>
+                        <?php if ($log->hasil_pengecekan): ?>
+                            <div style="color: #8e9bb0; font-family: 'Nunito', sans-serif;">
+                                Catatan: <strong style="color: #1a2b56; font-family: 'Nunito', sans-serif;">
+                                    <?= escape(strlen($log->hasil_pengecekan) > 50 ? substr($log->hasil_pengecekan, 0, 50) . '...' : $log->hasil_pengecekan); ?>
+                                </strong>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
     <?php else: ?>
-        <div style="padding: 60px 20px; text-align: center; color: #999;">
-            <i class="bi bi-inbox" style="font-size: 48px; display: block; margin-bottom: 16px;"></i>
-            <p style="margin: 0; font-size: 16px;">Belum ada riwayat maintenance</p>
-            <p style="margin: 8px 0 0; font-size: 13px; color: #bbb;">
-                <a href="<?= BASEURL; ?>/maintenance/log" style="color: #0d6efd; text-decoration: none;">
+        <div style="padding: 48px 16px; text-align: center; color: #8e9bb0; border-radius: 12px; background: #f9fafb;">
+            <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px; font-family: 'Nunito', sans-serif;">Belum ada riwayat maintenance</div>
+            <div style="font-size: 14px; font-family: 'Nunito', sans-serif;">
+                <a href="<?= BASEURL; ?>/maintenance/log" style="color: #3d6aff; text-decoration: none;">
                     Mulai dengan menginput log maintenance
                 </a>
-            </p>
+            </div>
         </div>
     <?php endif; ?>
 </div>
 
 <script>
-// Simple client-side filtering
-document.getElementById('filterItem')?.addEventListener('change', function() {
-    filterTable();
-});
-document.getElementById('filterStatus')?.addEventListener('change', function() {
-    filterTable();
-});
+document.getElementById('filterItem')?.addEventListener('change', filterList);
+document.getElementById('filterStatus')?.addEventListener('change', filterList);
 
-function filterTable() {
+function filterList() {
     const itemFilter = document.getElementById('filterItem')?.value || '';
     const statusFilter = document.getElementById('filterStatus')?.value || '';
-    const rows = document.querySelectorAll('tbody tr');
+    const rows = document.querySelectorAll('[data-item]');
 
     rows.forEach(row => {
         let show = true;
-        if (itemFilter) {
-            show = show && row.getAttribute('data-item') === itemFilter;
+        if (itemFilter && row.getAttribute('data-item') !== itemFilter) {
+            show = false;
         }
-        if (statusFilter) {
-            show = show && row.getAttribute('data-status') === statusFilter;
+        if (statusFilter && row.getAttribute('data-status') !== statusFilter) {
+            show = false;
         }
         row.style.display = show ? '' : 'none';
     });
