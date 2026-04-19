@@ -163,33 +163,42 @@ $isUnit = ($role === 'Unit_RS');
                 <span class="badge">3</span>
             </div>
 
-            <img src="<?= BASEURL; ?>/uploads/assets/default-avatar.png" class="profile-pic">
+            <!-- PROFILE SECTION - Clickable -->
+            <div style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 10px; transition: all 0.2s;"
+                 onclick="window.location='<?= BASEURL; ?>/profile'"
+                 onmouseover="this.style.background='#f0f4f8'"
+                 onmouseout="this.style.background='transparent'">
+                <!-- PROFILE IMAGE: Letakkan file gambar di /public/uploads/profiles/{id_user}.png atau gunakan default -->
+                <img src="<?= BASEURL; ?>/uploads/profiles/<?= $_SESSION['id_user'] ?? '0'; ?>.png"
+                     onerror="this.src='<?= BASEURL; ?>/uploads/assets/default-avatar.png'"
+                     class="profile-pic"
+                     style="cursor: pointer;"
+                     title="<?= escape($namaUser); ?>">
+            </div>
         </div>
 
-        <!-- SCHEDULE -->
-        <?php if ($isIPSRS || $isLogistik): ?>
-            <div class="schedule-section">
-                <div class="section-title">
-                    <h3><?= $isLogistik ? 'Jadwal Pengadaan' : 'Agenda Kalibrasi'; ?></h3>
-                    <i class="bi bi-three-dots"></i>
-                </div>
-
-                <div class="calendar-strip">
-                    <i class="bi bi-chevron-left"></i>
-                    <span>April 2026</span>
-                    <i class="bi bi-chevron-right"></i>
-                </div>
-
-                <div class="dates">
-                    <div class="date-item"><span>S</span> 14</div>
-                    <div class="date-item active"><span>R</span> 15</div>
-                    <div class="date-item"><span>K</span> 16</div>
-                    <div class="date-item"><span>J</span> 17</div>
-                </div>
+        <!-- SCHEDULE - ALL ROLES -->
+        <div class="schedule-section">
+            <div class="section-title">
+                <h3><?= $isLogistik ? 'Jadwal Pengadaan' : ($isUnit ? 'Jadwal Unit' : 'Agenda Kalibrasi'); ?></h3>
+                <i class="bi bi-three-dots"></i>
             </div>
-        <?php endif; ?>
 
-        <!-- TASK CARD -->
+            <div class="calendar-strip">
+                <i class="bi bi-chevron-left"></i>
+                <span>April 2026</span>
+                <i class="bi bi-chevron-right"></i>
+            </div>
+
+            <div class="dates">
+                <div class="date-item"><span>S</span> 14</div>
+                <div class="date-item active"><span>R</span> 15</div>
+                <div class="date-item"><span>K</span> 16</div>
+                <div class="date-item"><span>J</span> 17</div>
+            </div>
+        </div>
+
+        <!-- TASK CARD - ALL ROLES -->
         <div class="task-card">
 
             <?php if ($isIPSRS): ?>
