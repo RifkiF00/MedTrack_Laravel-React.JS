@@ -3,7 +3,7 @@
 
 class Aset extends Controller {
 
-    private $allowedRoles = ['Staf IPSRS', 'Staf Logistik'];
+    private $allowedRoles = ['Staf_IPSRS', 'Staf_Logistik'];
 
     private function guard() {
         if (!isset($_SESSION['user_id'])) {
@@ -61,7 +61,10 @@ class Aset extends Controller {
 
             'keterangan' => sanitizeInput($_POST['keterangan'] ?? ''),
 
-            'gambar_aset' => sanitizeInput($_POST['gambar_aset'] ?? '')
+            'gambar_aset' => sanitizeInput($_POST['gambar_aset'] ?? ''),
+
+            'latitude' => ($_POST['latitude'] !== '') ? (float)$_POST['latitude'] : null,
+            'longitude' => ($_POST['longitude'] !== '') ? (float)$_POST['longitude'] : null
         ];
     }
 
@@ -280,18 +283,66 @@ class Aset extends Controller {
 
         $data['judul'] = 'Detail Aset';
         $data['aset'] = $aset;
+        $data['role'] = $_SESSION['role'] ?? 'Guest';
         $data['content_view'] = 'aset/detail';
 
         $this->view('templates/dashboard_layout', $data);
     }
 
-        public function scan() {
-        $this->guard();
+    public function scan() {
+        // Guard: check login saja (tidak perlu role check)
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . BASEURL . '/auth');
+            exit;
+        }
 
         $data['judul'] = 'Scan QR Aset - MedTrack IPSRS';
         $data['page_heading'] = 'Scan QR Aset';
         $data['page_subheading'] = 'Arahkan kamera ke QR code aset.';
         $data['content_view'] = 'aset/scan';
+
+        $this->view('templates/dashboard_layout', $data);
+    }
+
+    // 🔥 LIST ASET UNTUK UNIT (Detail Aset)
+    public function listunit() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . BASEURL . '/auth');
+            exit;
+        }
+
+        // Hanya Unit_RS yang bisa akses
+        if ($_SESSION['role'] !== 'Unit_RS') {
+            http_response_code(403);
+            die('Akses ditolak. Fitur ini hanya untuk Unit.');
+        }
+
+        $asetModel = $this->model('Aset_model');
+        $idRuang = $_SESSION['id_ruang'] ?? null;
+
+        if (!$idRuang) {
+            redirectWithMessage(BASEURL . '/dashboard', 'Ruangan tidak ditemukan di profil Anda.', 'danger');
+            return;
+        }
+
+        // Get aset by ruangan
+        $data['aset'] = $asetModel->getAsetByRuangan($idRuang);
+
+        // Get ruangan info
+        $ruangan = $asetModel->getAllRuangan();
+        $namaRuang = '';
+        foreach ($ruangan as $r) {
+            if ($r['id_ruang'] == $idRuang) {
+                $namaRuang = $r['nama_ruang'];
+                break;
+            }
+        }
+
+        $data['judul'] = 'Detail Aset - MedTrack IPSRS';
+        $data['page_heading'] = 'Detail Aset';
+        $data['page_subheading'] = 'Daftar alat medis & sarana prasarana di ruangan ' . $namaRuang;
+        $data['nama_ruang'] = $namaRuang;
+        $data['content_view'] = 'aset/list_unit';
 
         $this->view('templates/dashboard_layout', $data);
     }

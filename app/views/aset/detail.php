@@ -1,5 +1,7 @@
 <?php
 $aset = $data['aset'] ?? null;
+$role = $data['role'] ?? 'Guest';
+$backLink = ($role === 'Unit_RS') ? BASEURL . '/aset/listunit' : BASEURL . '/aset';
 ?>
 
 <style>
@@ -15,7 +17,9 @@ $aset = $data['aset'] ?? null;
     .print-hide,
     .task-card,
     .schedule-section,
-    .top-right {
+    .top-right,
+    .leaflet-control-container,
+    .map-section {
         display: none !important;
     }
 
@@ -74,7 +78,7 @@ $aset = $data['aset'] ?? null;
 <?php if (!$aset): ?>
     <div class="card" style="padding:24px;">
         <h3>Data aset tidak ditemukan</h3>
-        <a href="<?= BASEURL; ?>/aset"
+        <a href="<?= $backLink; ?>"
            style="display:inline-block; margin-top:12px; padding:10px 16px; background:#0d6efd; color:#fff; text-decoration:none; border-radius:8px;">
             Kembali ke Daftar Aset
         </a>
@@ -98,7 +102,7 @@ $aset = $data['aset'] ?? null;
         </div>
 
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <a href="<?= BASEURL; ?>/aset"
+            <a href="<?= $backLink; ?>"
                style="padding:10px 14px; background:#6c757d; color:#fff; text-decoration:none; border-radius:8px;">
                 ← Kembali
             </a>
@@ -185,6 +189,16 @@ $aset = $data['aset'] ?? null;
                 <div style="font-size:16px; font-weight:600;"><?= escape($aset['lokasi_fisik'] ?? '-'); ?></div>
             </div>
 
+            <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
+                <div style="font-size:12px; color:#6b7280;">Latitude</div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset['latitude'] ?? '-'); ?></div>
+            </div>
+
+            <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
+                <div style="font-size:12px; color:#6b7280;">Longitude</div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset['longitude'] ?? '-'); ?></div>
+            </div>
+
             <div class="print-box print-full" style="background:#f8fafc; padding:16px; border-radius:12px; grid-column:1 / -1;">
                 <div style="font-size:12px; color:#6b7280;">Status Kondisi</div>
                 <div style="margin-top:6px;">
@@ -244,4 +258,45 @@ $aset = $data['aset'] ?? null;
 
         </div>
     </div>
+
+    <?php if (!empty($aset['latitude']) && !empty($aset['longitude'])): ?>
+        <div class="map-section" style="margin-top:24px; background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+                <div>
+                    <h3 style="margin:0 0 6px 0;">Lokasi Aset</h3>
+                    <p style="margin:0; color:#6b7280; font-size:14px;">
+                        Titik lokasi aset berdasarkan koordinat GPS.
+                    </p>
+                </div>
+
+                <a href="https://www.google.com/maps?q=<?= escape($aset['latitude']); ?>,<?= escape($aset['longitude']); ?>"
+                   target="_blank"
+                   style="padding:10px 14px; background:#0d6efd; color:#fff; text-decoration:none; border-radius:8px;">
+                    Buka di Google Maps
+                </a>
+            </div>
+
+            <div id="map" style="height:340px; border-radius:12px; overflow:hidden;"></div>
+        </div>
+
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var lat = <?= json_encode((float)$aset['latitude']); ?>;
+                var lng = <?= json_encode((float)$aset['longitude']); ?>;
+
+                var map = L.map('map').setView([lat, lng], 18);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap'
+                }).addTo(map);
+
+                L.marker([lat, lng])
+                    .addTo(map)
+                    .bindPopup("<?= escape($aset['nama_alat'] ?? 'Lokasi Aset'); ?>")
+                    .openPopup();
+            });
+        </script>
+    <?php endif; ?>
 </div>

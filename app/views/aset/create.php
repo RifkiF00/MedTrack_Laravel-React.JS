@@ -178,6 +178,66 @@
                 >
             </div>
 
+            <!-- GPS -->
+            <div style="grid-column:1 / -1; background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; padding:16px;">
+                <div style="margin-bottom:12px;">
+                    <h4 style="margin:0 0 6px 0;">Lokasi GPS (Opsional)</h4>
+                    <p style="margin:0; color:#6b7280; font-size:14px;">
+                        Direkomendasikan untuk aset tetap/utilitas seperti AC outdoor, genset, panel listrik, trafo, IPAL, pompa, dan central oxygen.
+                    </p>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div>
+                        <label>Latitude</label>
+                        <input
+                            type="text"
+                            name="latitude"
+                            id="latitude"
+                            value="<?= escape($data['old']['latitude'] ?? ''); ?>"
+                            placeholder="Contoh: -6.8734567"
+                            style="width:100%; padding:10px; margin-top:6px;"
+                        >
+                    </div>
+
+                    <div>
+                        <label>Longitude</label>
+                        <input
+                            type="text"
+                            name="longitude"
+                            id="longitude"
+                            value="<?= escape($data['old']['longitude'] ?? ''); ?>"
+                            placeholder="Contoh: 108.4567890"
+                            style="width:100%; padding:10px; margin-top:6px;"
+                        >
+                    </div>
+                </div>
+
+                <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <button
+                        type="button"
+                        onclick="getLocation()"
+                        style="padding:10px 14px; background:#0dcaf0; color:#000; border:none; border-radius:8px; cursor:pointer;"
+                    >
+                        Ambil Lokasi Saat Ini
+                    </button>
+
+                    <span id="gps-status" style="align-self:center; color:#6b7280; font-size:14px;">
+                        Belum mengambil lokasi.
+                    </span>
+                </div>
+
+                <div style="margin-top:16px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                        <div style="font-size:14px; color:#6b7280;">
+                            Klik peta untuk memilih titik lokasi, atau geser marker.
+                        </div>
+                    </div>
+
+                    <div id="map-picker" style="height:360px; border-radius:12px; overflow:hidden; border:1px solid #d1d5db;"></div>
+                </div>
+            </div>
+
             <div style="grid-column:1 / -1;">
                 <label>Gambar Aset</label>
                 <input
@@ -207,3 +267,127 @@
         </div>
     </form>
 </div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+function getLocation() {
+    const status = document.getElementById('gps-status');
+
+    if (!navigator.geolocation) {
+        status.textContent = 'Browser tidak mendukung geolocation.';
+        status.style.color = '#dc3545';
+        return;
+    }
+
+    status.textContent = 'Mengambil lokasi...';
+    status.style.color = '#2563eb';
+
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            document.getElementById('latitude').value = lat.toFixed(7);
+            document.getElementById('longitude').value = lng.toFixed(7);
+
+            if (window.assetMap && window.assetMarker) {
+                window.assetMap.setView([lat, lng], 19);
+                window.assetMarker.setLatLng([lat, lng]);
+            }
+
+            status.textContent = 'Lokasi berhasil diambil.';
+            status.style.color = '#198754';
+        },
+        function() {
+            status.textContent = 'Gagal mengambil lokasi. Pastikan izin lokasi diaktifkan.';
+            status.style.color = '#dc3545';
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const latInput = document.getElementById('latitude');
+    const lngInput = document.getElementById('longitude');
+    const status = document.getElementById('gps-status');
+
+    const defaultLat = latInput.value ? parseFloat(latInput.value) : -6.7320000;
+    const defaultLng = lngInput.value ? parseFloat(lngInput.value) : 108.4850000;
+
+    const map = L.map('map-picker').setView([defaultLat, defaultLng], 18);
+    window.assetMap = map;
+
+    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    });
+
+    const satelliteLayer = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        {
+            attribution: 'Tiles &copy; Esri'
+        }
+    );
+
+    satelliteLayer.addTo(map);
+
+    L.control.layers(
+        {
+            'Peta': streetLayer,
+            'Satelit': satelliteLayer
+        },
+        {},
+        { collapsed: false }
+    ).addTo(map);
+
+    const marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+    window.assetMarker = marker;
+
+    function updateInputs(lat, lng, message = 'Titik lokasi dipilih dari peta.') {
+        latInput.value = Number(lat).toFixed(7);
+        lngInput.value = Number(lng).toFixed(7);
+        status.textContent = message;
+        status.style.color = '#198754';
+    }
+
+    map.on('click', function (e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        marker.setLatLng([lat, lng]);
+        updateInputs(lat, lng);
+    });
+
+    marker.on('dragend', function () {
+        const pos = marker.getLatLng();
+        updateInputs(pos.lat, pos.lng, 'Marker digeser, koordinat diperbarui.');
+    });
+
+    latInput.addEventListener('change', function () {
+        const lat = parseFloat(latInput.value);
+        const lng = parseFloat(lngInput.value);
+        if (!isNaN(lat) && !isNaN(lng)) {
+            marker.setLatLng([lat, lng]);
+            map.setView([lat, lng], 19);
+        }
+    });
+
+    lngInput.addEventListener('change', function () {
+        const lat = parseFloat(latInput.value);
+        const lng = parseFloat(lngInput.value);
+        if (!isNaN(lat) && !isNaN(lng)) {
+            marker.setLatLng([lat, lng]);
+            map.setView([lat, lng], 19);
+        }
+    });
+
+    if (latInput.value && lngInput.value) {
+        status.textContent = 'Koordinat awal dimuat ke peta.';
+        status.style.color = '#198754';
+    }
+});
+</script>

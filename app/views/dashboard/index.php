@@ -2,6 +2,8 @@
 $role = $data['role'] ?? 'User';
 $namaUser = $data['nama'] ?? 'User';
 
+$isUnit = ($role === 'Unit_RS');
+
 $total = $data['total_aset'] ?? 0;
 $total_medis = $data['total_medis'] ?? 0;
 $total_sarpras = $data['total_sarpras'] ?? 0;
@@ -31,6 +33,12 @@ $persen_penanganan = $total > 0 ? round(($perlu_penanganan / $total) * 100, 1) :
             <p style="margin:0; color:#7b8aa0;">
                 Status: <strong style="color:#1d4ed8;"><?= escape($role) ?></strong>
             </p>
+
+            <?php if ($isUnit): ?>
+                <p style="margin:8px 0 0; color:#64748b;">
+                    Ringkasan aset pada unit/ruangan Anda.
+                </p>
+            <?php endif; ?>
         </div>
 
         <div style="display:flex; gap:12px; flex-wrap:wrap;">
@@ -60,7 +68,7 @@ $persen_penanganan = $total > 0 ? round(($perlu_penanganan / $total) * 100, 1) :
 <!-- PROGRESS + SUMMARY -->
 <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:20px; margin-bottom:20px;">
     <div class="card" style="padding:20px;">
-        <h3 style="margin-top:0;">Indeks Kelayakan Aset</h3>
+        <h3 style="margin-top:0;"><?= $isUnit ? 'Indeks Kelayakan Aset Unit' : 'Indeks Kelayakan Aset' ?></h3>
 
         <div style="margin-bottom:16px;">
             <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:6px;">
@@ -84,7 +92,7 @@ $persen_penanganan = $total > 0 ? round(($perlu_penanganan / $total) * 100, 1) :
     </div>
 
     <div class="card" style="padding:20px;">
-        <h3 style="margin-top:0;">Ringkasan Kondisi</h3>
+        <h3 style="margin-top:0;"><?= $isUnit ? 'Ringkasan Kondisi Unit' : 'Ringkasan Kondisi' ?></h3>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
             <div style="background:#f8fafc; padding:14px; border-radius:12px;">
                 <div style="font-size:12px; color:#7b8aa0;">Baik</div>
@@ -117,28 +125,28 @@ $persen_penanganan = $total > 0 ? round(($perlu_penanganan / $total) * 100, 1) :
 <!-- 4 CHARTS -->
 <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:20px;">
     <div class="card" style="padding:20px;">
-        <h3 style="margin-top:0; margin-bottom:12px;">Kondisi Aset</h3>
+        <h3 style="margin-top:0; margin-bottom:12px;"><?= $isUnit ? 'Kondisi Aset Unit' : 'Kondisi Aset' ?></h3>
         <div style="height:240px;">
             <canvas id="chartKondisi"></canvas>
         </div>
     </div>
 
     <div class="card" style="padding:20px;">
-        <h3 style="margin-top:0; margin-bottom:12px;">Komposisi Kategori</h3>
+        <h3 style="margin-top:0; margin-bottom:12px;"><?= $isUnit ? 'Komposisi Kategori Unit' : 'Komposisi Kategori' ?></h3>
         <div style="height:240px;">
             <canvas id="chartKategori"></canvas>
         </div>
     </div>
 
     <div class="card" style="padding:20px;">
-        <h3 style="margin-top:0; margin-bottom:12px;">Operasional vs Penanganan</h3>
+        <h3 style="margin-top:0; margin-bottom:12px;"><?= $isUnit ? 'Operasional vs Penanganan Unit' : 'Operasional vs Penanganan' ?></h3>
         <div style="height:240px;">
             <canvas id="chartOperasional"></canvas>
         </div>
     </div>
 
     <div class="card" style="padding:20px;">
-        <h3 style="margin-top:0; margin-bottom:12px;">Aset per Ruangan</h3>
+        <h3 style="margin-top:0; margin-bottom:12px;"><?= $isUnit ? 'Aset pada Unit Anda' : 'Aset per Ruangan' ?></h3>
         <div style="height:240px;">
             <canvas id="chartStatusBar"></canvas>
         </div>

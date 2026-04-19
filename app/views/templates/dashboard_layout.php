@@ -1,3 +1,14 @@
+<?php
+$role = $_SESSION['role'] ?? '';
+$namaUser = $_SESSION['nama_lengkap'] ?? 'User';
+$contentView = $data['content_view'] ?? '';
+$hidePageHeader = $data['hide_page_header'] ?? false;
+
+// helper role
+$isIPSRS = ($role === 'Staf_IPSRS' || $role === 'Staf_Logistik');
+$isLogistik = ($role === 'Staf_Logistik');
+$isUnit = ($role === 'Unit_RS');
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -10,15 +21,9 @@
 </head>
 <body>
 
-<?php
-$role = $_SESSION['role'] ?? '';
-$namaUser = $_SESSION['nama_lengkap'] ?? 'User';
-$contentView = $data['content_view'] ?? '';
-$hidePageHeader = $data['hide_page_header'] ?? false;
-?>
-
 <div class="dashboard-wrapper">
 
+    <!-- SIDEBAR LEFT -->
     <aside class="sidebar-left">
         <div class="brand">
             <div class="brand-icon"><i class="bi bi-hospital"></i></div>
@@ -26,36 +31,91 @@ $hidePageHeader = $data['hide_page_header'] ?? false;
         </div>
 
         <ul class="nav-menu">
+
+            <!-- DASHBOARD -->
             <li class="<?= $contentView === 'dashboard/index' ? 'active' : ''; ?>">
-                <a href="<?= BASEURL; ?>/dashboard"><i class="bi bi-grid-1x2"></i> Dasbor Utama</a>
+                <a href="<?= BASEURL; ?>/dashboard">
+                    <i class="bi bi-grid-1x2"></i> Dasbor Utama
+                </a>
             </li>
 
-            <?php if ($role == 'Staf IPSRS' || $role == 'Staf Logistik'): ?>
+            <!-- MASTER ASET -->
+            <?php if ($isIPSRS || $isLogistik): ?>
                 <li class="<?= strpos($contentView, 'aset/') === 0 ? 'active' : ''; ?>">
-                    <a href="<?= BASEURL; ?>/aset"><i class="bi bi-box-seam"></i> Master Alkes & Sarpras</a>
+                    <a href="<?= BASEURL; ?>/aset">
+                        <i class="bi bi-box-seam"></i> Master Alkes & Sarpras
+                    </a>
                 </li>
-                <li><a href="#"><i class="bi bi-arrow-left-right"></i> Mutasi Ruangan</a></li>
             <?php endif; ?>
 
-            <?php if ($role == 'Unit Pengguna'): ?>
-                <li><a href="#"><i class="bi bi-box2-heart"></i> Inventaris Instalasi</a></li>
+            <!-- MUTASI -->
+            <?php if ($isIPSRS || $isLogistik): ?>
+                <li>
+                    <a href="<?= BASEURL; ?>/mutasi">
+                        <i class="bi bi-arrow-left-right"></i> Mutasi Ruangan
+                    </a>
+                </li>
             <?php endif; ?>
 
-            <?php if ($role == 'Staf IPSRS' || $role == 'Unit Pengguna'): ?>
-                <li><a href="#"><i class="bi bi-ticket-detailed"></i> E-Work Order (WO)</a></li>
+            <!-- WORK ORDER -->
+            <?php if ($isIPSRS || $isUnit): ?>
+                <li>
+                    <a href="<?= BASEURL; ?>/workorder">
+                        <i class="bi bi-ticket-detailed"></i> E-Work Order (WO)
+                    </a>
+                </li>
             <?php endif; ?>
 
-            <?php if ($role == 'Staf IPSRS'): ?>
-                <li><a href="#"><i class="bi bi-tools"></i> Preventive Maintenance</a></li>
-                <li><a href="#"><i class="bi bi-building"></i> Direktori Unit & SDM</a></li>
+            <!-- PREVENTIVE -->
+            <?php if ($isIPSRS): ?>
+                <li>
+                    <a href="<?= BASEURL; ?>/maintenance">
+                        <i class="bi bi-tools"></i> Preventive Maintenance
+                    </a>
+                </li>
             <?php endif; ?>
 
-            <?php if ($role == 'Staf IPSRS' || $role == 'Staf Logistik'): ?>
-                <li><a href="#"><i class="bi bi-file-earmark-medical"></i> Dokumen Mutu</a></li>
+            <!-- DIREKTORI -->
+            <?php if ($isIPSRS): ?>
+                <li>
+                    <a href="<?= BASEURL; ?>/direktori">
+                        <i class="bi bi-building"></i> Direktori Unit & SDM
+                    </a>
+                </li>
             <?php endif; ?>
 
+            <!-- DOKUMEN -->
+            <?php if ($isIPSRS || $isLogistik): ?>
+                <li>
+                    <a href="<?= BASEURL; ?>/dokumen">
+                        <i class="bi bi-file-earmark-medical"></i> Dokumen Mutu
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <!-- SCAN QR -->
+            <?php if ($isUnit): ?>
+                <li class="<?= $contentView === 'aset/scan' ? 'active' : ''; ?>">
+                    <a href="<?= BASEURL; ?>/aset/scan">
+                        <i class="bi bi-qr-code-scan"></i> Scan QR Aset
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <!-- DETAIL ASET (UNIT) -->
+            <?php if ($isUnit): ?>
+                <li class="<?= $contentView === 'aset/list_unit' ? 'active' : ''; ?>">
+                    <a href="<?= BASEURL; ?>/aset/listunit">
+                        <i class="bi bi-info-circle"></i> Detail Aset
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <!-- LOGOUT -->
             <li style="margin-top: 30px;">
-                <a href="<?= BASEURL; ?>/auth/logout" style="color: #ffbaba;" onclick="return confirm('Apakah Anda yakin ingin keluar?')">
+                <a href="<?= BASEURL; ?>/auth/logout"
+                   style="color: #ffbaba;"
+                   onclick="return confirm('Apakah Anda yakin ingin keluar?')">
                     <i class="bi bi-box-arrow-left"></i> Keluar Sistem
                 </a>
             </li>
@@ -67,6 +127,7 @@ $hidePageHeader = $data['hide_page_header'] ?? false;
         </div>
     </aside>
 
+    <!-- MAIN CONTENT -->
     <main class="main-content">
         <?php if (!$hidePageHeader): ?>
             <div class="header-mid">
@@ -75,7 +136,7 @@ $hidePageHeader = $data['hide_page_header'] ?? false;
                     <p><?= $data['page_subheading'] ?? 'Sistem Manajemen Aset Medis'; ?></p>
                 </div>
 
-                <button id="toggleRight" class="toggle-btn" title="Tutup/Buka Sidebar Kontrol">
+                <button id="toggleRight" class="toggle-btn">
                     <i class="bi bi-layout-sidebar-reverse"></i>
                 </button>
             </div>
@@ -88,76 +149,64 @@ $hidePageHeader = $data['hide_page_header'] ?? false;
         ?>
     </main>
 
+    <!-- SIDEBAR RIGHT -->
     <aside class="sidebar-right">
+
         <div class="top-right">
             <div class="search-box">
                 <i class="bi bi-search"></i>
                 <input type="text" placeholder="Cari Kode Label / SN...">
             </div>
-            <div class="icon-btn"><i class="bi bi-bell"></i><span class="badge">3</span></div>
-            <img src="<?= BASEURL; ?>/uploads/assets/default-avatar.png" class="profile-pic" alt="User Profile">
-        </div>
 
-        <?php if ($role == 'Staf IPSRS' || $role == 'Staf Logistik'): ?>
-        <div class="schedule-section">
-            <div class="section-title">
-                <h3><?= ($role == 'Staf Logistik') ? 'Jadwal Pengadaan' : 'Agenda Kalibrasi'; ?></h3>
-                <i class="bi bi-three-dots"></i>
+            <div class="icon-btn">
+                <i class="bi bi-bell"></i>
+                <span class="badge">3</span>
             </div>
 
-            <div class="calendar-strip">
-                <i class="bi bi-chevron-left"></i>
-                <span>April 2026</span>
-                <i class="bi bi-chevron-right"></i>
-            </div>
-            <div class="dates">
-                <div class="date-item"><span>S</span> 14</div>
-                <div class="date-item active"><span>R</span> 15</div>
-                <div class="date-item"><span>K</span> 16</div>
-                <div class="date-item"><span>J</span> 17</div>
-            </div>
+            <img src="<?= BASEURL; ?>/uploads/assets/default-avatar.png" class="profile-pic">
         </div>
+
+        <!-- SCHEDULE -->
+        <?php if ($isIPSRS || $isLogistik): ?>
+            <div class="schedule-section">
+                <div class="section-title">
+                    <h3><?= $isLogistik ? 'Jadwal Pengadaan' : 'Agenda Kalibrasi'; ?></h3>
+                    <i class="bi bi-three-dots"></i>
+                </div>
+
+                <div class="calendar-strip">
+                    <i class="bi bi-chevron-left"></i>
+                    <span>April 2026</span>
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+
+                <div class="dates">
+                    <div class="date-item"><span>S</span> 14</div>
+                    <div class="date-item active"><span>R</span> 15</div>
+                    <div class="date-item"><span>K</span> 16</div>
+                    <div class="date-item"><span>J</span> 17</div>
+                </div>
+            </div>
         <?php endif; ?>
 
+        <!-- TASK CARD -->
         <div class="task-card">
-            <?php if ($role == 'Staf IPSRS'): ?>
+
+            <?php if ($isIPSRS): ?>
                 <div class="task-img"></div>
                 <h4>Kalibrasi EKG Monitor</h4>
-                <div class="task-details">
-                    <div class="detail-row"><i class="bi bi-calendar"></i> Kamis, 16 April 2026</div>
-                    <div class="detail-row"><i class="bi bi-geo-alt"></i> Instalasi Gawat Darurat</div>
-                </div>
-                <div class="task-actions">
-                    <button class="btn-outline">Reschedule</button>
-                    <button class="btn-solid">Eksekusi WO <i class="bi bi-arrow-right"></i></button>
-                </div>
 
-            <?php elseif ($role == 'Unit Pengguna'): ?>
+            <?php elseif ($isUnit): ?>
                 <div class="task-img" style="background-image: url('<?= BASEURL; ?>/img/qr-scan-bg.jpg');"></div>
                 <h4>Lapor Malfungsi Alat</h4>
-                <p style="color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 20px;">
-                    Gunakan pemindai untuk respon cepat teknisi IPSRS.
-                </p>
-                <div class="task-actions" style="flex-direction: column;">
-                    <button class="btn-solid" style="width: 100%; margin-bottom: 10px;">
-                        <i class="bi bi-qr-code-scan"></i> Pindai QR Aset
-                    </button>
-                    <button class="btn-outline" style="width: 100%;">Input Manual</button>
-                </div>
 
-            <?php elseif ($role == 'Staf Logistik'): ?>
+            <?php elseif ($isLogistik): ?>
                 <div class="task-img" style="background-image: url('<?= BASEURL; ?>/img/box-bg.jpg');"></div>
                 <h4>Verifikasi Sparepart</h4>
-                <div class="task-details">
-                    <div class="detail-row"><i class="bi bi-box-seam"></i> Oxygen Sensor Kit</div>
-                    <div class="detail-row"><i class="bi bi-person"></i> Req: Teknisi Budi</div>
-                </div>
-                <div class="task-actions">
-                    <button class="btn-outline">Reject</button>
-                    <button class="btn-solid">Approve <i class="bi bi-check2"></i></button>
-                </div>
             <?php endif; ?>
+
         </div>
+
     </aside>
 </div>
 
