@@ -258,18 +258,18 @@ class Aset_model {
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         $row = $stmt->fetch();
-        return $row ? (int)$row['total'] : 0;
+        return $row ? (int)$row->total : 0;
     }
 
     // 🔹 COUNT ASET BY RUANGAN
     public function countAsetByRuangan($id_ruang) {
-        $query = "SELECT COUNT(*) as total 
-                  FROM m_aset 
+        $query = "SELECT COUNT(*) as total
+                  FROM m_aset
                   WHERE id_ruang_saat_ini = :id_ruang";
         $stmt = $this->db->prepare($query);
         $stmt->execute(['id_ruang' => $id_ruang]);
         $row = $stmt->fetch();
-        return $row ? (int)$row['total'] : 0;
+        return $row ? (int)$row->total : 0;
     }
 
     // 🔹 COUNT BY KONDISI
@@ -278,7 +278,7 @@ class Aset_model {
         $stmt = $this->db->prepare($query);
         $stmt->execute(['kondisi' => $kondisi]);
         $row = $stmt->fetch();
-        return $row ? (int)$row['total'] : 0;
+        return $row ? (int)$row->total : 0;
     }
 
     // 🔹 COUNT BY KONDISI DAN RUANGAN
@@ -293,7 +293,7 @@ class Aset_model {
             'id_ruang' => $id_ruang
         ]);
         $row = $stmt->fetch();
-        return $row ? (int)$row['total'] : 0;
+        return $row ? (int)$row->total : 0;
     }
 
     // 🔹 COUNT BY KATEGORI
@@ -302,7 +302,7 @@ class Aset_model {
         $stmt = $this->db->prepare($query);
         $stmt->execute(['kategori' => $kategori]);
         $row = $stmt->fetch();
-        return $row ? (int)$row['total'] : 0;
+        return $row ? (int)$row->total : 0;
     }
 
     // 🔹 COUNT BY KATEGORI DAN RUANGAN
@@ -317,7 +317,7 @@ class Aset_model {
             'id_ruang' => $id_ruang
         ]);
         $row = $stmt->fetch();
-        return $row ? (int)$row['total'] : 0;
+        return $row ? (int)$row->total : 0;
     }
 
     // 🔹 ASET PER RUANGAN

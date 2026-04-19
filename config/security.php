@@ -226,6 +226,9 @@ function generateUniqueFilename($originalName) {
  * Escape HTML
  */
 function escape($string) {
+    if ($string === null) {
+        return '';
+    }
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
 
