@@ -217,7 +217,7 @@ class WorkOrder extends Controller
         if ($updated) {
             $workOrderModel->addStatusLog([
                 'id_ticket' => $id_ticket,
-                'status_lama' => $ticket['status_ticket'],
+                'status_lama' => $ticket->status_ticket,
                 'status_baru' => $statusBaru,
                 'catatan' => $catatan,
                 'diubah_oleh' => $_SESSION['user_id']

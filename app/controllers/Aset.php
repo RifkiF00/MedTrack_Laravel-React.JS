@@ -332,8 +332,8 @@ class Aset extends Controller {
         $ruangan = $asetModel->getAllRuangan();
         $namaRuang = '';
         foreach ($ruangan as $r) {
-            if ($r['id_ruang'] == $idRuang) {
-                $namaRuang = $r['nama_ruang'];
+            if ($r->id_ruang == $idRuang) {
+                $namaRuang = $r->nama_ruang;
                 break;
             }
         }
@@ -362,7 +362,7 @@ class Aset extends Controller {
         $totalGenerated = 0;
 
         foreach ($allAset as $aset) {
-            $id = (int)($aset['id_aset'] ?? 0);
+            $id = (int)($aset->id_aset ?? 0);
 
             if ($id <= 0) {
                 continue;
