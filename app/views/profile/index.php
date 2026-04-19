@@ -11,10 +11,16 @@
         <!-- PROFILE IMAGE: Clickable for upload -->
         <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 16px; cursor: pointer;">
             <img src="<?= BASEURL; ?>/uploads/profiles/<?= $_SESSION['id_user'] ?? '0'; ?>.png?t=<?= time(); ?>"
-                 onerror="this.src='<?= BASEURL; ?>/uploads/assets/default-avatar.png?t=<?= time(); ?>'"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid #3d6aff;"
                  title="<?= escape($_SESSION['nama_lengkap'] ?? 'User'); ?>"
                  onclick="document.getElementById('photoInput').click();">
+
+            <!-- DEFAULT PLACEHOLDER -->
+            <div style="display: none; width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #3d6aff, #2952cc); border: 4px solid #3d6aff; align-items: center; justify-content: center; font-size: 48px; color: white; cursor: pointer;"
+                 onclick="document.getElementById('photoInput').click();">
+                👤
+            </div>
 
             <!-- UPLOAD OVERLAY -->
             <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0); transition: all 0.2s; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 28px; font-weight: bold;"
