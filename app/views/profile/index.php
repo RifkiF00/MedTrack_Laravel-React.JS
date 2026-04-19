@@ -8,13 +8,14 @@
 
     <!-- PROFILE SECTION -->
     <div style="text-align: center; margin-bottom: 32px;">
-        <!-- PROFILE IMAGE: Clickable for upload -->
-        <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 16px; cursor: pointer; border-radius: 50%; background: linear-gradient(135deg, #3d6aff, #2952cc); display: flex; align-items: center; justify-content: center; border: 4px solid #3d6aff; overflow: hidden;" onclick="document.getElementById('photoInput').click();">
+        <!-- PROFILE IMAGE: Simple version -->
+        <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 16px; cursor: pointer; border-radius: 50%; background: linear-gradient(135deg, #3d6aff, #2952cc); display: flex; align-items: center; justify-content: center; border: 4px solid #3d6aff; overflow: hidden;">
             <img id="profileImg" src="<?= BASEURL; ?>/uploads/profiles/<?= $_SESSION['id_user'] ?? '0'; ?>.png?t=<?= time(); ?>"
                  style="width: 100%; height: 100%; object-fit: cover; display: block;"
-                 title="<?= escape($_SESSION['nama_lengkap'] ?? 'User'); ?>">
+                 title="<?= escape($_SESSION['nama_lengkap'] ?? 'User'); ?>"
+                 onerror="this.style.display='none'; document.getElementById('profilePlaceholder').style.display='flex';">
 
-            <!-- DEFAULT PLACEHOLDER (shown if image fails) -->
+            <!-- DEFAULT PLACEHOLDER -->
             <div id="profilePlaceholder" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center; font-size: 48px; color: white; position: absolute; top: 0; left: 0;">
                 👤
             </div>
@@ -22,22 +23,10 @@
             <!-- UPLOAD OVERLAY -->
             <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0); transition: all 0.2s; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 28px; font-weight: bold;"
                  onmouseover="this.style.background='rgba(0,0,0,0.3)'; this.innerHTML='📷';"
-                 onmouseout="this.style.background='rgba(0,0,0,0)'; this.innerHTML='';">
+                 onmouseout="this.style.background='rgba(0,0,0,0)'; this.innerHTML='';"
+                 onclick="document.getElementById('photoUploadBtn').click();">
             </div>
-
-            <!-- HIDDEN FILE INPUT -->
-            <form id="photoForm" method="POST" action="<?= BASEURL; ?>/profile/uploadPhoto" enctype="multipart/form-data" style="display: none;">
-                <input type="hidden" name="csrf_token" value="<?= getCSRFToken(); ?>">
-                <input type="file" id="photoInput" name="profile_photo" accept="image/jpeg,image/png,image/jpg" onchange="document.getElementById('photoForm').submit();">
-            </form>
         </div>
-
-        <script>
-            document.getElementById('profileImg').onerror = function() {
-                this.style.display = 'none';
-                document.getElementById('profilePlaceholder').style.display = 'flex';
-            };
-        </script>
 
         <h2 style="margin: 0; font-size: 24px; font-weight: 700; color: #1a2b56; font-family: 'Nunito', sans-serif;">
             <?= escape($_SESSION['nama_lengkap'] ?? 'User'); ?>
@@ -45,7 +34,7 @@
         <p style="margin: 4px 0 0; color: #8e9bb0; font-family: 'Nunito', sans-serif;">
             ID: <?= escape($_SESSION['username'] ?? '-'); ?>
         </p>
-        <p style="margin: 8px 0 0; font-size: 12px; color: #6b7280; font-family: 'Nunito', sans-serif; cursor: pointer;" onclick="document.getElementById('photoInput').click();">
+        <p style="margin: 8px 0 0; font-size: 12px; color: #6b7280; font-family: 'Nunito', sans-serif;">
             Klik foto untuk mengubah
         </p>
     </div>
@@ -86,6 +75,12 @@
             Klik foto Anda untuk mengunggah gambar baru
         </p>
     </div>
+
+    <!-- UPLOAD FORM -->
+    <form id="photoForm" method="POST" action="<?= BASEURL; ?>/profile/uploadPhoto" enctype="multipart/form-data" style="margin-top: 24px;">
+        <input type="hidden" name="csrf_token" value="<?= getCSRFToken(); ?>">
+        <input type="file" id="photoUploadBtn" name="profile_photo" accept="image/jpeg,image/png,image/jpg" style="display: none;" onchange="document.getElementById('photoForm').submit();">
+    </form>
 
     <!-- ACTION BUTTONS -->
     <div style="margin-top: 24px; display: flex; gap: 12px;">
