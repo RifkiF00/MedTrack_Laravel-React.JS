@@ -8,16 +8,36 @@
 
     <!-- PROFILE SECTION -->
     <div style="text-align: center; margin-bottom: 32px;">
-        <!-- PROFILE IMAGE: Letakkan file di /public/uploads/profiles/{id_user}.png -->
-        <img src="<?= BASEURL; ?>/uploads/profiles/<?= $_SESSION['id_user'] ?? '0'; ?>.png"
-             onerror="this.src='<?= BASEURL; ?>/uploads/assets/default-avatar.png'"
-             style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #3d6aff; margin-bottom: 16px;"
-             title="<?= escape($_SESSION['nama_lengkap'] ?? 'User'); ?>">
+        <!-- PROFILE IMAGE: Clickable for upload -->
+        <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 16px; cursor: pointer;">
+            <img src="<?= BASEURL; ?>/uploads/profiles/<?= $_SESSION['id_user'] ?? '0'; ?>.png"
+                 onerror="this.src='<?= BASEURL; ?>/uploads/assets/default-avatar.png'"
+                 style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid #3d6aff;"
+                 title="<?= escape($_SESSION['nama_lengkap'] ?? 'User'); ?>"
+                 onclick="document.getElementById('photoInput').click();">
+
+            <!-- UPLOAD OVERLAY -->
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0); transition: all 0.2s; display: flex; align-items: center; justify-content: center; cursor: pointer;"
+                 onmouseover="this.style.background='rgba(0,0,0,0.3)'; this.style.color='white'; this.innerHTML='📷';"
+                 onmouseout="this.style.background='rgba(0,0,0,0)'; this.innerHTML='';"
+                 onclick="document.getElementById('photoInput').click();"
+                 style="font-size: 28px; font-weight: bold;">
+            </div>
+
+            <!-- HIDDEN FILE INPUT -->
+            <form id="photoForm" method="POST" action="<?= BASEURL; ?>/profile/uploadPhoto" enctype="multipart/form-data" style="display: none;">
+                <input type="file" id="photoInput" name="profile_photo" accept="image/jpeg,image/png,image/jpg" onchange="document.getElementById('photoForm').submit();">
+            </form>
+        </div>
+
         <h2 style="margin: 0; font-size: 24px; font-weight: 700; color: #1a2b56; font-family: 'Nunito', sans-serif;">
             <?= escape($_SESSION['nama_lengkap'] ?? 'User'); ?>
         </h2>
         <p style="margin: 4px 0 0; color: #8e9bb0; font-family: 'Nunito', sans-serif;">
             ID: <?= escape($_SESSION['username'] ?? '-'); ?>
+        </p>
+        <p style="margin: 8px 0 0; font-size: 12px; color: #6b7280; font-family: 'Nunito', sans-serif; cursor: pointer;" onclick="document.getElementById('photoInput').click();">
+            Klik foto untuk mengubah
         </p>
     </div>
 
@@ -51,10 +71,10 @@
     <!-- INFO BOX -->
     <div style="margin-top: 24px; padding: 14px; background: #eff6ff; border-radius: 10px; border-left: 4px solid #3d6aff;">
         <p style="margin: 0; font-size: 13px; color: #0369a1; font-family: 'Nunito', sans-serif;">
-            <strong>📝 Petunjuk Upload Gambar Profil:</strong><br>
-            Letakkan file gambar profil Anda di folder:<br>
-            <code style="background: #ffffff; padding: 4px 8px; border-radius: 6px; font-size: 12px;">public/uploads/profiles/<?= $_SESSION['id_user'] ?? '{id_user}'; ?>.png</code><br>
-            Format: PNG, JPG, atau JPEG (maks 5MB)
+            <strong>💡 Tips Foto Profil:</strong><br>
+            Format: PNG, JPG, atau JPEG (maks 5MB)<br>
+            Ukuran rekomendasi: 256x256px<br>
+            Klik foto Anda untuk mengunggah gambar baru
         </p>
     </div>
 
