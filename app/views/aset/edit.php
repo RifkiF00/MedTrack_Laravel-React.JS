@@ -102,9 +102,9 @@
                 <label>Ruangan Saat Ini</label>
                 <select name="id_ruang_saat_ini" style="width:100%; padding:10px;">
                     <?php foreach ($data['ruangan'] as $ruang): ?>
-                        <option value="<?= $ruang['id_ruang']; ?>"
-                            <?= (($data['aset']['id_ruang_saat_ini'] ?? '') == $ruang['id_ruang']) ? 'selected' : ''; ?>>
-                            <?= escape($ruang['nama_ruang']); ?>
+                        <option value="<?= $ruang->id_ruang; ?>"
+                            <?= (($data['aset']['id_ruang_saat_ini'] ?? '') == $ruang->id_ruang) ? 'selected' : ''; ?>>
+                            <?= escape($ruang->nama_ruang); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>

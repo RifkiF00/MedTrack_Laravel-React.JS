@@ -158,10 +158,10 @@
                     <option value="">-- Pilih Ruangan --</option>
                     <?php foreach ($data['ruangan'] as $ruang): ?>
                         <option
-                            value="<?= $ruang['id_ruang']; ?>"
-                            <?= (($data['old']['id_ruang_saat_ini'] ?? '') == $ruang['id_ruang']) ? 'selected' : ''; ?>
+                            value="<?= $ruang->id_ruang; ?>"
+                            <?= (($data['old']['id_ruang_saat_ini'] ?? '') == $ruang->id_ruang) ? 'selected' : ''; ?>
                         >
-                            <?= escape($ruang['nama_ruang']); ?>
+                            <?= escape($ruang->nama_ruang); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>

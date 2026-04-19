@@ -90,17 +90,17 @@
 
                             <td style="padding:12px;"><?= $no++; ?></td>
 
-                            <td style="padding:12px;"><?= escape($aset['kode_label'] ?? '-'); ?></td>
+                            <td style="padding:12px;"><?= escape($aset->kode_label ?? '-'); ?></td>
 
-                            <td style="padding:12px;"><?= escape($aset['nama_alat'] ?? '-'); ?></td>
+                            <td style="padding:12px;"><?= escape($aset->nama_alat ?? '-'); ?></td>
 
-                            <td style="padding:12px;"><?= escape($aset['kategori_aset'] ?? '-'); ?></td>
+                            <td style="padding:12px;"><?= escape($aset->kategori_aset ?? '-'); ?></td>
 
-                            <td style="padding:12px;"><?= escape($aset['nama_ruang'] ?? '-'); ?></td>
+                            <td style="padding:12px;"><?= escape($aset->nama_ruang ?? '-'); ?></td>
 
                             <td style="padding:12px;">
                                 <?php
-                                $kondisi = $aset['status_kondisi'] ?? '';
+                                $kondisi = $aset->status_kondisi ?? '';
                                 $color = '#eee';
 
                                 if ($kondisi == 'Baik') $color = '#d1fae5';
@@ -117,8 +117,8 @@
 
                             <!-- GAMBAR -->
                             <td style="padding:12px;">
-                                <?php if (!empty($aset['gambar_aset'])): ?>
-                                    <img src="<?= BASEURL; ?>/uploads/assets/<?= escape($aset['gambar_aset']); ?>"
+                                <?php if (!empty($aset->gambar_aset)): ?>
+                                    <img src="<?= BASEURL; ?>/uploads/assets/<?= escape($aset->gambar_aset); ?>"
                                          width="45"
                                          style="border-radius:6px;">
                                 <?php else: ?>
@@ -130,17 +130,17 @@
                             <td style="padding:12px;">
                                 <div style="display:flex; gap:6px; flex-wrap:wrap;">
 
-                                    <a href="<?= BASEURL; ?>/aset/detail/<?= $aset['id_aset']; ?>"
+                                    <a href="<?= BASEURL; ?>/aset/detail/<?= $aset->id_aset; ?>"
                                        style="background:#198754; color:#fff; padding:6px 10px; border-radius:6px; text-decoration:none;">
                                         Detail
                                     </a>
 
-                                    <a href="<?= BASEURL; ?>/aset/edit/<?= $aset['id_aset']; ?>"
+                                    <a href="<?= BASEURL; ?>/aset/edit/<?= $aset->id_aset; ?>"
                                        style="background:#ffc107; color:#222; padding:6px 10px; border-radius:6px; text-decoration:none;">
                                         Edit
                                     </a>
 
-                                    <form action="<?= BASEURL; ?>/aset/delete/<?= $aset['id_aset']; ?>"
+                                    <form action="<?= BASEURL; ?>/aset/delete/<?= $aset->id_aset; ?>"
                                           method="POST"
                                           onsubmit="return confirm('Hapus aset ini?');"
                                           style="margin:0;">

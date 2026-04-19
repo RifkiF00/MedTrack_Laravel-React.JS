@@ -43,9 +43,9 @@ $asetList = $data['aset'] ?? [];
                         style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;">
                     <option value="">-- Pilih Aset --</option>
                     <?php foreach ($asetList as $aset): ?>
-                        <option value="<?= $aset['id_aset']; ?>"
-                            <?= (($old['id_aset'] ?? '') == $aset['id_aset']) ? 'selected' : ''; ?>>
-                            <?= escape(($aset['kode_label'] ?? '-') . ' - ' . ($aset['nama_alat'] ?? '-') . ' (' . ($aset['nama_ruang'] ?? '-') . ')'); ?>
+                        <option value="<?= $aset->id_aset; ?>"
+                            <?= (($old['id_aset'] ?? '') == $aset->id_aset) ? 'selected' : ''; ?>>
+                            <?= escape(($aset->kode_label ?? '-') . ' - ' . ($aset->nama_alat ?? '-') . ' (' . ($aset->nama_ruang ?? '-') . ')'); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>

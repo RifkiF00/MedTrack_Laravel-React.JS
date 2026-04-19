@@ -22,12 +22,12 @@
                 <?php if (!empty($data['aset'])): ?>
                     <?php foreach ($data['aset'] as $aset): ?>
                         <tr>
-                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= escape($aset['kode_label'] ?? '-') ?></td>
-                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= escape($aset['nama_alat'] ?? '-') ?></td>
-                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= escape($aset['nama_ruang'] ?? '-') ?></td>
-                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= escape($aset['tgl_kalibrasi_terakhir'] ?? 'Belum ada data') ?></td>
+                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= escape($aset->kode_label ?? '-') ?></td>
+                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= escape($aset->nama_alat ?? '-') ?></td>
+                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= escape($aset->nama_ruang ?? '-') ?></td>
+                            <td style="padding:12px; border-bottom:1px solid #eee;"><?= escape($aset->tgl_kalibrasi_terakhir ?? 'Belum ada data') ?></td>
                             <td style="padding:12px; border-bottom:1px solid #eee;">
-                                <a href="<?= BASEURL; ?>/aset/edit/<?= $aset['id_aset']; ?>" style="padding:8px 12px; background:#ffc107; color:#222; text-decoration:none; border-radius:8px;">Update Kalibrasi</a>
+                                <a href="<?= BASEURL; ?>/aset/edit/<?= $aset->id_aset; ?>" style="padding:8px 12px; background:#ffc107; color:#222; text-decoration:none; border-radius:8px;">Update Kalibrasi</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
