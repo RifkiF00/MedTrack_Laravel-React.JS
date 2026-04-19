@@ -1,6 +1,6 @@
 <?php
-$aset = $data['aset'] ?? null;
-$role = $data['role'] ?? 'Guest';
+$aset = $data['aset ?? null;
+$role = $data['role ?? 'Guest';
 $backLink = ($role === 'Unit_RS') ? BASEURL . '/aset/listunit' : BASEURL . '/aset';
 ?>
 
@@ -122,88 +122,88 @@ $backLink = ($role === 'Unit_RS') ? BASEURL . '/aset/listunit' : BASEURL . '/ase
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Kode Label</div>
-                <div style="font-size:18px; font-weight:700;"><?= escape($aset['kode_label'] ?? '-'); ?></div>
+                <div style="font-size:18px; font-weight:700;"><?= escape($aset->kode_label ?? '-'); ?></div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Nama Alat</div>
-                <div style="font-size:18px; font-weight:700;"><?= escape($aset['nama_alat'] ?? '-'); ?></div>
+                <div style="font-size:18px; font-weight:700;"><?= escape($aset->nama_alat ?? '-'); ?></div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Kategori</div>
-                <div style="font-size:16px; font-weight:600;"><?= escape($aset['kategori_aset'] ?? '-'); ?></div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset->kategori_aset ?? '-'); ?></div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Jumlah Unit</div>
-                <div style="font-size:16px; font-weight:600;"><?= escape($aset['jumlah_unit'] ?? '1'); ?></div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset->jumlah_unit ?? '1'); ?></div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Merk</div>
-                <div style="font-size:16px; font-weight:600;"><?= escape($aset['merk'] ?? '-'); ?></div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset->merk ?? '-'); ?></div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Model</div>
-                <div style="font-size:16px; font-weight:600;"><?= escape($aset['model'] ?? '-'); ?></div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset->model ?? '-'); ?></div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Serial Number</div>
-                <div style="font-size:16px; font-weight:600;"><?= escape($aset['serial_number'] ?? '-'); ?></div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset->serial_number ?? '-'); ?></div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">No. Sertifikat</div>
-                <div style="font-size:16px; font-weight:600;"><?= escape($aset['no_sertifikat'] ?? '-'); ?></div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset->no_sertifikat ?? '-'); ?></div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Tanggal Pengadaan</div>
-                <div style="font-size:16px; font-weight:600;"><?= escape($aset['tgl_pengadaan'] ?? '-'); ?></div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset->tgl_pengadaan ?? '-'); ?></div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Kalibrasi Terakhir</div>
-                <div style="font-size:16px; font-weight:600;"><?= escape($aset['tgl_kalibrasi_terakhir'] ?? '-'); ?></div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset->tgl_kalibrasi_terakhir ?? '-'); ?></div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Harga Perolehan</div>
                 <div style="font-size:16px; font-weight:600;">
-                    <?= isset($aset['harga_perolehan']) && $aset['harga_perolehan'] !== null
-                        ? 'Rp ' . number_format((float)$aset['harga_perolehan'], 0, ',', '.')
+                    <?= isset($aset->harga_perolehan) && $aset->harga_perolehan !== null
+                        ? 'Rp ' . number_format((float)$aset->harga_perolehan, 0, ',', '.')
                         : '-'; ?>
                 </div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Ruangan</div>
-                <div style="font-size:16px; font-weight:600;"><?= escape($aset['nama_ruang'] ?? '-'); ?></div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset->nama_ruang ?? '-'); ?></div>
             </div>
 
             <div class="print-box print-full" style="background:#f8fafc; padding:16px; border-radius:12px; grid-column:1 / -1;">
                 <div style="font-size:12px; color:#6b7280;">Lokasi Fisik</div>
-                <div style="font-size:16px; font-weight:600;"><?= escape($aset['lokasi_fisik'] ?? '-'); ?></div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset->lokasi_fisik ?? '-'); ?></div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Latitude</div>
-                <div style="font-size:16px; font-weight:600;"><?= escape($aset['latitude'] ?? '-'); ?></div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset->latitude ?? '-'); ?></div>
             </div>
 
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px;">
                 <div style="font-size:12px; color:#6b7280;">Longitude</div>
-                <div style="font-size:16px; font-weight:600;"><?= escape($aset['longitude'] ?? '-'); ?></div>
+                <div style="font-size:16px; font-weight:600;"><?= escape($aset->longitude ?? '-'); ?></div>
             </div>
 
             <div class="print-box print-full" style="background:#f8fafc; padding:16px; border-radius:12px; grid-column:1 / -1;">
                 <div style="font-size:12px; color:#6b7280;">Status Kondisi</div>
                 <div style="margin-top:6px;">
                     <?php
-                    $kondisi = $aset['status_kondisi'] ?? '';
+                    $kondisi = $aset->status_kondisi ?? '';
                     $color = '#eef2ff';
                     if ($kondisi === 'Baik') $color = '#d1fae5';
                     elseif ($kondisi === 'Rusak Ringan') $color = '#fef3c7';
@@ -220,7 +220,7 @@ $backLink = ($role === 'Unit_RS') ? BASEURL . '/aset/listunit' : BASEURL . '/ase
             <div class="print-box print-full" style="background:#f8fafc; padding:16px; border-radius:12px; grid-column:1 / -1;">
                 <div style="font-size:12px; color:#6b7280;">Keterangan</div>
                 <div style="font-size:15px; line-height:1.6; margin-top:6px;">
-                    <?= nl2br(escape($aset['keterangan'] ?? '-')); ?>
+                    <?= nl2br(escape($aset->keterangan ?? '-')); ?>
                 </div>
             </div>
 
@@ -232,8 +232,8 @@ $backLink = ($role === 'Unit_RS') ? BASEURL . '/aset/listunit' : BASEURL . '/ase
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px; text-align:center;">
                 <div style="font-size:13px; color:#6b7280; margin-bottom:10px;">QR Code Aset</div>
 
-                <?php if (!empty($aset['file_qr_code'])): ?>
-                    <img src="<?= BASEURL; ?>/uploads/qr/<?= escape($aset['file_qr_code']); ?>"
+                <?php if (!empty($aset->file_qr_code)): ?>
+                    <img src="<?= BASEURL; ?>/uploads/qr/<?= escape($aset->file_qr_code); ?>"
                          alt="QR Aset"
                          style="width:220px; max-width:100%; border-radius:12px; background:#fff; padding:10px; border:1px solid #e5e7eb;">
                     <div style="margin-top:10px; font-size:12px; color:#6b7280;">
@@ -247,8 +247,8 @@ $backLink = ($role === 'Unit_RS') ? BASEURL . '/aset/listunit' : BASEURL . '/ase
             <div class="print-box" style="background:#f8fafc; padding:16px; border-radius:12px; text-align:center;">
                 <div style="font-size:13px; color:#6b7280; margin-bottom:10px;">Gambar Aset</div>
 
-                <?php if (!empty($aset['gambar_aset'])): ?>
-                    <img src="<?= BASEURL; ?>/uploads/assets/<?= escape($aset['gambar_aset']); ?>"
+                <?php if (!empty($aset->gambar_aset)): ?>
+                    <img src="<?= BASEURL; ?>/uploads/assets/<?= escape($aset->gambar_aset); ?>"
                          alt="Gambar Aset"
                          style="width:100%; max-width:280px; border-radius:12px; object-fit:cover;">
                 <?php else: ?>
@@ -259,7 +259,7 @@ $backLink = ($role === 'Unit_RS') ? BASEURL . '/aset/listunit' : BASEURL . '/ase
         </div>
     </div>
 
-    <?php if (!empty($aset['latitude']) && !empty($aset['longitude'])): ?>
+    <?php if (!empty($aset->latitude) && !empty($aset->longitude)): ?>
         <div class="map-section" style="margin-top:24px; background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; padding:16px;">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
                 <div>
@@ -269,7 +269,7 @@ $backLink = ($role === 'Unit_RS') ? BASEURL . '/aset/listunit' : BASEURL . '/ase
                     </p>
                 </div>
 
-                <a href="https://www.google.com/maps?q=<?= escape($aset['latitude']); ?>,<?= escape($aset['longitude']); ?>"
+                <a href="https://www.google.com/maps?q=<?= escape($aset->latitude); ?>,<?= escape($aset->longitude); ?>"
                    target="_blank"
                    style="padding:10px 14px; background:#0d6efd; color:#fff; text-decoration:none; border-radius:8px;">
                     Buka di Google Maps
@@ -283,8 +283,8 @@ $backLink = ($role === 'Unit_RS') ? BASEURL . '/aset/listunit' : BASEURL . '/ase
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                var lat = <?= json_encode((float)$aset['latitude']); ?>;
-                var lng = <?= json_encode((float)$aset['longitude']); ?>;
+                var lat = <?= json_encode((float)$aset->latitude); ?>;
+                var lng = <?= json_encode((float)$aset->longitude); ?>;
 
                 var map = L.map('map').setView([lat, lng], 18);
 
@@ -294,7 +294,7 @@ $backLink = ($role === 'Unit_RS') ? BASEURL . '/aset/listunit' : BASEURL . '/ase
 
                 L.marker([lat, lng])
                     .addTo(map)
-                    .bindPopup("<?= escape($aset['nama_alat'] ?? 'Lokasi Aset'); ?>")
+                    .bindPopup("<?= escape($aset->nama_alat ?? 'Lokasi Aset'); ?>")
                     .openPopup();
             });
         </script>
