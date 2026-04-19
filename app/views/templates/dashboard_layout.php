@@ -76,7 +76,7 @@ $isUnit = ($role === 'Unit_RS');
             <?php endif; ?>
 
             <!-- DIREKTORI -->
-            <?php if ($isIPSRS): ?>
+            <?php if ($role === 'Staf_IPSRS'): ?>
                 <li>
                     <a href="<?= BASEURL; ?>/direktori">
                         <i class="bi bi-building"></i> Direktori Unit & SDM
