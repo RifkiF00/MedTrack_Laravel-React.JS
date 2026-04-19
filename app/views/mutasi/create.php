@@ -1,14 +1,4 @@
 <div class="card" style="padding: 24px; border-radius: 16px; background: #ffffff;">
-    <!-- HEADER -->
-    <div style="margin-bottom: 24px;">
-        <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: 700; color: #1a2b56; font-family: 'Nunito', sans-serif;">
-            Catat Mutasi
-        </h1>
-        <p style="margin: 0; font-size: 15px; color: #8e9bb0; font-family: 'Nunito', sans-serif;">
-            Pencatatan pergerakan aset ke ruangan lain
-        </p>
-    </div>
-
     <!-- FLASH MESSAGE -->
     <?php if (!empty($data['flash'])): ?>
         <div style="margin-bottom: 20px; padding: 12px 16px; border-radius: 12px; background: #ecfdf5; color: #047857; font-size: 14px; font-family: 'Nunito', sans-serif;">
