@@ -54,11 +54,11 @@ class Dashboard extends Controller {
             $ruanganStats = $asetModel->getAsetPerRuanganById($idRuang);
 
             $data['ruangan_labels'] = array_map(function($item) {
-                return $item['nama_ruang'];
+                return $item->nama_ruang;
             }, $ruanganStats);
 
             $data['ruangan_totals'] = array_map(function($item) {
-                return (int)$item['total_aset'];
+                return (int)$item->total_aset;
             }, $ruanganStats);
 
             $data['page_subheading'] = 'Ringkasan data aset pada ruangan/unit Anda.';
@@ -79,11 +79,11 @@ class Dashboard extends Controller {
             $ruanganStats = $asetModel->getAsetPerRuangan(8);
 
             $data['ruangan_labels'] = array_map(function($item) {
-                return $item['nama_ruang'];
+                return $item->nama_ruang;
             }, $ruanganStats);
 
             $data['ruangan_totals'] = array_map(function($item) {
-                return (int)$item['total_aset'];
+                return (int)$item->total_aset;
             }, $ruanganStats);
 
             $data['page_subheading'] = 'Ringkasan data aset dan kondisi alat.';
