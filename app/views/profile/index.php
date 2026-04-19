@@ -9,32 +9,35 @@
     <!-- PROFILE SECTION -->
     <div style="text-align: center; margin-bottom: 32px;">
         <!-- PROFILE IMAGE: Clickable for upload -->
-        <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 16px; cursor: pointer;">
-            <img src="<?= BASEURL; ?>/uploads/profiles/<?= $_SESSION['id_user'] ?? '0'; ?>.png?t=<?= time(); ?>"
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                 style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid #3d6aff;"
-                 title="<?= escape($_SESSION['nama_lengkap'] ?? 'User'); ?>"
-                 onclick="document.getElementById('photoInput').click();">
+        <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 16px; cursor: pointer; border-radius: 50%; background: linear-gradient(135deg, #3d6aff, #2952cc); display: flex; align-items: center; justify-content: center; border: 4px solid #3d6aff; overflow: hidden;" onclick="document.getElementById('photoInput').click();">
+            <img id="profileImg" src="<?= BASEURL; ?>/uploads/profiles/<?= $_SESSION['id_user'] ?? '0'; ?>.png?t=<?= time(); ?>"
+                 style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                 title="<?= escape($_SESSION['nama_lengkap'] ?? 'User'); ?>">
 
-            <!-- DEFAULT PLACEHOLDER -->
-            <div style="display: none; width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #3d6aff, #2952cc); border: 4px solid #3d6aff; align-items: center; justify-content: center; font-size: 48px; color: white; cursor: pointer;"
-                 onclick="document.getElementById('photoInput').click();">
+            <!-- DEFAULT PLACEHOLDER (shown if image fails) -->
+            <div id="profilePlaceholder" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center; font-size: 48px; color: white; position: absolute; top: 0; left: 0;">
                 👤
             </div>
 
             <!-- UPLOAD OVERLAY -->
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: rgba(0,0,0,0); transition: all 0.2s; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 28px; font-weight: bold;"
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0); transition: all 0.2s; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 28px; font-weight: bold;"
                  onmouseover="this.style.background='rgba(0,0,0,0.3)'; this.innerHTML='📷';"
-                 onmouseout="this.style.background='rgba(0,0,0,0)'; this.innerHTML='';"
-                 onclick="document.getElementById('photoInput').click();">
+                 onmouseout="this.style.background='rgba(0,0,0,0)'; this.innerHTML='';">
             </div>
 
             <!-- HIDDEN FILE INPUT -->
             <form id="photoForm" method="POST" action="<?= BASEURL; ?>/profile/uploadPhoto" enctype="multipart/form-data" style="display: none;">
-                <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
+                <input type="hidden" name="csrf_token" value="<?= getCSRFToken(); ?>">
                 <input type="file" id="photoInput" name="profile_photo" accept="image/jpeg,image/png,image/jpg" onchange="document.getElementById('photoForm').submit();">
             </form>
         </div>
+
+        <script>
+            document.getElementById('profileImg').onerror = function() {
+                this.style.display = 'none';
+                document.getElementById('profilePlaceholder').style.display = 'flex';
+            };
+        </script>
 
         <h2 style="margin: 0; font-size: 24px; font-weight: 700; color: #1a2b56; font-family: 'Nunito', sans-serif;">
             <?= escape($_SESSION['nama_lengkap'] ?? 'User'); ?>
