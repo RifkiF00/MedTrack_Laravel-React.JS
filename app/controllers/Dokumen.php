@@ -24,6 +24,10 @@ class Dokumen extends Controller {
         $data['content_view'] = 'dokumen/index';
         $data['flash'] = getFlashMessage();
 
+        // Get documents (placeholder - can integrate with model later)
+        $data['dokumen_list'] = [];
+
         $this->view('templates/dashboard_layout', $data);
     }
 }
+

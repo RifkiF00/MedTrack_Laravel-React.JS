@@ -30,4 +30,18 @@ class User_model {
 
         return $stmt->fetchAll();
     }
+
+    // Ambil semua user dengan detail ruangan
+    public function getAllUsers() {
+        $query = "SELECT u.id_user, u.nama_lengkap, u.username, u.role, r.nama_ruang
+                  FROM m_user u
+                  LEFT JOIN m_ruangan r ON u.id_ruang = r.id_ruang
+                  WHERE u.status = 'Aktif'
+                  ORDER BY u.role ASC, u.nama_lengkap ASC";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
 }

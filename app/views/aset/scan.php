@@ -1,16 +1,18 @@
-<div class="card" style="padding:24px; max-width:1100px;">
+<div class="card" style="padding:24px; border-radius:16px; background:#ffffff;">
 
     <!-- HEADER -->
     <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:24px;">
         <div>
-            <h2 style="margin:0 0 8px 0;">Scan QR Aset</h2>
-            <p style="margin:0; color:#6b7280;">
+            <h1 style="margin:0 0 8px 0; font-size:28px; font-weight:700; color:#1a2b56; font-family:'Nunito',sans-serif;">Scan QR Aset</h1>
+            <p style="margin:0; color:#8e9bb0; font-size:14px; font-family:'Nunito',sans-serif;">
                 Pindai QR melalui kamera atau upload gambar QR untuk membuka detail aset otomatis.
             </p>
         </div>
 
         <a href="<?= BASEURL; ?>/aset"
-           style="padding:10px 14px; background:#6c757d; color:#fff; text-decoration:none; border-radius:8px;">
+           style="padding:11px 18px; background:#e5e7eb; color:#1a2b56; text-decoration:none; border-radius:10px; font-size:14px; font-weight:600; font-family:'Nunito',sans-serif; transition:all 0.2s;"
+           onmouseover="this.style.background='#d1d5db'"
+           onmouseout="this.style.background='#e5e7eb'">
             ← Kembali
         </a>
     </div>
@@ -22,11 +24,11 @@
         <div style="display:flex; flex-direction:column; gap:20px;">
 
             <!-- SCAN KAMERA -->
-            <div style="background:#f8fafc; border:1px solid #e5e7eb; border-radius:14px; padding:18px;">
+            <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:12px; padding:18px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
                     <div>
-                        <h3 style="margin:0 0 4px 0;">Kamera</h3>
-                        <p style="margin:0; color:#6b7280; font-size:14px;">
+                        <h3 style="margin:0 0 4px 0; font-size:16px; font-weight:600; color:#1a2b56; font-family:'Nunito',sans-serif;">Kamera</h3>
+                        <p style="margin:0; color:#8e9bb0; font-size:13px; font-family:'Nunito',sans-serif;">
                             Arahkan kamera ke QR code aset.
                         </p>
                     </div>
@@ -34,13 +36,13 @@
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
                         <button id="stop-scan-btn"
                                 type="button"
-                                style="padding:9px 14px; background:#dc3545; color:#fff; border:none; border-radius:8px; cursor:pointer;">
+                                style="padding:9px 14px; background:#ef4444; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600; font-family:'Nunito',sans-serif;">
                             Stop Kamera
                         </button>
 
                         <button id="start-scan-btn"
                                 type="button"
-                                style="padding:9px 14px; background:#198754; color:#fff; border:none; border-radius:8px; cursor:pointer;">
+                                style="padding:9px 14px; background:#10b981; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600; font-family:'Nunito',sans-serif;">
                             Start Ulang
                         </button>
                     </div>
@@ -51,19 +53,21 @@
             </div>
 
             <!-- UPLOAD QR -->
-            <div style="background:#f8fafc; border:1px solid #e5e7eb; border-radius:14px; padding:18px;">
-                <h3 style="margin:0 0 8px 0;">Upload Gambar QR</h3>
-                <p style="margin:0 0 14px 0; color:#6b7280; font-size:14px;">
+            <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:12px; padding:18px;">
+                <h3 style="margin:0 0 8px 0; font-size:16px; font-weight:600; color:#1a2b56; font-family:'Nunito',sans-serif;">Upload Gambar QR</h3>
+                <p style="margin:0 0 14px 0; color:#8e9bb0; font-size:13px; font-family:'Nunito',sans-serif;">
                     Gunakan ini jika kamera tidak bisa membaca QR.
                 </p>
 
                 <input id="qr-file-input"
                        type="file"
                        accept="image/*"
-                       style="display:block; width:100%; padding:10px; border:1px solid #d1d5db; border-radius:10px; background:#fff;">
+                       style="display:block; width:100%; padding:11px 12px; border:1px solid #e5e7eb; border-radius:10px; background:#fff; font-size:14px; font-family:'Nunito',sans-serif;"
+                       onfocus="this.style.borderColor='#3d6aff'; this.style.boxShadow='0 0 0 3px rgba(61, 106, 255, 0.1)'"
+                       onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
 
                 <div id="upload-status"
-                     style="margin-top:12px; font-size:14px; color:#6b7280;">
+                     style="margin-top:12px; font-size:13px; color:#8e9bb0; font-family:'Nunito',sans-serif;">
                     Belum ada file dipilih.
                 </div>
             </div>
@@ -73,27 +77,27 @@
         <!-- KANAN -->
         <div style="display:flex; flex-direction:column; gap:20px;">
 
-            <div style="background:#f8fafc; border:1px solid #e5e7eb; border-radius:14px; padding:18px;">
-                <h3 style="margin:0 0 12px 0;">Hasil Scan</h3>
+            <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:12px; padding:18px;">
+                <h3 style="margin:0 0 12px 0; font-size:16px; font-weight:600; color:#1a2b56; font-family:'Nunito',sans-serif;">Hasil Scan</h3>
 
-                <div style="padding:14px; background:#fff; border:1px solid #e5e7eb; border-radius:12px;">
-                    <div style="font-size:12px; color:#6b7280; margin-bottom:8px;">Status</div>
-                    <div id="scan-status" style="font-weight:600; color:#111827;">
+                <div style="padding:14px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px;">
+                    <div style="font-size:12px; color:#8e9bb0; margin-bottom:8px; font-family:'Nunito',sans-serif;">Status</div>
+                    <div id="scan-status" style="font-weight:600; color:#1a2b56; font-family:'Nunito',sans-serif;">
                         Menunggu scan...
                     </div>
                 </div>
 
-                <div style="margin-top:14px; padding:14px; background:#fff; border:1px solid #e5e7eb; border-radius:12px;">
-                    <div style="font-size:12px; color:#6b7280; margin-bottom:8px;">Hasil QR</div>
-                    <div id="scan-result" style="font-size:14px; word-break:break-word; color:#111827;">
+                <div style="margin-top:14px; padding:14px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px;">
+                    <div style="font-size:12px; color:#8e9bb0; margin-bottom:8px; font-family:'Nunito',sans-serif;">Hasil QR</div>
+                    <div id="scan-result" style="font-size:13px; word-break:break-word; color:#1a2b56; font-family:'Nunito',sans-serif;">
                         Belum ada hasil.
                     </div>
                 </div>
             </div>
 
-            <div style="background:#f8fafc; border:1px solid #e5e7eb; border-radius:14px; padding:18px;">
-                <h3 style="margin:0 0 10px 0;">Petunjuk</h3>
-                <ol style="margin:0; padding-left:18px; line-height:1.8; color:#374151;">
+            <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:12px; padding:18px;">
+                <h3 style="margin:0 0 10px 0; font-size:16px; font-weight:600; color:#1a2b56; font-family:'Nunito',sans-serif;">Petunjuk</h3>
+                <ol style="margin:0; padding-left:18px; line-height:1.8; color:#4b5563; font-family:'Nunito',sans-serif; font-size:13px;">
                     <li>Izinkan akses kamera saat diminta browser.</li>
                     <li>Arahkan QR ke tengah frame.</li>
                     <li>Jika valid, sistem akan langsung membuka detail aset.</li>

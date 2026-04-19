@@ -18,12 +18,23 @@ class Direktori extends Controller {
     public function index() {
         $this->guard();
 
+        $userModel = $this->model('User_model');
+        $asetModel = $this->model('Aset_model');
+
         $data['judul'] = 'Direktori Unit & SDM - MedTrack IPSRS';
         $data['page_heading'] = 'Direktori Unit & SDM';
         $data['page_subheading'] = 'Daftar unit, ruangan, dan sumber daya manusia.';
         $data['content_view'] = 'direktori/index';
         $data['flash'] = getFlashMessage();
 
+        // Get rooms with asset count
+        $ruangan = $asetModel->getAllRuangan();
+        $data['ruangan_list'] = $ruangan;
+
+        // Get all staff
+        $data['staff_list'] = $userModel->getAllUsers();
+
         $this->view('templates/dashboard_layout', $data);
     }
 }
+
