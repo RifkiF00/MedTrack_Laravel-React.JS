@@ -27,13 +27,15 @@ class Maintenance_model {
     // Ambil jadwal pemeliharaan untuk bulan ini
     public function getJadwalBulanIni() {
         $query = "
-            SELECT p.*, COUNT(l.id_log) as total_log
+            SELECT p.*,
+                   COALESCE(COUNT(l.id_log), 0) as total_log
             FROM m_pemeliharaan p
             LEFT JOIN t_pemeliharaan_log l ON p.id_pemeliharaan = l.id_pemeliharaan
                 AND MONTH(l.tgl_rencana) = MONTH(CURDATE())
                 AND YEAR(l.tgl_rencana) = YEAR(CURDATE())
             WHERE p.status = 'Aktif'
-            GROUP BY p.id_pemeliharaan
+            GROUP BY p.id_pemeliharaan, p.nama_item, p.deskripsi, p.lokasi, p.frekuensi,
+                     p.pic_penanggung_jawab, p.catatan, p.status, p.created_at, p.updated_at
             ORDER BY p.nama_item ASC
         ";
         $stmt = $this->db->prepare($query);
