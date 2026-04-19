@@ -2,10 +2,10 @@
     <!-- HEADER -->
     <div style="margin-bottom: 24px;">
         <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: 700; color: #1a2b56; font-family: 'Nunito', sans-serif;">
-            Input Log Maintenance
+            Catat Maintenance
         </h1>
         <p style="margin: 0; font-size: 15px; color: #8e9bb0; font-family: 'Nunito', sans-serif;">
-            Catat pelaksanaan pemeliharaan rutin yang telah selesai
+            Dokumentasi Pekerjaan Selesai
         </p>
     </div>
 
