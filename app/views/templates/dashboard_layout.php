@@ -167,31 +167,28 @@ $isUnit = ($role === 'Unit_RS');
                  onclick="window.location='<?= BASEURL; ?>/profile'"
                  onmouseover="this.style.background='#f0f4f8'"
                  onmouseout="this.style.background='transparent'">
-                <!-- PROFILE IMAGE - Try extensions in order -->
-                <img id="profileImg"
-                     src="<?= BASEURL; ?>/uploads/profiles/profile_<?= $_SESSION['id_user'] ?? '0'; ?>.jpg?t=<?= time(); ?>"
-                     onerror="tryNextExtension(this)"
-                     class="profile-pic"
-                     style="cursor: pointer; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background-color: #f0f4f8;"
-                     title="<?= escape($namaUser); ?>">
-                <script>
-                    let extensionIndex = 0;
-                    const extensions = ['jpeg', 'png', 'webp'];
-                    const userId = <?= $_SESSION['id_user'] ?? '0'; ?>;
-                    const baseUrl = '<?= BASEURL; ?>';
-                    const timestamp = <?= time(); ?>;
+                <!-- PROFILE IMAGE -->
+                <div style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid #3d6aff; background: #f0f4f8; cursor: pointer;">
+                    <?php
+                        $profile_photo = null;
+                        $userId = !empty($data['user']->id_user) ? $data['user']->id_user : ($_SESSION['id_user'] ?? '0');
+                        $allowed_ext = ['jpg', 'jpeg', 'png', 'webp'];
 
-                    function tryNextExtension(img) {
-                        if (extensionIndex < extensions.length) {
-                            img.src = baseUrl + '/uploads/profiles/profile_' + userId + '.' + extensions[extensionIndex++] + '?t=' + timestamp;
-                        } else {
-                            // All extensions failed, show emoji
-                            img.style.fontSize = '24px';
-                            img.style.display = 'none';
-                            img.outerHTML = '<div style="cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: #f0f4f8; font-size: 24px;">👤</div>';
+                        foreach ($allowed_ext as $ext) {
+                            $photo_path = BASEURL . '/uploads/profiles/profile_' . $userId . '.' . $ext;
+                            $file_path = __DIR__ . '/../../public/uploads/profiles/profile_' . $userId . '.' . $ext;
+                            if (@file_exists($file_path)) {
+                                $profile_photo = $photo_path . '?t=' . time();
+                                break;
+                            }
                         }
-                    }
-                </script>
+                    ?>
+                    <?php if ($profile_photo): ?>
+                        <img src="<?= $profile_photo; ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" title="<?= escape($namaUser); ?>">
+                    <?php else: ?>
+                        <div style="font-size: 20px;">👤</div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
 
