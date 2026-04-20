@@ -28,7 +28,7 @@
                 $allowed_ext = ['jpg', 'jpeg', 'png', 'webp'];
                 foreach ($allowed_ext as $ext) {
                     $photo_path = BASEURL . '/uploads/profiles/profile_' . $data['user']->id_user . '.' . $ext;
-                    $file_path = '../public/uploads/profiles/profile_' . $data['user']->id_user . '.' . $ext;
+                    $file_path = __DIR__ . '/../../public/uploads/profiles/profile_' . $data['user']->id_user . '.' . $ext;
                     if (file_exists($file_path)) {
                         $profile_photo = $photo_path;
                         break;
@@ -102,13 +102,6 @@
                         $roles = ['Staf_IPSRS' => 'Staf IPSRS', 'Staf_Logistik' => 'Staf Logistik', 'Unit_RS' => 'Unit Rumah Sakit', 'Admin_IPSRS' => 'Admin IPSRS', 'Kepala_IPSRS' => 'Kepala IPSRS'];
                         echo $roles[$data['user']->role] ?? escape($data['user']->role);
                     ?>
-                </p>
-            </div>
-
-            <div style="padding: 12px 16px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #495057;">
-                <p style="margin: 0; font-size: 11px; color: #8e9bb0; margin-bottom: 4px; font-weight: 600; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">LOGIN TERAKHIR</p>
-                <p style="margin: 0; font-size: 14px; font-weight: 500; color: #1a2b56; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-                    <?= $data['user']->last_login ? (new DateTime($data['user']->last_login))->format('d M Y, H:i') : '-'; ?>
                 </p>
             </div>
         </div>
