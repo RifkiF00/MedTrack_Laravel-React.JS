@@ -167,12 +167,39 @@ $isUnit = ($role === 'Unit_RS');
                  onclick="window.location='<?= BASEURL; ?>/profile'"
                  onmouseover="this.style.background='#f0f4f8'"
                  onmouseout="this.style.background='transparent'">
-                <!-- PROFILE IMAGE: Letakkan file gambar di /public/uploads/profiles/{id_user}.png atau gunakan default -->
-                <img src="<?= BASEURL; ?>/uploads/profiles/<?= $_SESSION['id_user'] ?? '0'; ?>.png"
-                     onerror="this.style.background='linear-gradient(135deg, #3d6aff, #2952cc)'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.style.fontSize='24px'; this.innerHTML='👤';"
-                     class="profile-pic"
-                     style="cursor: pointer; background-color: #f0f4f8;"
-                     title="<?= escape($namaUser); ?>">
+                <!-- PROFILE IMAGE -->
+                <div class="profile-pic"
+                     style="cursor: pointer; background-color: #f0f4f8; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; object-fit: cover; overflow: hidden;">
+                    <img id="profileImg"
+                         src=""
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: none;"
+                         title="<?= escape($namaUser); ?>">
+                    <span id="profileFallback">👤</span>
+                </div>
+                <script>
+                    (function() {
+                        const userId = <?= $_SESSION['id_user'] ?? '0'; ?>;
+                        const extensions = ['jpg', 'jpeg', 'png', 'webp'];
+                        const baseUrl = '<?= BASEURL; ?>';
+                        const img = document.getElementById('profileImg');
+                        const fallback = document.getElementById('profileFallback');
+
+                        // Try to find which extension exists
+                        let found = false;
+                        for (let ext of extensions) {
+                            const testImg = new Image();
+                            testImg.onload = function() {
+                                if (!found) {
+                                    img.src = baseUrl + '/uploads/profiles/profile_' + userId + '.' + ext;
+                                    img.style.display = 'block';
+                                    fallback.style.display = 'none';
+                                    found = true;
+                                }
+                            };
+                            testImg.src = baseUrl + '/uploads/profiles/profile_' + userId + '.' + ext;
+                        }
+                    })();
+                </script>
             </div>
         </div>
 
