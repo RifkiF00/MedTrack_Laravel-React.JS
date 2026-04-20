@@ -171,12 +171,12 @@ $isUnit = ($role === 'Unit_RS');
                 <?php
                     $userId = $_SESSION['id_user'] ?? '0';
                     $profilePhoto = null;
-                    $uploadDir = '../public/uploads/profiles/';
+                    $uploadDir = __DIR__ . '/../../public/uploads/profiles/';
 
                     foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                         $filePath = $uploadDir . 'profile_' . $userId . '.' . $ext;
                         if (@file_exists($filePath)) {
-                            $profilePhoto = BASEURL . '/uploads/profiles/profile_' . $userId . '.' . $ext;
+                            $profilePhoto = BASEURL . '/uploads/profiles/profile_' . $userId . '.' . $ext . '?t=' . time();
                             break;
                         }
                     }
