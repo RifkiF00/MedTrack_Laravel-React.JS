@@ -169,7 +169,7 @@ $isUnit = ($role === 'Unit_RS');
                  onmouseout="this.style.background='transparent'">
                 <!-- PROFILE IMAGE - Try extensions in order -->
                 <img id="profileImg"
-                     src="<?= BASEURL; ?>/uploads/profiles/profile_<?= $_SESSION['id_user'] ?? '0'; ?>.jpg"
+                     src="<?= BASEURL; ?>/uploads/profiles/profile_<?= $_SESSION['id_user'] ?? '0'; ?>.jpg?t=<?= time(); ?>"
                      onerror="tryNextExtension(this)"
                      class="profile-pic"
                      style="cursor: pointer; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background-color: #f0f4f8;"
@@ -179,10 +179,11 @@ $isUnit = ($role === 'Unit_RS');
                     const extensions = ['jpeg', 'png', 'webp'];
                     const userId = <?= $_SESSION['id_user'] ?? '0'; ?>;
                     const baseUrl = '<?= BASEURL; ?>';
+                    const timestamp = <?= time(); ?>;
 
                     function tryNextExtension(img) {
                         if (extensionIndex < extensions.length) {
-                            img.src = baseUrl + '/uploads/profiles/profile_' + userId + '.' + extensions[extensionIndex++];
+                            img.src = baseUrl + '/uploads/profiles/profile_' + userId + '.' + extensions[extensionIndex++] + '?t=' + timestamp;
                         } else {
                             // All extensions failed, show emoji
                             img.style.fontSize = '24px';
