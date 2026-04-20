@@ -168,38 +168,24 @@ $isUnit = ($role === 'Unit_RS');
                  onmouseover="this.style.background='#f0f4f8'"
                  onmouseout="this.style.background='transparent'">
                 <!-- PROFILE IMAGE -->
-                <div class="profile-pic"
-                     style="cursor: pointer; background-color: #f0f4f8; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; object-fit: cover; overflow: hidden;">
-                    <img id="profileImg"
-                         src=""
-                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: none;"
-                         title="<?= escape($namaUser); ?>">
-                    <span id="profileFallback">👤</span>
-                </div>
-                <script>
-                    (function() {
-                        const userId = <?= $_SESSION['id_user'] ?? '0'; ?>;
-                        const extensions = ['jpg', 'jpeg', 'png', 'webp'];
-                        const baseUrl = '<?= BASEURL; ?>';
-                        const img = document.getElementById('profileImg');
-                        const fallback = document.getElementById('profileFallback');
+                <?php
+                    $userId = $_SESSION['id_user'] ?? '0';
+                    $profilePhoto = null;
+                    $uploadDir = '../public/uploads/profiles/';
 
-                        // Try to find which extension exists
-                        let found = false;
-                        for (let ext of extensions) {
-                            const testImg = new Image();
-                            testImg.onload = function() {
-                                if (!found) {
-                                    img.src = baseUrl + '/uploads/profiles/profile_' + userId + '.' + ext;
-                                    img.style.display = 'block';
-                                    fallback.style.display = 'none';
-                                    found = true;
-                                }
-                            };
-                            testImg.src = baseUrl + '/uploads/profiles/profile_' + userId + '.' + ext;
+                    foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
+                        $filePath = $uploadDir . 'profile_' . $userId . '.' . $ext;
+                        if (@file_exists($filePath)) {
+                            $profilePhoto = BASEURL . '/uploads/profiles/profile_' . $userId . '.' . $ext;
+                            break;
                         }
-                    })();
-                </script>
+                    }
+                ?>
+                <img src="<?= $profilePhoto ?: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22%3E%3C/svg%3E'; ?>"
+                     onerror="this.style.fontSize='24px'; this.style.width='40px'; this.style.height='40px'; this.innerHTML='👤';"
+                     class="profile-pic"
+                     style="cursor: pointer; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background-color: #f0f4f8;"
+                     title="<?= escape($namaUser); ?>">
             </div>
         </div>
 
