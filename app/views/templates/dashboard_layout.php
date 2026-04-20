@@ -169,9 +169,9 @@ $isUnit = ($role === 'Unit_RS');
                  onmouseout="this.style.background='transparent'">
                 <!-- PROFILE IMAGE: Letakkan file gambar di /public/uploads/profiles/{id_user}.png atau gunakan default -->
                 <img src="<?= BASEURL; ?>/uploads/profiles/<?= $_SESSION['id_user'] ?? '0'; ?>.png"
-                     onerror="this.src='<?= BASEURL; ?>/uploads/assets/default-avatar.png'"
+                     onerror="this.style.background='linear-gradient(135deg, #3d6aff, #2952cc)'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.style.fontSize='24px'; this.innerHTML='👤';"
                      class="profile-pic"
-                     style="cursor: pointer;"
+                     style="cursor: pointer; background-color: #f0f4f8;"
                      title="<?= escape($namaUser); ?>">
             </div>
         </div>
@@ -205,11 +205,11 @@ $isUnit = ($role === 'Unit_RS');
                 <h4>Kalibrasi EKG Monitor</h4>
 
             <?php elseif ($isUnit): ?>
-                <div class="task-img" style="background-image: url('<?= BASEURL; ?>/img/qr-scan-bg.jpg');"></div>
+                <div class="task-img" style="background: linear-gradient(135deg, #3d6aff 0%, #2952cc 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">📱</div>
                 <h4>Lapor Malfungsi Alat</h4>
 
             <?php elseif ($isLogistik): ?>
-                <div class="task-img" style="background-image: url('<?= BASEURL; ?>/img/box-bg.jpg');"></div>
+                <div class="task-img" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">📦</div>
                 <h4>Verifikasi Sparepart</h4>
             <?php endif; ?>
 

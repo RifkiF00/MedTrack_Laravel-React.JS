@@ -44,4 +44,64 @@ class User_model {
 
         return $stmt->fetchAll();
     }
+
+    // Get complete profile data for a user with room information
+    public function getProfileData($user_id) {
+        $query = "SELECT u.id_user, u.username, u.email, u.nama_lengkap, u.role, u.nip, u.no_hp, u.status, u.last_login, r.nama_ruang
+                  FROM m_user u
+                  LEFT JOIN m_ruangan r ON u.id_ruang = r.id_ruang
+                  WHERE u.id_user = :id_user";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute(['id_user' => $user_id]);
+
+        return $stmt->fetch();
+    }
+
+    // Upload profile photo with validation
+    public function uploadProfilePhoto($user_id, $file) {
+        // Validate file exists and no upload error
+        if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
+            return ['success' => false, 'message' => 'File upload error'];
+        }
+
+        // Allowed extensions
+        $allowed_ext = ['jpg', 'jpeg', 'png', 'webp'];
+        $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if (!in_array($file_ext, $allowed_ext)) {
+            return ['success' => false, 'message' => 'Format file harus jpg, jpeg, png, atau webp'];
+        }
+
+        // Validate file size (5MB max)
+        $max_size = 5 * 1024 * 1024; // 5MB in bytes
+        if ($file['size'] > $max_size) {
+            return ['success' => false, 'message' => 'Ukuran file maksimal 5MB'];
+        }
+
+        // Create upload directory if not exists
+        $upload_dir = '../public/uploads/profiles/';
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+
+        // Generate filename: profile_[user_id].[extension]
+        $filename = 'profile_' . $user_id . '.' . $file_ext;
+        $filepath = $upload_dir . $filename;
+
+        // Delete old profile photo if exists
+        foreach ($allowed_ext as $ext) {
+            $old_file = $upload_dir . 'profile_' . $user_id . '.' . $ext;
+            if (file_exists($old_file) && $ext !== $file_ext) {
+                unlink($old_file);
+            }
+        }
+
+        // Move uploaded file
+        if (move_uploaded_file($file['tmp_name'], $filepath)) {
+            return ['success' => true, 'message' => 'Foto profile berhasil diupload', 'filename' => $filename];
+        } else {
+            return ['success' => false, 'message' => 'Gagal upload file'];
+        }
+    }
 }
