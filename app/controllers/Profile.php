@@ -57,7 +57,6 @@ class Profile extends Controller {
         $data['flash'] = getFlashMessage();
         $data['user'] = $user_data;
         $data['edit_mode'] = true;
-        $data['ruangan'] = $userModel->getAllRuangan();
         $data['errors'] = [];
 
         $this->view('templates/dashboard_layout', $data);
@@ -78,8 +77,7 @@ class Profile extends Controller {
         $formData = [
             'email' => sanitizeInput($_POST['email'] ?? ''),
             'no_hp' => sanitizeInput($_POST['no_hp'] ?? ''),
-            'nip' => sanitizeInput($_POST['nip'] ?? ''),
-            'id_ruang' => !empty($_POST['id_ruang']) ? (int)$_POST['id_ruang'] : null
+            'nip' => sanitizeInput($_POST['nip'] ?? '')
         ];
 
         // Validate input
@@ -95,7 +93,6 @@ class Profile extends Controller {
             $data['flash'] = getFlashMessage();
             $data['user'] = $user_data;
             $data['edit_mode'] = true;
-            $data['ruangan'] = $userModel->getAllRuangan();
             $data['errors'] = $errors;
             $data['old'] = $formData;
 

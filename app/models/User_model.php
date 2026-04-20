@@ -119,7 +119,6 @@ class User_model {
                     email = :email,
                     no_hp = :no_hp,
                     nip = :nip,
-                    id_ruang = :id_ruang,
                     updated_at = NOW()
                   WHERE id_user = :id_user";
 
@@ -128,8 +127,7 @@ class User_model {
             'id_user' => $user_id,
             'email' => $data['email'],
             'no_hp' => $data['no_hp'],
-            'nip' => $data['nip'] ?? null,
-            'id_ruang' => $data['id_ruang'] ?? null
+            'nip' => $data['nip'] ?? null
         ]);
     }
 }

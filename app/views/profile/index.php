@@ -142,19 +142,6 @@
                 <input type="text" name="nip" value="<?= escape($data['old']['nip'] ?? $data['user']->nip); ?>" style="width: 100%; padding: 10px 12px; border: 1px solid #d0d9f0; border-radius: 8px; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; box-sizing: border-box; transition: 0.3s;" onfocus="this.style.borderColor='#3d6aff'" onblur="this.style.borderColor='#d0d9f0'">
             </div>
 
-            <!-- Department Dropdown -->
-            <div>
-                <label style="display: block; margin-bottom: 6px; font-size: 12px; font-weight: 600; color: #8e9bb0; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">DEPARTEMEN</label>
-                <select name="id_ruang" style="width: 100%; padding: 10px 12px; border: 1px solid #d0d9f0; border-radius: 8px; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; box-sizing: border-box; background: white; transition: 0.3s; cursor: pointer;" onfocus="this.style.borderColor='#3d6aff'" onblur="this.style.borderColor='#d0d9f0'">
-                    <option value="">-- Pilih Departemen --</option>
-                    <?php foreach ($data['ruangan'] as $ruang): ?>
-                        <option value="<?= $ruang->id_ruang; ?>" <?= (!empty($data['old']['id_ruang']) ? $data['old']['id_ruang'] : $data['user']->id_ruang) == $ruang->id_ruang ? 'selected' : ''; ?>>
-                            <?= escape($ruang->nama_ruang); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
             <!-- Action Buttons -->
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button type="submit" onclick="return confirm('Yakin ingin menyimpan perubahan profil?')" style="flex: 1; padding: 12px; background: #3d6aff; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.3s; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;" onmouseover="this.style.background='#2952cc'" onmouseout="this.style.background='#3d6aff'">
