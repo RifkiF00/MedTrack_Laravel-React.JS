@@ -104,4 +104,32 @@ class User_model {
             return ['success' => false, 'message' => 'Gagal upload file'];
         }
     }
+
+    // Get all departments/ruangan for dropdown
+    public function getAllRuangan() {
+        $query = "SELECT id_ruang, nama_ruang FROM m_ruangan ORDER BY nama_ruang ASC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Update user profile information
+    public function updateUserProfile($user_id, $data) {
+        $query = "UPDATE m_user SET
+                    email = :email,
+                    no_hp = :no_hp,
+                    nip = :nip,
+                    id_ruang = :id_ruang,
+                    updated_at = NOW()
+                  WHERE id_user = :id_user";
+
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute([
+            'id_user' => $user_id,
+            'email' => $data['email'],
+            'no_hp' => $data['no_hp'],
+            'nip' => $data['nip'] ?? null,
+            'id_ruang' => $data['id_ruang'] ?? null
+        ]);
+    }
 }
