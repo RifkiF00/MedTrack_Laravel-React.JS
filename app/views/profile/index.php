@@ -25,14 +25,21 @@
         <div style="width: 120px; height: 120px; margin: 0 auto 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 4px solid #3d6aff; background: #f4f7fe;">
             <?php
                 $profile_photo = null;
-                $allowed_ext = ['jpg', 'jpeg', 'png', 'webp'];
-                foreach ($allowed_ext as $ext) {
-                    $photo_path = BASEURL . '/uploads/profiles/profile_' . $data['user']->id_user . '.' . $ext;
-                    $file_path = __DIR__ . '/../../public/uploads/profiles/profile_' . $data['user']->id_user . '.' . $ext;
-                    if (file_exists($file_path)) {
-                        $profile_photo = $photo_path;
+                $user_id = $data['user']->id_user;
+                $upload_dir = __DIR__ . '/../../public/uploads/profiles/';
+
+                // Check which photo format exists
+                foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
+                    $full_path = $upload_dir . 'profile_' . $user_id . '.' . $ext;
+                    if (@file_exists($full_path)) {
+                        $profile_photo = BASEURL . '/uploads/profiles/profile_' . $user_id . '.' . $ext;
                         break;
                     }
+                }
+
+                // Fallback: just try jpg (most common)
+                if (!$profile_photo) {
+                    $profile_photo = BASEURL . '/uploads/profiles/profile_' . $user_id . '.jpg';
                 }
             ?>
             <?php if ($profile_photo): ?>
@@ -104,6 +111,13 @@
                     ?>
                 </p>
             </div>
+
+            <div style="padding: 12px 16px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #495057;">
+                <p style="margin: 0; font-size: 11px; color: #8e9bb0; margin-bottom: 4px; font-weight: 600; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">ALAMAT</p>
+                <p style="margin: 0; font-size: 14px; font-weight: 500; color: #1a2b56; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+                    <?= escape($data['user']->alamat ?? '-'); ?>
+                </p>
+            </div>
         </div>
 
         <!-- Edit Button -->
@@ -133,6 +147,12 @@
             <div>
                 <label style="display: block; margin-bottom: 6px; font-size: 12px; font-weight: 600; color: #8e9bb0; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">NIP</label>
                 <input type="text" name="nip" value="<?= escape($data['old']['nip'] ?? $data['user']->nip); ?>" style="width: 100%; padding: 10px 12px; border: 1px solid #d0d9f0; border-radius: 8px; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; box-sizing: border-box; transition: 0.3s;" onfocus="this.style.borderColor='#3d6aff'" onblur="this.style.borderColor='#d0d9f0'">
+            </div>
+
+            <!-- Alamat -->
+            <div>
+                <label style="display: block; margin-bottom: 6px; font-size: 12px; font-weight: 600; color: #8e9bb0; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">ALAMAT</label>
+                <textarea name="alamat" placeholder="Masukkan alamat lengkap" style="width: 100%; padding: 10px 12px; border: 1px solid #d0d9f0; border-radius: 8px; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; box-sizing: border-box; transition: 0.3s; resize: vertical; min-height: 70px;" onfocus="this.style.borderColor='#3d6aff'" onblur="this.style.borderColor='#d0d9f0'"><?= escape($data['old']['alamat'] ?? $data['user']->alamat ?? ''); ?></textarea>
             </div>
 
             <!-- Action Buttons -->

@@ -77,7 +77,8 @@ class Profile extends Controller {
         $formData = [
             'email' => sanitizeInput($_POST['email'] ?? ''),
             'no_hp' => sanitizeInput($_POST['no_hp'] ?? ''),
-            'nip' => sanitizeInput($_POST['nip'] ?? '')
+            'nip' => sanitizeInput($_POST['nip'] ?? ''),
+            'alamat' => sanitizeInput($_POST['alamat'] ?? '')
         ];
 
         // Validate input
