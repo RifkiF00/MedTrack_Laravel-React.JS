@@ -47,7 +47,7 @@ class User_model {
 
     // Get complete profile data for a user with room information
     public function getProfileData($user_id) {
-        $query = "SELECT u.id_user, u.username, u.email, u.nama_lengkap, u.role, u.nip, u.no_hp, u.status, u.id_ruang, r.nama_ruang
+        $query = "SELECT u.id_user, u.username, u.email, u.nama_lengkap, u.role, u.nip, u.no_hp, u.alamat, u.status, u.id_ruang, r.nama_ruang
                   FROM m_user u
                   LEFT JOIN m_ruangan r ON u.id_ruang = r.id_ruang
                   WHERE u.id_user = :id_user";
@@ -119,6 +119,7 @@ class User_model {
                     email = :email,
                     no_hp = :no_hp,
                     nip = :nip,
+                    alamat = :alamat,
                     updated_at = NOW()
                   WHERE id_user = :id_user";
 
@@ -127,7 +128,8 @@ class User_model {
             'id_user' => $user_id,
             'email' => $data['email'],
             'no_hp' => $data['no_hp'],
-            'nip' => $data['nip'] ?? null
+            'nip' => $data['nip'] ?? null,
+            'alamat' => $data['alamat'] ?? null
         ]);
     }
 }
