@@ -148,7 +148,7 @@
                 <select name="id_ruang" style="width: 100%; padding: 10px 12px; border: 1px solid #d0d9f0; border-radius: 8px; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; box-sizing: border-box; background: white; transition: 0.3s; cursor: pointer;" onfocus="this.style.borderColor='#3d6aff'" onblur="this.style.borderColor='#d0d9f0'">
                     <option value="">-- Pilih Departemen --</option>
                     <?php foreach ($data['ruangan'] as $ruang): ?>
-                        <option value="<?= $ruang->id_ruang; ?>" <?= ($data['old']['id_ruang'] ?? $data['user']->id_ruang) == $ruang->id_ruang ? 'selected' : ''; ?>>
+                        <option value="<?= $ruang->id_ruang; ?>" <?= (!empty($data['old']['id_ruang']) ? $data['old']['id_ruang'] : $data['user']->id_ruang) == $ruang->id_ruang ? 'selected' : ''; ?>>
                             <?= escape($ruang->nama_ruang); ?>
                         </option>
                     <?php endforeach; ?>

@@ -47,7 +47,7 @@ class User_model {
 
     // Get complete profile data for a user with room information
     public function getProfileData($user_id) {
-        $query = "SELECT u.id_user, u.username, u.email, u.nama_lengkap, u.role, u.nip, u.no_hp, u.status, u.last_login, r.nama_ruang
+        $query = "SELECT u.id_user, u.username, u.email, u.nama_lengkap, u.role, u.nip, u.no_hp, u.status, u.last_login, u.id_ruang, r.nama_ruang
                   FROM m_user u
                   LEFT JOIN m_ruangan r ON u.id_ruang = r.id_ruang
                   WHERE u.id_user = :id_user";
