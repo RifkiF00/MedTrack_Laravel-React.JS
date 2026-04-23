@@ -274,4 +274,14 @@ function getFlashMessage() {
     return null;
 }
 
+/**
+ * Set flash message in session
+ * @param string $message Message to display
+ * @param string $type Message type: 'success', 'error', 'warning', 'info'
+ */
+function setFlashMessage($message, $type = 'success') {
+    $_SESSION['message'] = $message;
+    $_SESSION['message_type'] = $type;
+}
+
 ?>

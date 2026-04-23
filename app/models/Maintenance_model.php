@@ -70,6 +70,22 @@ class Maintenance_model {
         return $stmt->fetchAll();
     }
 
+    // Ambil jadwal untuk minggu ini (untuk kalender)
+    public function getJadwalMingguIni() {
+        $query = "
+            SELECT DATE(l.tgl_rencana) as tanggal,
+                   COUNT(*) as total_jadwal
+            FROM t_pemeliharaan_log l
+            WHERE DATE(l.tgl_rencana) >= CURDATE()
+              AND DATE(l.tgl_rencana) < DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+            GROUP BY DATE(l.tgl_rencana)
+            ORDER BY DATE(l.tgl_rencana) ASC
+        ";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     // Ambil jadwal yang belum dikerjakan hari ini
     public function getJadwalPendingHariIni() {
         $query = "
@@ -131,5 +147,90 @@ class Maintenance_model {
         $stmt->execute();
         return $stmt->fetch();
     }
-}
 
+    // 📍 SIDEBAR METHODS - STAF IPSRS
+
+    // Get upcoming calibration (Staf IPSRS)
+    public function getKalibrasiMendekati($limit = 5) {
+        $query = "SELECT p.id_pemeliharaan, p.nama_item, p.lokasi, COUNT(l.id_log) as total_log
+                  FROM m_pemeliharaan p
+                  LEFT JOIN t_pemeliharaan_log l ON p.id_pemeliharaan = l.id_pemeliharaan
+                    AND DATE(l.tgl_rencana) <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+                  WHERE p.status = 'Aktif'
+                    AND p.frekuensi IN ('6_Bulanan', 'Tahunan')
+                  GROUP BY p.id_pemeliharaan
+                  ORDER BY p.nama_item ASC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get today's scheduled maintenance (Staf IPSRS)
+    public function getMaintenanceHariIni() {
+        $query = "SELECT p.id_pemeliharaan, p.nama_item, p.lokasi, l.status_pelaksanaan, u.nama_lengkap
+                  FROM t_pemeliharaan_log l
+                  JOIN m_pemeliharaan p ON l.id_pemeliharaan = p.id_pemeliharaan
+                  LEFT JOIN m_user u ON l.id_user_pelaksana = u.id_user
+                  WHERE DATE(l.tgl_rencana) = CURDATE()
+                  ORDER BY l.tgl_rencana ASC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get maintenance schedule for a specific date
+    public function getMaintenanceByDate($tanggal) {
+        $query = "SELECT l.id_log, p.id_pemeliharaan, p.nama_item, p.lokasi, l.status_pelaksanaan, u.nama_lengkap, l.tgl_rencana
+                  FROM t_pemeliharaan_log l
+                  JOIN m_pemeliharaan p ON l.id_pemeliharaan = p.id_pemeliharaan
+                  LEFT JOIN m_user u ON l.id_user_pelaksana = u.id_user
+                  WHERE DATE(l.tgl_rencana) = :tanggal
+                  ORDER BY l.tgl_rencana ASC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute(['tanggal' => $tanggal]);
+        return $stmt->fetchAll();
+    }
+
+    // Create new maintenance item
+    public function createPemeliharaan($data) {
+        $query = "INSERT INTO m_pemeliharaan (
+                    nama_item,
+                    deskripsi,
+                    lokasi,
+                    frekuensi,
+                    pic_penanggung_jawab,
+                    catatan,
+                    status
+                  ) VALUES (
+                    :nama_item,
+                    :deskripsi,
+                    :lokasi,
+                    :frekuensi,
+                    :pic_penanggung_jawab,
+                    :catatan,
+                    :status
+                  )";
+
+        $stmt = $this->db->prepare($query);
+
+        return $stmt->execute([
+            'nama_item' => $data['nama_item'],
+            'deskripsi' => $data['deskripsi'] ?? null,
+            'lokasi' => $data['lokasi'] ?? null,
+            'frekuensi' => $data['frekuensi'],
+            'pic_penanggung_jawab' => $data['pic_penanggung_jawab'] ?? null,
+            'catatan' => $data['catatan'] ?? null,
+            'status' => 'Aktif'
+        ]);
+    }
+
+    // Get maintenance item by name
+    public function getPemeliharaanByName($nama_item) {
+        $query = "SELECT * FROM m_pemeliharaan WHERE nama_item = :nama_item LIMIT 1";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute(['nama_item' => $nama_item]);
+        return $stmt->fetch();
+    }
+}

@@ -79,11 +79,11 @@ body {
 .brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     color: #ffffff;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 800;
-    margin-bottom: 40px;
+    margin-bottom: 24px;
 }
 
 .brand-icon {
@@ -178,6 +178,9 @@ body {
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .toggle-btn:hover {
@@ -282,6 +285,12 @@ body {
     /* Ubah jadi abu-abu muda/kebiruan */
     padding: 10px 15px;
     border-radius: 12px;
+}
+
+.search-box i {
+    color: var(--text-muted);
+    font-size: 16px;
+    flex-shrink: 0;
 }
 
 .search-box input {

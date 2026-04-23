@@ -45,6 +45,9 @@ body {
 
     <!-- ACTION BUTTONS -->
     <div style="margin-bottom: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="<?= BASEURL; ?>/maintenance/create" style="padding: 11px 18px; background: #10b981; color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Nunito', sans-serif; transition: all 0.2s; display: inline-block;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
+            + Tambah Jadwal
+        </a>
         <a href="<?= BASEURL; ?>/maintenance/log" style="padding: 11px 18px; background: #3d6aff; color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Nunito', sans-serif; transition: all 0.2s; display: inline-block;" onmouseover="this.style.background='#2952cc'" onmouseout="this.style.background='#3d6aff'">
             + Input Log
         </a>

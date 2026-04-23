@@ -340,7 +340,7 @@ class Aset_model {
 
     // 🔹 ASET PER RUANGAN KHUSUS 1 RUANG
     public function getAsetPerRuanganById($id_ruang) {
-        $query = "SELECT 
+        $query = "SELECT
                     r.nama_ruang,
                     COUNT(a.id_aset) AS total_aset
                   FROM m_ruangan r
@@ -351,6 +351,125 @@ class Aset_model {
         $stmt = $this->db->prepare($query);
         $stmt->execute(['id_ruang' => $id_ruang]);
 
+        return $stmt->fetchAll();
+    }
+
+    // 📍 SIDEBAR METHODS - STAF LOGISTIK & STAF IPSRS
+
+    // Get recent assets (Staf Logistik)
+    public function getRecentAset($limit = 5) {
+        $query = "SELECT id_aset, kode_label, nama_alat, status_kondisi, tgl_pengadaan
+                  FROM m_aset
+                  ORDER BY created_at DESC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get assets in warehouse (Staf Logistik)
+    public function getAsetGudang() {
+        $query = "SELECT a.id_aset, a.kode_label, a.nama_alat, a.status_kondisi, r.nama_ruang
+                  FROM m_aset a
+                  LEFT JOIN m_ruangan r ON a.id_ruang_saat_ini = r.id_ruang
+                  WHERE r.kategori = 'Gudang_Logistik'
+                  ORDER BY a.nama_alat ASC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get assets needing procurement (Staf Logistik)
+    public function getAsetPerluPengadaan() {
+        $query = "SELECT id_aset, kode_label, nama_alat, status_kondisi
+                  FROM m_aset
+                  WHERE status_kondisi IN ('Rusak_Berat', 'Pensiun')
+                  ORDER BY kode_label ASC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get assets without certificate or expired (Staf Logistik)
+    public function getAsetTanpaSerifikat() {
+        $query = "SELECT id_aset, kode_label, nama_alat, no_sertifikat, tgl_kadaluarsa_sertif
+                  FROM m_aset
+                  WHERE no_sertifikat IS NULL
+                     OR tgl_kadaluarsa_sertif < NOW()
+                  ORDER BY tgl_kadaluarsa_sertif ASC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get damaged assets (Staf IPSRS)
+    public function getAsetRusak() {
+        $query = "SELECT a.id_aset, a.kode_label, a.nama_alat, a.status_kondisi, r.nama_ruang
+                  FROM m_aset a
+                  LEFT JOIN m_ruangan r ON a.id_ruang_saat_ini = r.id_ruang
+                  WHERE a.status_kondisi IN ('Rusak_Ringan', 'Rusak_Berat', 'Maintenance')
+                  ORDER BY a.status_kondisi DESC, a.kode_label ASC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get critical assets (Staf IPSRS)
+    public function getAsetKritis() {
+        $query = "SELECT a.id_aset, a.kode_label, a.nama_alat, a.status_kondisi, r.nama_ruang
+                  FROM m_aset a
+                  LEFT JOIN m_ruangan r ON a.id_ruang_saat_ini = r.id_ruang
+                  WHERE LOWER(a.nama_alat) LIKE '%genset%'
+                     OR LOWER(a.nama_alat) LIKE '%oksigen%'
+                     OR LOWER(a.nama_alat) LIKE '%ventilator%'
+                     OR LOWER(a.nama_alat) LIKE '%monitor%'
+                     OR LOWER(a.nama_alat) LIKE '%ekg%'
+                     OR LOWER(a.nama_alat) LIKE '%defibrillator%'
+                  ORDER BY a.kode_label ASC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get assets in user's room (Unit Pengguna)
+    public function getAsetByRuanganUnitUser($id_ruang, $limit = 10) {
+        $query = "SELECT id_aset, kode_label, nama_alat, status_kondisi, merk
+                  FROM m_aset
+                  WHERE id_ruang_saat_ini = :id_ruang
+                  ORDER BY nama_alat ASC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':id_ruang', $id_ruang, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get damaged assets in user's room (Unit Pengguna)
+    public function getAsetRusakByRuangan($id_ruang) {
+        $query = "SELECT id_aset, kode_label, nama_alat, status_kondisi
+                  FROM m_aset
+                  WHERE id_ruang_saat_ini = :id_ruang
+                    AND status_kondisi IN ('Rusak_Ringan', 'Rusak_Berat')
+                  ORDER BY status_kondisi DESC";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':id_ruang', $id_ruang, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get assets by condition
+    public function getAsetByKondisi($kondisi, $limit = 5) {
+        $query = "SELECT id_aset, kode_label, nama_alat, status_kondisi
+                  FROM m_aset
+                  WHERE status_kondisi = :kondisi
+                  ORDER BY updated_at DESC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':kondisi', $kondisi, PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 }

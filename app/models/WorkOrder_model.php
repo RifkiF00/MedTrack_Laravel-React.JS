@@ -204,4 +204,140 @@ class WorkOrder_model {
 
         return $stmt->fetchAll();
     }
+
+    // 📍 SIDEBAR METHODS - STAF IPSRS & UNIT PENGGUNA
+
+    // Get open work orders (Staf IPSRS)
+    public function getWorkOrderOpen($limit = 5) {
+        $query = "SELECT t.id_ticket, t.id_aset, a.kode_label, a.nama_alat, t.tingkat_urgensi, t.tgl_lapor
+                  FROM t_troubleshoot t
+                  LEFT JOIN m_aset a ON t.id_aset = a.id_aset
+                  WHERE t.status_ticket = 'Open'
+                  ORDER BY t.tgl_lapor DESC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get priority/emergency work orders (Staf IPSRS)
+    public function getWorkOrderPriority($limit = 5) {
+        $query = "SELECT t.id_ticket, t.id_aset, a.kode_label, a.nama_alat, t.tingkat_urgensi, t.tgl_lapor, t.status_ticket
+                  FROM t_troubleshoot t
+                  LEFT JOIN m_aset a ON t.id_aset = a.id_aset
+                  WHERE t.tingkat_urgensi IN ('Tinggi', 'Darurat')
+                  ORDER BY t.tgl_lapor DESC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get work orders in progress (Staf IPSRS)
+    public function getWorkOrderInProgress($limit = 5) {
+        $query = "SELECT t.id_ticket, t.id_aset, a.kode_label, a.nama_alat, t.tgl_lapor, u.nama_lengkap
+                  FROM t_troubleshoot t
+                  LEFT JOIN m_aset a ON t.id_aset = a.id_aset
+                  LEFT JOIN m_user u ON t.id_teknisi_penanggungjawab = u.id_user
+                  WHERE t.status_ticket = 'Dikerjakan'
+                  ORDER BY t.tgl_lapor DESC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get work orders by reporter (Unit Pengguna)
+    public function getWorkOrderByReporter($id_user_pelapor, $limit = 5) {
+        $query = "SELECT t.id_ticket, t.id_aset, a.kode_label, a.nama_alat, t.status_ticket, t.tgl_lapor
+                  FROM t_troubleshoot t
+                  LEFT JOIN m_aset a ON t.id_aset = a.id_aset
+                  WHERE t.id_user_pelapor = :id_user_pelapor
+                  ORDER BY t.tgl_lapor DESC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':id_user_pelapor', $id_user_pelapor, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get unresolved work orders (Unit Pengguna)
+    public function getWorkOrderUnresolved($id_user_pelapor, $limit = 5) {
+        $query = "SELECT t.id_ticket, t.id_aset, a.kode_label, a.nama_alat, t.status_ticket, t.tgl_lapor
+                  FROM t_troubleshoot t
+                  LEFT JOIN m_aset a ON t.id_aset = a.id_aset
+                  WHERE t.id_user_pelapor = :id_user_pelapor
+                    AND t.status_ticket != 'Closed'
+                  ORDER BY t.tgl_lapor DESC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':id_user_pelapor', $id_user_pelapor, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get recently updated work orders (Unit Pengguna)
+    public function getWorkOrderRecentUpdate($id_user_pelapor, $limit = 3) {
+        $query = "SELECT t.id_ticket, t.id_aset, a.kode_label, a.nama_alat, t.status_ticket, t.tgl_lapor
+                  FROM t_troubleshoot t
+                  LEFT JOIN m_aset a ON t.id_aset = a.id_aset
+                  WHERE t.id_user_pelapor = :id_user_pelapor
+                  ORDER BY t.tgl_lapor DESC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':id_user_pelapor', $id_user_pelapor, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get completed work orders (Unit Pengguna)
+    public function getWorkOrderCompleted($id_user_pelapor, $limit = 3) {
+        $query = "SELECT t.id_ticket, t.id_aset, a.kode_label, a.nama_alat, t.tgl_lapor
+                  FROM t_troubleshoot t
+                  LEFT JOIN m_aset a ON t.id_aset = a.id_aset
+                  WHERE t.id_user_pelapor = :id_user_pelapor
+                    AND t.status_ticket = 'Closed'
+                  ORDER BY t.tgl_lapor DESC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':id_user_pelapor', $id_user_pelapor, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get work orders for this week (for calendar)
+    public function getWorkOrdersMingguIni() {
+        $query = "
+            SELECT DATE(t.tgl_lapor) as tanggal,
+                   COUNT(*) as total_wo
+            FROM t_troubleshoot t
+            WHERE DATE(t.tgl_lapor) >= CURDATE()
+              AND DATE(t.tgl_lapor) < DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+            GROUP BY DATE(t.tgl_lapor)
+            ORDER BY DATE(t.tgl_lapor) ASC
+        ";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get work orders for a specific date
+    public function getWorkOrdersByDate($tanggal) {
+        $query = "SELECT t.id_ticket, t.id_aset, a.kode_label, a.nama_alat, t.tingkat_urgensi, t.status_ticket, u.nama_lengkap, t.tgl_lapor
+                  FROM t_troubleshoot t
+                  LEFT JOIN m_aset a ON t.id_aset = a.id_aset
+                  LEFT JOIN m_user u ON t.id_teknisi_penanggungjawab = u.id_user
+                  WHERE DATE(t.tgl_lapor) = :tanggal
+                  ORDER BY t.tgl_lapor ASC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute(['tanggal' => $tanggal]);
+        return $stmt->fetchAll();
+    }
 }

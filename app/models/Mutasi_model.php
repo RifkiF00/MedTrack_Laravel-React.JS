@@ -134,4 +134,37 @@ class Mutasi_model {
         $stmt->execute();
         return $stmt->fetch();
     }
+
+    // 📍 SIDEBAR METHODS - STAF LOGISTIK
+
+    // Get recent transfers (Staf Logistik)
+    public function getMutasiTerbaru($limit = 5) {
+        $query = "SELECT m.id_mutasi, m.id_aset, a.kode_label, a.nama_alat, r1.nama_ruang as asal, r2.nama_ruang as tujuan, m.status_mutasi, m.tgl_mutasi
+                  FROM t_mutasi m
+                  JOIN m_aset a ON m.id_aset = a.id_aset
+                  JOIN m_ruangan r1 ON m.ruang_asal = r1.id_ruang
+                  JOIN m_ruangan r2 ON m.ruang_tujuan = r2.id_ruang
+                  ORDER BY m.tgl_mutasi DESC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Get assets in/out (Staf Logistik)
+    public function getMutasiKelMasuk($limit = 5) {
+        $query = "SELECT m.id_mutasi, a.kode_label, a.nama_alat, r1.nama_ruang as asal, r2.nama_ruang as tujuan, m.status_mutasi
+                  FROM t_mutasi m
+                  JOIN m_aset a ON m.id_aset = a.id_aset
+                  JOIN m_ruangan r1 ON m.ruang_asal = r1.id_ruang
+                  JOIN m_ruangan r2 ON m.ruang_tujuan = r2.id_ruang
+                  WHERE m.status_mutasi IN ('Menunggu_Verifikasi', 'Disetujui')
+                  ORDER BY m.tgl_mutasi DESC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }

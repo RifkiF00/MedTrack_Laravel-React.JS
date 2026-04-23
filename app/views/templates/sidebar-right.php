@@ -377,8 +377,15 @@ $role = $data['role'] ?? '';
         $aset_rusak_berat = $data['aset_rusak_berat'] ?? [];
         $aset_maintenance = $data['aset_maintenance'] ?? [];
         $aset_gudang = $data['aset_gudang'] ?? [];
-        // DEBUG: Counts - Ringan: <?= count($aset_rusak_ringan) ?>, Berat: <?= count($aset_rusak_berat) ?>, Maintenance: <?= count($aset_maintenance) ?>, Gudang: <?= count($aset_gudang) ?>
     ?>
+
+    <div style="background: #fff3cd; padding: 12px; margin-bottom: 12px; border-radius: 8px; font-size: 10px; color: #856404; word-break: break-word;">
+        <strong>🔍 DEBUG:</strong><br>
+        Ringan: <?= count($aset_rusak_ringan) ?> items<br>
+        Berat: <?= count($aset_rusak_berat) ?> items<br>
+        Maint: <?= count($aset_maintenance) ?> items<br>
+        Gudang: <?= count($aset_gudang) ?> items
+    </div>
 
     <!-- RUSAK RINGAN -->
     <?php if (!empty($aset_rusak_ringan)): ?>
