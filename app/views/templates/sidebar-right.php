@@ -369,7 +369,7 @@ $role = $data['role'] ?? '';
 
 <?php endif; ?>
 
-<!-- ========== MASTER ASET PAGE - ASSET CONDITIONS ========== -->
+
 <?php if (($data['content_view'] ?? '') === 'aset/index'): ?>
 
     <?php
