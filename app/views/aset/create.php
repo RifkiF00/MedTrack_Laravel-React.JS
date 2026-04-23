@@ -141,7 +141,7 @@
                 <select name="status_kondisi" style="width:100%; padding:10px; margin-top:6px;">
                     <option value="">-- Pilih Kondisi --</option>
                     <?php
-                    $kondisiList = ['Gudang', 'Baik', 'Rusak_Ringan', 'Rusak_Berat', 'Maintenance', 'Pensiun'];
+                    $kondisiList = ['Gudang', 'Baik', 'Rusak Ringan', 'Rusak Berat', 'Maintenance', 'Pensiun'];
                     $selectedKondisi = $data['old']['status_kondisi'] ?? '';
                     foreach ($kondisiList as $kondisi):
                     ?>

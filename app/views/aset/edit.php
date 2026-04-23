@@ -88,7 +88,7 @@
                 <label>Status Kondisi</label>
                 <select name="status_kondisi" style="width:100%; padding:10px;">
                     <?php
-                    $kondisiList = ['Gudang','Baik','Rusak_Ringan','Rusak_Berat','Maintenance','Pensiun'];
+                    $kondisiList = ['Gudang','Baik','Rusak Ringan','Rusak Berat','Maintenance','Pensiun'];
                     foreach ($kondisiList as $kondisi):
                     ?>
                         <option value="<?= $kondisi; ?>" <?= (($data['aset']['status_kondisi'] ?? '') === $kondisi) ? 'selected' : ''; ?>>

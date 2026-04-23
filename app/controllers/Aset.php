@@ -93,8 +93,8 @@ class Aset extends Controller {
         $data['jadwal_minggu_maintenance'] = $maintenanceModel->getJadwalMingguIni();
 
         // ASSET CONDITION DATA - For sidebar
-        $data['aset_rusak_ringan'] = $asetModel->getAsetByKondisi('Rusak_Ringan', 5);
-        $data['aset_rusak_berat'] = $asetModel->getAsetByKondisi('Rusak_Berat', 5);
+        $data['aset_rusak_ringan'] = $asetModel->getAsetByKondisi('Rusak Ringan', 5);
+        $data['aset_rusak_berat'] = $asetModel->getAsetByKondisi('Rusak Berat', 5);
         $data['aset_maintenance'] = $asetModel->getAsetByKondisi('Maintenance', 5);
         $data['aset_gudang'] = $asetModel->getAsetByKondisi('Gudang', 5);
 

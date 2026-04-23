@@ -154,8 +154,8 @@ class Dashboard extends Controller {
             $data['total_it'] = $asetModel->countByKategoriAndRuangan('IT', $idRuang);
 
             $data['baik'] = $asetModel->countByKondisiAndRuangan('Baik', $idRuang);
-            $data['rusak_ringan'] = $asetModel->countByKondisiAndRuangan('Rusak_Ringan', $idRuang);
-            $data['rusak_berat'] = $asetModel->countByKondisiAndRuangan('Rusak_Berat', $idRuang);
+            $data['rusak_ringan'] = $asetModel->countByKondisiAndRuangan('Rusak Ringan', $idRuang);
+            $data['rusak_berat'] = $asetModel->countByKondisiAndRuangan('Rusak Berat', $idRuang);
             $data['maintenance'] = $asetModel->countByKondisiAndRuangan('Maintenance', $idRuang);
             $data['gudang'] = $asetModel->countByKondisiAndRuangan('Gudang', $idRuang);
 

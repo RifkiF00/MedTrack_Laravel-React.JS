@@ -23,22 +23,14 @@ class Profile extends Controller {
             } else {
                 $_SESSION['flash'] = ['type' => 'error', 'message' => $upload_result['message']];
             }
-            // Redirect to refresh page
-            header('Location: ' . BASEURL . '/profile');
+            // Redirect to edit profile page
+            header('Location: ' . BASEURL . '/profile/edit');
             exit;
         }
 
-        // Get user profile data from database
-        $user_data = $userModel->getProfileData($_SESSION['user_id']);
-
-        $data['judul'] = 'Profil Pengguna - MedTrack IPSRS';
-        $data['page_heading'] = 'Profil Pengguna';
-        $data['page_subheading'] = 'Informasi akun dan pengaturan profil Anda';
-        $data['content_view'] = 'profile/index';
-        $data['flash'] = getFlashMessage();
-        $data['user'] = $user_data;
-
-        $this->view('templates/dashboard_layout', $data);
+        // Redirect to edit mode
+        header('Location: ' . BASEURL . '/profile/edit');
+        exit;
     }
 
     public function edit() {
@@ -56,7 +48,6 @@ class Profile extends Controller {
         $data['content_view'] = 'profile/index';
         $data['flash'] = getFlashMessage();
         $data['user'] = $user_data;
-        $data['edit_mode'] = true;
         $data['errors'] = [];
 
         $this->view('templates/dashboard_layout', $data);
@@ -87,13 +78,13 @@ class Profile extends Controller {
         // If errors exist, re-display form with errors
         if (!empty($errors)) {
             $user_data = $userModel->getProfileData($_SESSION['user_id']);
+
             $data['judul'] = 'Edit Profil - MedTrack IPSRS';
             $data['page_heading'] = 'Edit Profil Pengguna';
             $data['page_subheading'] = 'Perbarui informasi akun Anda';
             $data['content_view'] = 'profile/index';
             $data['flash'] = getFlashMessage();
             $data['user'] = $user_data;
-            $data['edit_mode'] = true;
             $data['errors'] = $errors;
             $data['old'] = $formData;
 
@@ -108,13 +99,15 @@ class Profile extends Controller {
             $_SESSION['no_hp'] = $formData['no_hp'];
             $_SESSION['nip'] = $formData['nip'];
 
-            // Redirect with success message
-            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Profil berhasil diperbarui'];
+            // Redirect with success message using correct session keys
+            $_SESSION['message'] = '✓ Data profil berhasil dirubah!';
+            $_SESSION['message_type'] = 'success';
             header('Location: ' . BASEURL . '/profile');
             exit;
         } else {
             // Database update failed
-            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Gagal memperbarui profil'];
+            $_SESSION['message'] = 'Gagal memperbarui profil';
+            $_SESSION['message_type'] = 'error';
             header('Location: ' . BASEURL . '/profile/edit');
             exit;
         }
