@@ -72,6 +72,7 @@ class Aset extends Controller {
         $this->guard();
 
         $asetModel = $this->model('Aset_model');
+        $maintenanceModel = $this->model('Maintenance_model');
 
         // 🔥 FILTER + SEARCH
         $search = $_GET['search'] ?? '';
@@ -85,6 +86,17 @@ class Aset extends Controller {
             'kategori' => $kategori,
             'kondisi' => $kondisi
         ];
+
+        // CALIBRATION SCHEDULE DATA
+        $today = date('Y-m-d');
+        $data['jadwal_hari_ini_maintenance'] = $maintenanceModel->getMaintenanceByDate($today);
+        $data['jadwal_minggu_maintenance'] = $maintenanceModel->getJadwalMingguIni();
+
+        // ASSET CONDITION DATA - For sidebar
+        $data['aset_rusak_ringan'] = $asetModel->getAsetByKondisi('Rusak_Ringan', 5);
+        $data['aset_rusak_berat'] = $asetModel->getAsetByKondisi('Rusak_Berat', 5);
+        $data['aset_maintenance'] = $asetModel->getAsetByKondisi('Maintenance', 5);
+        $data['aset_gudang'] = $asetModel->getAsetByKondisi('Gudang', 5);
 
         $data['judul'] = 'Master Aset - MedTrack IPSRS';
         $data['page_heading'] = 'Master Aset';
