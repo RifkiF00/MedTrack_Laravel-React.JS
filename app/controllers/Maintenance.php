@@ -35,6 +35,69 @@ class Maintenance extends Controller {
         $this->view('templates/dashboard_layout', $data);
     }
 
+    public function create() {
+        $this->guard();
+
+        $asetModel = $this->model('Aset_model');
+
+        $data['judul'] = 'Tambah Jadwal Preventive Maintenance - MedTrack IPSRS';
+        $data['page_heading'] = 'Tambah Jadwal Maintenance';
+        $data['page_subheading'] = 'Buat jadwal pemeliharaan rutin untuk aset';
+        $data['content_view'] = 'maintenance/create';
+        $data['aset_list'] = $asetModel->getAllAset();
+        $data['flash'] = getFlashMessage();
+
+        $this->view('templates/dashboard_layout', $data);
+    }
+
+    public function store() {
+        $this->guard();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASEURL . '/maintenance');
+            exit;
+        }
+
+        // Validasi CSRF token
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            setFlashMessage('CSRF token tidak valid', 'error');
+            header('Location: ' . BASEURL . '/maintenance');
+            exit;
+        }
+
+        $maintenanceModel = $this->model('Maintenance_model');
+
+        $formData = [
+            'nama_item' => sanitizeInput($_POST['nama_item'] ?? ''),
+            'deskripsi' => sanitizeInput($_POST['tanggal_maintenance'] ?? ''),
+            'lokasi' => sanitizeInput($_POST['lokasi_item'] ?? ''),
+            'frekuensi' => sanitizeInput($_POST['frekuensi_maintenance'] ?? ''),
+            'pic_penanggung_jawab' => $_SESSION['user_id'] ?? null,
+            'catatan' => sanitizeInput($_POST['keterangan'] ?? '')
+        ];
+
+        // Validasi input
+        $errors = [];
+        if (empty($formData['nama_item'])) $errors[] = 'Pilih aset terlebih dahulu';
+        if (empty($formData['frekuensi'])) $errors[] = 'Pilih frekuensi maintenance';
+        if (empty($formData['deskripsi'])) $errors[] = 'Masukkan tanggal maintenance';
+
+        if (!empty($errors)) {
+            $_SESSION['form_errors'] = $errors;
+            header('Location: ' . BASEURL . '/maintenance/create');
+            exit;
+        }
+
+        if ($maintenanceModel->createPemeliharaan($formData)) {
+            setFlashMessage('Jadwal maintenance berhasil ditambahkan', 'success');
+            header('Location: ' . BASEURL . '/maintenance');
+        } else {
+            setFlashMessage('Gagal menambahkan jadwal maintenance', 'error');
+            header('Location: ' . BASEURL . '/maintenance/create');
+        }
+        exit;
+    }
+
     public function log() {
         $this->guard();
 
