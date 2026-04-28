@@ -35,6 +35,14 @@ class Aset extends Controller {
         return $errors;
     }
 
+    private function validateDuplicateKodeLabel($kode_label, $exclude_id = null) {
+        $asetModel = $this->model('Aset_model');
+        if ($asetModel->isKodeLabelExists($kode_label, $exclude_id)) {
+            return 'Kode label sudah digunakan. Gunakan kode label yang berbeda.';
+        }
+        return null;
+    }
+
     private function handleImageUpload($file, $oldImage = null) {
         $maxSize = 5 * 1024 * 1024; // 5MB
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -180,6 +188,12 @@ class Aset extends Controller {
         $formData = $this->collectFormData();
         $errors = $this->validateInput($_POST);
 
+        // Cek duplicate kode label
+        $duplicateError = $this->validateDuplicateKodeLabel($formData['kode_label']);
+        if ($duplicateError) {
+            $errors[] = $duplicateError;
+        }
+
         // Handle upload gambar
         if (isset($_FILES['gambar_aset']) && $_FILES['gambar_aset']['error'] === UPLOAD_ERR_OK) {
             $uploadResult = $this->handleImageUpload($_FILES['gambar_aset']);
@@ -285,6 +299,14 @@ class Aset extends Controller {
 
         $formData = $this->collectFormData();
         $errors = $this->validateInput($_POST);
+
+        // Cek duplicate kode label (exclude current aset)
+        if ($formData['kode_label'] !== $aset->kode_label) {
+            $duplicateError = $this->validateDuplicateKodeLabel($formData['kode_label'], $id);
+            if ($duplicateError) {
+                $errors[] = $duplicateError;
+            }
+        }
 
         // Handle upload gambar
         if (isset($_FILES['gambar_aset']) && $_FILES['gambar_aset']['error'] === UPLOAD_ERR_OK) {

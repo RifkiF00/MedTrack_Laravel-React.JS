@@ -11,7 +11,7 @@ class Aset_model {
 
     // 🔹 GET ALL ASET
     public function getAllAset() {
-        $query = "SELECT 
+        $query = "SELECT
                     a.*,
                     r.nama_ruang
                   FROM m_aset a
@@ -21,6 +21,23 @@ class Aset_model {
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll();
+    }
+
+    // 🔹 CHECK DUPLICATE KODE LABEL
+    public function isKodeLabelExists($kode_label, $exclude_id = null) {
+        $query = "SELECT COUNT(*) as total FROM m_aset WHERE kode_label = :kode_label";
+        if ($exclude_id) {
+            $query .= " AND id_aset != :id_aset";
+        }
+
+        $stmt = $this->db->prepare($query);
+        $params = ['kode_label' => $kode_label];
+        if ($exclude_id) {
+            $params['id_aset'] = $exclude_id;
+        }
+        $stmt->execute($params);
+        $result = $stmt->fetch();
+        return $result && $result->total > 0;
     }
 
     // 🔹 GET ASET BY RUANGAN
