@@ -7,7 +7,7 @@
         </a>
     </div>
 
-    <form action="<?= BASEURL; ?>/aset/update/<?= $data['aset']->id_aset; ?>" method="POST" style="background:#fff; border: 1px solid #e2e8f0; border-radius:16px; padding:35px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+    <form action="<?= BASEURL; ?>/aset/update/<?= $data['aset']->id_aset; ?>" method="POST" enctype="multipart/form-data" style="background:#fff; border: 1px solid #e2e8f0; border-radius:16px; padding:35px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
         <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
 
         <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:25px;">

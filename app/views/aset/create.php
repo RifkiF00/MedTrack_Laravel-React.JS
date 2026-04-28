@@ -20,7 +20,7 @@
         </div>
     <?php endif; ?>
 
-    <form action="<?= BASEURL; ?>/aset/store" method="POST" style="background:#fff; border:1px solid #ddd; border-radius:12px; padding:24px;">
+    <form action="<?= BASEURL; ?>/aset/store" method="POST" enctype="multipart/form-data" style="background:#fff; border:1px solid #ddd; border-radius:12px; padding:24px;">
         <input type="hidden" name="csrf_token" value="<?= getCSRFToken(); ?>">
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
