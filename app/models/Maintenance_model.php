@@ -233,4 +233,37 @@ class Maintenance_model {
         $stmt->execute(['nama_item' => $nama_item]);
         return $stmt->fetch();
     }
+
+    // Get assets with calibration due within 1 week
+    public function getKalibrasiMendekatiAset($limit = 5) {
+        $query = "SELECT id_aset, kode_label, nama_alat, tgl_kadaluarsa_sertif
+                  FROM m_aset
+                  WHERE tgl_kadaluarsa_sertif IS NOT NULL
+                    AND tgl_kadaluarsa_sertif <= DATE_ADD(NOW(), INTERVAL 7 DAY)
+                    AND tgl_kadaluarsa_sertif >= CURDATE()
+                    AND status_kondisi != 'Pensiun'
+                  ORDER BY tgl_kadaluarsa_sertif ASC
+                  LIMIT :limit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Delete maintenance schedule (hard delete)
+    public function deletePemeliharaan($id) {
+        try {
+            // Delete logs first (cascade)
+            $queryLogs = "DELETE FROM t_pemeliharaan_log WHERE id_pemeliharaan = :id";
+            $stmtLogs = $this->db->prepare($queryLogs);
+            $stmtLogs->execute(['id' => $id]);
+
+            // Delete maintenance item
+            $query = "DELETE FROM m_pemeliharaan WHERE id_pemeliharaan = :id";
+            $stmt = $this->db->prepare($query);
+            return $stmt->execute(['id' => $id]);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
 }

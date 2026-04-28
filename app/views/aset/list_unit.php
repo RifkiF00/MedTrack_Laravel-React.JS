@@ -38,10 +38,10 @@ $namaRuang = $data['nama_ruang'] ?? 'Ruangan';
                         if ($a->status_kondisi === 'Baik') {
                             $statusColor = '#047857';
                             $statusBgColor = '#d1fae5';
-                        } elseif ($a->status_kondisi === 'Rusak Ringan') {
+                        } elseif ($a->status_kondisi === 'Rusak_Ringan') {
                             $statusColor = '#c2410c';
                             $statusBgColor = '#fed7aa';
-                        } elseif ($a->status_kondisi === 'Rusak Berat') {
+                        } elseif ($a->status_kondisi === 'Rusak_Berat') {
                             $statusColor = '#991b1b';
                             $statusBgColor = '#fee2e2';
                         } elseif ($a->status_kondisi === 'Maintenance') {
@@ -71,7 +71,7 @@ $namaRuang = $data['nama_ruang'] ?? 'Ruangan';
                             </td>
                             <td style="padding: 12px;">
                                 <span style="display: inline-block; padding: 6px 12px; background: <?= $statusBgColor; ?>; color: <?= $statusColor; ?>; border-radius: 8px; font-size: 12px; font-weight: 600;">
-                                    <?= escape($a->status_kondisi ?? 'Tidak Diketahui'); ?>
+                                    <?= escape(!empty($a->status_kondisi) ? str_replace('_', ' ', $a->status_kondisi) : 'Tidak Diketahui'); ?>
                                 </span>
                             </td>
                             <td style="padding: 12px;">
@@ -92,7 +92,7 @@ $namaRuang = $data['nama_ruang'] ?? 'Ruangan';
         <div style="margin-top: 20px; padding: 16px; background: #f9fafb; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 14px; color: #1a2b56;">
             <strong>Total Aset:</strong> <?= count($aset); ?> unit
             | <strong>Baik:</strong> <?php echo count(array_filter($aset, fn($a) => $a->status_kondisi === 'Baik')); ?>
-            | <strong>Rusak:</strong> <?php echo count(array_filter($aset, fn($a) => in_array($a->status_kondisi, ['Rusak Ringan', 'Rusak Berat']))); ?>
+            | <strong>Rusak:</strong> <?php echo count(array_filter($aset, fn($a) => in_array($a->status_kondisi, ['Rusak_Ringan', 'Rusak_Berat']))); ?>
             | <strong>Maintenance:</strong> <?php echo count(array_filter($aset, fn($a) => $a->status_kondisi === 'Maintenance')); ?>
         </div>
 

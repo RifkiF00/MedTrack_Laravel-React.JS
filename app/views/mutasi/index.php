@@ -106,25 +106,38 @@ body {
 
                         <!-- ACTIONS -->
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <?php if ($mutasi->status_mutasi === 'Menunggu_Verifikasi'): ?>
-                                <a href="<?= BASEURL; ?>/mutasi/approve/<?= $mutasi->id_mutasi; ?>" style="padding: 6px 12px; background: #10b981; color: #fff; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif;">
-                                    ✓ Setujui
-                                </a>
-                                <a href="<?= BASEURL; ?>/mutasi/reject/<?= $mutasi->id_mutasi; ?>" style="padding: 6px 12px; background: #ef4444; color: #fff; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif;">
-                                    ✕ Tolak
-                                </a>
-                            <?php elseif ($mutasi->status_mutasi === 'Disetujui'): ?>
-                                <a href="<?= BASEURL; ?>/mutasi/complete/<?= $mutasi->id_mutasi; ?>" style="padding: 6px 12px; background: #3b82f6; color: #fff; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif;">
-                                    ✓ Selesaikan
-                                </a>
-                            <?php endif; ?>
+                            <?php $role = $_SESSION['role'] ?? ''; ?>
 
-                            <form action="<?= BASEURL; ?>/mutasi/delete/<?= $mutasi->id_mutasi; ?>" method="POST" style="display: inline;" onsubmit="return confirm('Hapus mutasi ini?');">
-                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
-                                <button type="submit" style="padding: 6px 12px; background: #6b7280; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif; cursor: pointer;">
-                                    🗑 Hapus
-                                </button>
-                            </form>
+                            <!-- IPSRS: Approve, Reject, Complete, Delete -->
+                            <?php if ($role === 'Staf_IPSRS'): ?>
+                                <?php if ($mutasi->status_mutasi === 'Menunggu_Verifikasi'): ?>
+                                    <a href="<?= BASEURL; ?>/mutasi/approve/<?= $mutasi->id_mutasi; ?>" style="padding: 6px 12px; background: #10b981; color: #fff; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif;">
+                                        ✓ Setujui
+                                    </a>
+                                    <a href="<?= BASEURL; ?>/mutasi/reject/<?= $mutasi->id_mutasi; ?>" style="padding: 6px 12px; background: #ef4444; color: #fff; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif;">
+                                        ✕ Tolak
+                                    </a>
+                                <?php elseif ($mutasi->status_mutasi === 'Disetujui'): ?>
+                                    <a href="<?= BASEURL; ?>/mutasi/complete/<?= $mutasi->id_mutasi; ?>" style="padding: 6px 12px; background: #3b82f6; color: #fff; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif;">
+                                        ✓ Selesaikan
+                                    </a>
+                                <?php endif; ?>
+
+                                <form action="<?= BASEURL; ?>/mutasi/delete/<?= $mutasi->id_mutasi; ?>" method="POST" style="display: inline;" onsubmit="return confirm('Hapus mutasi ini?');">
+                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+                                    <button type="submit" style="padding: 6px 12px; background: #6b7280; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif; cursor: pointer;">
+                                        🗑 Hapus
+                                    </button>
+                                </form>
+                            <!-- UNIT_RS: Only withdraw own pending requests -->
+                            <?php elseif ($role === 'Unit_RS' && $mutasi->status_mutasi === 'Menunggu_Verifikasi' && $mutasi->id_user_pencatat == $_SESSION['user_id']): ?>
+                                <form action="<?= BASEURL; ?>/mutasi/delete/<?= $mutasi->id_mutasi; ?>" method="POST" style="display: inline;" onsubmit="return confirm('Tarik kembali permintaan mutasi ini?');">
+                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+                                    <button type="submit" style="padding: 6px 12px; background: #6b7280; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif; cursor: pointer;">
+                                        ↩ Tarik Kembali
+                                    </button>
+                                </form>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>

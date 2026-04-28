@@ -74,16 +74,27 @@ body {
                                 <?= str_replace('_', ' ', escape($item->frekuensi)); ?> • <?= escape($item->lokasi ?? 'Lokasi umum'); ?>
                             </div>
                         </div>
-                        <div>
-                            <?php if ($item->sudah_dikerjakan > 0): ?>
-                                <div style="padding: 6px 10px; background: #ecfdf5; color: #047857; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif;">
-                                    ✓ <?= $item->sudah_dikerjakan; ?>x
-                                </div>
-                            <?php else: ?>
-                                <div style="padding: 6px 10px; background: #fef2f2; color: #991b1b; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif;">
-                                    ⏱ Pending
-                                </div>
-                            <?php endif; ?>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <div>
+                                <?php if ($item->sudah_dikerjakan > 0): ?>
+                                    <div style="padding: 6px 10px; background: #ecfdf5; color: #047857; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif;">
+                                        ✓ <?= $item->sudah_dikerjakan; ?>x
+                                    </div>
+                                <?php else: ?>
+                                    <div style="padding: 6px 10px; background: #fef2f2; color: #991b1b; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Nunito', sans-serif;">
+                                        ⏱ Pending
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <form method="POST" action="<?= BASEURL; ?>/maintenance/delete/<?= $item->id_pemeliharaan; ?>" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
+                                <button type="submit" onclick="return confirm('Hapus jadwal ini?');"
+                                        style="padding: 6px 10px; background: #fee2e2; color: #991b1b; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; white-space: nowrap;"
+                                        onmouseover="this.style.background='#fecaca'"
+                                        onmouseout="this.style.background='#fee2e2'">
+                                    🗑 Hapus
+                                </button>
+                            </form>
                         </div>
                     </div>
                 <?php endforeach; ?>

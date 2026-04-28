@@ -61,6 +61,7 @@ class Dashboard extends Controller {
             $wo_open = $workOrderModel->getWorkOrderOpen(10);
             $aset_rusak = $asetModel->getAsetRusak();
             $maintenance_mendekati = $maintenanceModel->getKalibrasiMendekati(5);
+            $kalibrasi_mendekati = $maintenanceModel->getKalibrasiMendekatiAset(5);
 
             $notifications = [];
             foreach ($wo_open as $wo) {
@@ -69,25 +70,38 @@ class Dashboard extends Controller {
                     'icon' => '🔴',
                     'title' => 'Work Order Baru',
                     'message' => $wo->kode_label . ' - ' . ($wo->nama_alat ?? 'Equipment'),
-                    'color' => '#cd1601'
+                    'color' => '#cd1601',
+                    'action_url' => BASEURL . '/aset/detail/' . $wo->id_aset
                 ];
             }
-            foreach (array_slice($aset_rusak, 0, 3) as $aset) {
+            foreach (array_slice($aset_rusak, 0, 7) as $aset) {
                 $notifications[] = [
                     'type' => 'aset_rusak',
                     'icon' => '⚠️',
                     'title' => 'Aset Rusak',
                     'message' => $aset->kode_label . ' - ' . $aset->nama_alat,
-                    'color' => '#f97316'
+                    'color' => '#f97316',
+                    'action_url' => BASEURL . '/aset/detail/' . $aset->id_aset
                 ];
             }
-            foreach (array_slice($maintenance_mendekati, 0, 3) as $m) {
+            foreach (array_slice($maintenance_mendekati, 0, 2) as $m) {
                 $notifications[] = [
                     'type' => 'maintenance',
                     'icon' => '📅',
                     'title' => 'Maintenance Mendekati',
                     'message' => $m->nama_item,
-                    'color' => '#3b82f6'
+                    'color' => '#3b82f6',
+                    'action_url' => BASEURL . '/maintenance'
+                ];
+            }
+            foreach (array_slice($kalibrasi_mendekati, 0, 2) as $aset) {
+                $notifications[] = [
+                    'type' => 'kalibrasi_mendekati',
+                    'icon' => '📋',
+                    'title' => 'Jadwal Kalibrasi Mendekati',
+                    'message' => $aset->kode_label . ' - ' . $aset->nama_alat,
+                    'color' => '#f59e0b',
+                    'action_url' => BASEURL . '/aset/edit/' . $aset->id_aset . '#kalibrasi-section'
                 ];
             }
             $data['notifications'] = array_slice($notifications, 0, 10);
@@ -103,7 +117,8 @@ class Dashboard extends Controller {
                     'icon' => '📦',
                     'title' => 'Aset Baru Ditambahkan',
                     'message' => $aset->kode_label . ' - ' . $aset->nama_alat,
-                    'color' => '#10b981'
+                    'color' => '#10b981',
+                    'action_url' => BASEURL . '/aset/detail/' . $aset->id_aset
                 ];
             }
             foreach (array_slice($aset_perlu_pengadaan, 0, 3) as $aset) {
@@ -112,7 +127,8 @@ class Dashboard extends Controller {
                     'icon' => '🛒',
                     'title' => 'Perlu Pengadaan',
                     'message' => $aset->kode_label . ' - ' . $aset->status_kondisi,
-                    'color' => '#ef4444'
+                    'color' => '#ef4444',
+                    'action_url' => BASEURL . '/aset'
                 ];
             }
             $data['notifications'] = array_slice($notifications, 0, 10);
@@ -128,7 +144,8 @@ class Dashboard extends Controller {
                     'icon' => '🔔',
                     'title' => 'WO Belum Ditangani',
                     'message' => $wo->kode_label . ' - ' . ($wo->nama_alat ?? 'Equipment'),
-                    'color' => '#f97316'
+                    'color' => '#f97316',
+                    'action_url' => BASEURL . '/aset/detail/' . $wo->id_aset
                 ];
             }
             foreach (array_slice($aset_rusak_ruangan, 0, 3) as $aset) {
@@ -137,7 +154,8 @@ class Dashboard extends Controller {
                     'icon' => '⚠️',
                     'title' => 'Aset Rusak di Ruangan',
                     'message' => $aset->kode_label . ' - ' . $aset->status_kondisi,
-                    'color' => '#ef4444'
+                    'color' => '#ef4444',
+                    'action_url' => BASEURL . '/aset/detail/' . $aset->id_aset
                 ];
             }
             $data['notifications'] = array_slice($notifications, 0, 10);
@@ -154,8 +172,8 @@ class Dashboard extends Controller {
             $data['total_it'] = $asetModel->countByKategoriAndRuangan('IT', $idRuang);
 
             $data['baik'] = $asetModel->countByKondisiAndRuangan('Baik', $idRuang);
-            $data['rusak_ringan'] = $asetModel->countByKondisiAndRuangan('Rusak Ringan', $idRuang);
-            $data['rusak_berat'] = $asetModel->countByKondisiAndRuangan('Rusak Berat', $idRuang);
+            $data['rusak_ringan'] = $asetModel->countByKondisiAndRuangan('Rusak_Ringan', $idRuang);
+            $data['rusak_berat'] = $asetModel->countByKondisiAndRuangan('Rusak_Berat', $idRuang);
             $data['maintenance'] = $asetModel->countByKondisiAndRuangan('Maintenance', $idRuang);
             $data['gudang'] = $asetModel->countByKondisiAndRuangan('Gudang', $idRuang);
 

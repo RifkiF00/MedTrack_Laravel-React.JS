@@ -29,7 +29,7 @@ CREATE TABLE m_user (
   email VARCHAR(100) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
   nama_lengkap VARCHAR(100) NOT NULL,
-  role ENUM('Admin_IPSRS', 'Staf_Logistik', 'Staf_Unit', 'Kepala_IPSRS') NOT NULL,
+  role ENUM('Admin_IPSRS', 'Staf_IPSRS', 'Staf_Logistik', 'Unit_RS', 'Kepala_IPSRS') NOT NULL,
   id_ruang INT,
   nip VARCHAR(20),
   no_hp VARCHAR(15),
@@ -47,17 +47,23 @@ CREATE TABLE m_aset (
   id_aset INT PRIMARY KEY AUTO_INCREMENT,
   kode_label VARCHAR(50) NOT NULL UNIQUE,
   nama_alat VARCHAR(150) NOT NULL,
+  kategori_aset ENUM('Medis', 'Sarpras', 'IT') DEFAULT 'Medis',
+  jumlah_unit INT NOT NULL DEFAULT 1,
   merk VARCHAR(80),
   model VARCHAR(80),
   serial_number VARCHAR(100),
   no_sertifikat VARCHAR(50),
   tgl_pengadaan DATE,
+  tgl_kalibrasi_terakhir DATE,
   tgl_kadaluarsa_sertif DATE,
   harga_perolehan DECIMAL(15, 2),
-  status_kondisi ENUM('Baik', 'Rusak_Ringan', 'Rusak_Berat', 'Maintenance', 'Pensiun') DEFAULT 'Baik',
+  status_kondisi ENUM('Baik', 'Rusak_Ringan', 'Rusak_Berat', 'Maintenance', 'Gudang', 'Pensiun') DEFAULT 'Baik',
   id_ruang_saat_ini INT,
   lokasi_fisik VARCHAR(255),
   keterangan TEXT,
+  gambar_aset VARCHAR(255),
+  latitude DECIMAL(10, 8),
+  longitude DECIMAL(11, 8),
   file_qr_code VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -127,6 +133,28 @@ CREATE TABLE t_sirkulasi (
   INDEX idx_status_pinjam (status_pinjam)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Tabel Mutasi Ruangan (Pencatatan pergerakan aset antar ruangan)
+CREATE TABLE t_mutasi (
+  id_mutasi INT PRIMARY KEY AUTO_INCREMENT,
+  id_aset INT NOT NULL,
+  ruang_asal INT NOT NULL,
+  ruang_tujuan INT NOT NULL,
+  id_user_pencatat INT,
+  tgl_mutasi DATETIME DEFAULT CURRENT_TIMESTAMP,
+  alasan_mutasi VARCHAR(255),
+  status_mutasi ENUM('Menunggu_Verifikasi', 'Disetujui', 'Ditolak', 'Selesai') DEFAULT 'Menunggu_Verifikasi',
+  catatan TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_aset) REFERENCES m_aset(id_aset) ON DELETE CASCADE,
+  FOREIGN KEY (ruang_asal) REFERENCES m_ruangan(id_ruang) ON DELETE RESTRICT,
+  FOREIGN KEY (ruang_tujuan) REFERENCES m_ruangan(id_ruang) ON DELETE RESTRICT,
+  FOREIGN KEY (id_user_pencatat) REFERENCES m_user(id_user) ON DELETE SET NULL,
+  INDEX idx_status (status_mutasi),
+  INDEX idx_tgl (tgl_mutasi),
+  INDEX idx_aset (id_aset)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Tabel Maintenance & Kalibrasi (Penting untuk IPSRS)
 CREATE TABLE t_maintenance (
   id_main INT PRIMARY KEY AUTO_INCREMENT,
@@ -151,13 +179,32 @@ CREATE TABLE t_troubleshoot (
   id_ticket INT PRIMARY KEY AUTO_INCREMENT,
   id_aset INT NOT NULL,
   id_user_pelapor INT NOT NULL,
+  id_teknisi_penanggungjawab INT,
   tgl_lapor TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   tingkat_urgensi ENUM('Rendah', 'Sedang', 'Tinggi', 'Darurat') DEFAULT 'Sedang',
   deskripsi_kerusakan TEXT NOT NULL,
   foto_kerusakan VARCHAR(255),
   status_ticket ENUM('Open', 'Pengecekan', 'Dikerjakan', 'Closed') DEFAULT 'Open',
   FOREIGN KEY (id_aset) REFERENCES m_aset(id_aset),
-  FOREIGN KEY (id_user_pelapor) REFERENCES m_user(id_user)
+  FOREIGN KEY (id_user_pelapor) REFERENCES m_user(id_user),
+  FOREIGN KEY (id_teknisi_penanggungjawab) REFERENCES m_user(id_user) ON DELETE SET NULL,
+  INDEX idx_status_ticket (status_ticket),
+  INDEX idx_teknisi (id_teknisi_penanggungjawab)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabel Log Perubahan Status Work Order
+CREATE TABLE t_troubleshoot_log (
+  id_log INT PRIMARY KEY AUTO_INCREMENT,
+  id_ticket INT NOT NULL,
+  status_lama ENUM('Open', 'Pengecekan', 'Dikerjakan', 'Closed') NOT NULL,
+  status_baru ENUM('Open', 'Pengecekan', 'Dikerjakan', 'Closed') NOT NULL,
+  catatan TEXT,
+  diubah_oleh INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_ticket) REFERENCES t_troubleshoot(id_ticket) ON DELETE CASCADE,
+  FOREIGN KEY (diubah_oleh) REFERENCES m_user(id_user) ON DELETE SET NULL,
+  INDEX idx_ticket (id_ticket),
+  INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabel Master Pemeliharaan (Jadwal rutin infrastruktur/fasilitas)

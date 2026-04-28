@@ -257,6 +257,24 @@
                     style="width:100%; padding:10px; margin-top:6px;"
                 ><?= escape($data['old']['keterangan'] ?? ''); ?></textarea>
             </div>
+
+            <!-- GAMBAR ASET -->
+            <div style="grid-column:1 / -1; margin-top:20px; padding-top:20px; border-top:1px solid #ddd;">
+                <h4 style="margin:0 0 16px 0; font-size:15px; font-weight:600;">📸 Upload Gambar Aset</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <label style="font-weight:600; font-size:13px;">Pilih Gambar</label>
+                        <input type="file" id="gambar_aset_input" name="gambar_aset" accept="image/*" style="padding:10px; border:1px solid #ddd; border-radius:8px; background:#fff; cursor:pointer;">
+                        <div style="font-size:12px; color:#666;">Format: JPG, PNG, GIF (Max: 5MB)</div>
+                    </div>
+                    <div id="image-preview-container" style="display:none;">
+                        <label style="font-weight:600; font-size:13px;">Preview</label>
+                        <div style="width:100%; aspect-ratio:1; border:2px dashed #ddd; border-radius:8px; display:flex; align-items:center; justify-content:center; background:#f9f9f9; overflow:hidden;">
+                            <img id="preview-image" src="" alt="Preview" style="width:100%; height:100%; object-fit:cover;">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
@@ -389,5 +407,35 @@ document.addEventListener('DOMContentLoaded', function () {
         status.textContent = 'Koordinat awal dimuat ke peta.';
         status.style.color = '#198754';
     }
+
+    // Preview Gambar
+    document.getElementById('gambar_aset_input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validasi ukuran file (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Ukuran gambar maksimal 5MB');
+            this.value = '';
+            document.getElementById('image-preview-container').style.display = 'none';
+            return;
+        }
+
+        // Validasi tipe file
+        if (!file.type.startsWith('image/')) {
+            alert('File harus berupa gambar');
+            this.value = '';
+            document.getElementById('image-preview-container').style.display = 'none';
+            return;
+        }
+
+        // Preview gambar
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('preview-image').src = event.target.result;
+            document.getElementById('image-preview-container').style.display = 'grid';
+        };
+        reader.readAsDataURL(file);
+    });
 });
 </script>

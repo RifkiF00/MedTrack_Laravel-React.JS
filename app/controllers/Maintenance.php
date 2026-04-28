@@ -98,4 +98,67 @@ class Maintenance extends Controller {
 
         $this->view('templates/dashboard_layout', $data);
     }
+
+    public function delete($id) {
+        $this->guard();
+
+        // Validasi CSRF token
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            setFlashMessage('CSRF token tidak valid', 'error');
+            header('Location: ' . BASEURL . '/maintenance');
+            exit;
+        }
+
+        $maintenanceModel = $this->model('Maintenance_model');
+
+        if ($maintenanceModel->deletePemeliharaan($id)) {
+            setFlashMessage('Jadwal pemeliharaan berhasil dihapus', 'success');
+        } else {
+            setFlashMessage('Gagal menghapus jadwal pemeliharaan', 'error');
+        }
+
+        header('Location: ' . BASEURL . '/maintenance');
+        exit;
+    }
+
+    public function reschedule() {
+        $this->guard();
+
+        // Validasi CSRF token
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            setFlashMessage('CSRF token tidak valid', 'error');
+            header('Location: ' . BASEURL . '/dashboard');
+            exit;
+        }
+
+        $id_pemeliharaan = htmlspecialchars($_POST['id_pemeliharaan'] ?? '');
+        $tgl_rencana = htmlspecialchars($_POST['tgl_rencana'] ?? '');
+
+        if (empty($id_pemeliharaan) || empty($tgl_rencana)) {
+            setFlashMessage('Data tidak lengkap', 'error');
+            header('Location: ' . BASEURL . '/dashboard');
+            exit;
+        }
+
+        $maintenanceModel = $this->model('Maintenance_model');
+
+        $logData = [
+            'id_pemeliharaan' => $id_pemeliharaan,
+            'id_user_pelaksana' => $_SESSION['user_id'],
+            'tgl_rencana' => $tgl_rencana,
+            'status_pelaksanaan' => 'Terjadwal',
+            'hasil_pengecekan' => '',
+            'kondisi_laporan' => 'Normal',
+            'catatan_khusus' => 'Dijadwalkan ulang'
+        ];
+
+        if ($maintenanceModel->createLog($logData)) {
+            setFlashMessage('Jadwal maintenance berhasil dijadwalkan ulang ke ' . date('d/m/Y', strtotime($tgl_rencana)), 'success');
+        } else {
+            setFlashMessage('Gagal menjadwalkan ulang maintenance', 'error');
+        }
+
+        header('Location: ' . BASEURL . '/dashboard');
+        exit;
+    }
 }

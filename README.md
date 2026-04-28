@@ -128,17 +128,22 @@ Staf Unit:
 
 ## 📊 Database Schema
 
-### 7 Main Tables
+### Core Tables (Master + Transaksi)
 
 | Table | Purpose | Rows |
 |-------|---------|------|
 | **m_ruangan** | Master ruangan (IGD, ICCU, OK, dll) | 10 |
-| **m_user** | User dengan 3 roles | 5 |
-| **m_aset** | Peralatan medis | 50 dummy |
+| **m_user** | User dengan role operasional sistem | 5 |
+| **m_aset** | Peralatan medis + metadata kalibrasi | 50 dummy |
+| **m_vendor** | Supplier/vendor | 5 dummy |
+| **m_pemeliharaan** | Master jadwal preventive maintenance | Dynamic |
 | **t_tracking** | GPS location history | Dynamic |
 | **t_sirkulasi** | Peminjaman aset | Dynamic |
-| **t_maintenance** | Jadwal maintenance | Dynamic |
-| **m_vendor** | Supplier/vendor | 5 dummy |
+| **t_mutasi** | Mutasi/pergerakan aset antar ruangan | Dynamic |
+| **t_maintenance** | Maintenance/servis berbasis aset | Dynamic |
+| **t_troubleshoot** | Ticket work order kerusakan | Dynamic |
+| **t_troubleshoot_log** | Riwayat perubahan status ticket | Dynamic |
+| **t_pemeliharaan_log** | Riwayat pelaksanaan preventive maintenance | Dynamic |
 
 ---
 
@@ -149,7 +154,7 @@ Staf Unit:
 ✅ **PDO Prepared Statements** - SQL injection prevention  
 ✅ **Session Management** - Secure auth handling  
 ✅ **Input Validation** - Server-side validation  
-✅ **Role-Based Access Control** - 3 role permissions  
+✅ **Role-Based Access Control** - Role permissions per modul  
 
 ---
 

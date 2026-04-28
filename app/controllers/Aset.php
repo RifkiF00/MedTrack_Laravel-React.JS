@@ -35,6 +35,42 @@ class Aset extends Controller {
         return $errors;
     }
 
+    private function handleImageUpload($file, $oldImage = null) {
+        $maxSize = 5 * 1024 * 1024; // 5MB
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $uploadDir = '../public/uploads/assets/';
+
+        // Validasi
+        if ($file['size'] > $maxSize) {
+            return ['Ukuran gambar maksimal 5MB.'];
+        }
+
+        if (!in_array($file['type'], $allowedTypes)) {
+            return ['Format gambar harus JPG, PNG, atau GIF.'];
+        }
+
+        // Buat direktori jika belum ada
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        // Generate nama file unik
+        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $fileName = 'aset_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+        $filePath = $uploadDir . $fileName;
+
+        // Upload file
+        if (move_uploaded_file($file['tmp_name'], $filePath)) {
+            // Hapus gambar lama jika ada
+            if ($oldImage && file_exists($uploadDir . $oldImage)) {
+                unlink($uploadDir . $oldImage);
+            }
+            return $fileName;
+        }
+
+        return ['Gagal upload gambar. Coba lagi.'];
+    }
+
     private function collectFormData() {
         return [
             'kode_label' => sanitizeInput($_POST['kode_label'] ?? ''),
@@ -69,43 +105,48 @@ class Aset extends Controller {
     }
 
     public function index() {
-        $this->guard();
+    $this->guard();
 
-        $asetModel = $this->model('Aset_model');
-        $maintenanceModel = $this->model('Maintenance_model');
+    $asetModel = $this->model('Aset_model');
+    $maintenanceModel = $this->model('Maintenance_model');
 
-        // 🔥 FILTER + SEARCH
-        $search = $_GET['search'] ?? '';
-        $kategori = $_GET['kategori'] ?? '';
-        $kondisi = $_GET['kondisi'] ?? '';
+    $search = $_GET['search'] ?? '';
+    $kategori = $_GET['kategori'] ?? '';
+    $kondisi = $_GET['kondisi'] ?? '';
 
-        $data['aset'] = $asetModel->getFilteredAset($search, $kategori, $kondisi);
+    $data['aset'] = $asetModel->getFilteredAset($search, $kategori, $kondisi);
 
-        $data['filter'] = [
-            'search' => $search,
-            'kategori' => $kategori,
-            'kondisi' => $kondisi
-        ];
+    $data['filter'] = [
+        'search' => $search,
+        'kategori' => $kategori,
+        'kondisi' => $kondisi
+    ];
 
-        // CALIBRATION SCHEDULE DATA
-        $today = date('Y-m-d');
-        $data['jadwal_hari_ini_maintenance'] = $maintenanceModel->getMaintenanceByDate($today);
-        $data['jadwal_minggu_maintenance'] = $maintenanceModel->getJadwalMingguIni();
+    $today = date('Y-m-d');
+    $data['jadwal_hari_ini_maintenance'] = $maintenanceModel->getMaintenanceByDate($today);
+    $data['jadwal_minggu_maintenance'] = $maintenanceModel->getJadwalMingguIni();
 
-        // ASSET CONDITION DATA - For sidebar
-        $data['aset_rusak_ringan'] = $asetModel->getAsetByKondisi('Rusak_Ringan', 5);
-        $data['aset_rusak_berat'] = $asetModel->getAsetByKondisi('Rusak_Berat', 5);
-        $data['aset_maintenance'] = $asetModel->getAsetByKondisi('Maintenance', 5);
-        $data['aset_gudang'] = $asetModel->getAsetByKondisi('Gudang', 5);
+    $data['aset_rusak_ringan'] = $asetModel->getAsetByKondisi('Rusak_Ringan', 8);
+    $data['aset_rusak_berat'] = $asetModel->getAsetByKondisi('Rusak_Berat', 8);
+    $data['aset_maintenance'] = $asetModel->getAsetByKondisi('Maintenance', 8);
+    $data['aset_gudang'] = $asetModel->getAsetByKondisi('Gudang', 8);
 
-        $data['judul'] = 'Master Aset - MedTrack IPSRS';
-        $data['page_heading'] = 'Master Aset';
-        $data['page_subheading'] = 'Kelola data alat medis dan sarana prasarana.';
-        $data['flash'] = getFlashMessage();
-        $data['content_view'] = 'aset/index';
+    // INI YANG TADI KURANG
+    $data['sidebar_data'] = [
+        'aset_rusak_ringan' => $data['aset_rusak_ringan'],
+        'aset_rusak_berat' => $data['aset_rusak_berat'],
+        'aset_maintenance' => $data['aset_maintenance'],
+        'aset_gudang' => $data['aset_gudang']
+    ];
 
-        $this->view('templates/dashboard_layout', $data);
-    }
+    $data['judul'] = 'Master Aset - MedTrack IPSRS';
+    $data['page_heading'] = 'Master Aset';
+    $data['page_subheading'] = 'Kelola data alat medis dan sarana prasarana.';
+    $data['flash'] = getFlashMessage();
+    $data['content_view'] = 'aset/index';
+
+    $this->view('templates/dashboard_layout', $data);
+}
 
     public function create() {
         $this->guard();
@@ -138,6 +179,16 @@ class Aset extends Controller {
         $asetModel = $this->model('Aset_model');
         $formData = $this->collectFormData();
         $errors = $this->validateInput($_POST);
+
+        // Handle upload gambar
+        if (isset($_FILES['gambar_aset']) && $_FILES['gambar_aset']['error'] === UPLOAD_ERR_OK) {
+            $uploadResult = $this->handleImageUpload($_FILES['gambar_aset']);
+            if (is_array($uploadResult)) {
+                $errors = array_merge($errors, $uploadResult);
+            } else {
+                $formData['gambar_aset'] = $uploadResult;
+            }
+        }
 
         if (!empty($errors)) {
             $data['judul'] = 'Tambah Aset - MedTrack IPSRS';
@@ -234,6 +285,16 @@ class Aset extends Controller {
 
         $formData = $this->collectFormData();
         $errors = $this->validateInput($_POST);
+
+        // Handle upload gambar
+        if (isset($_FILES['gambar_aset']) && $_FILES['gambar_aset']['error'] === UPLOAD_ERR_OK) {
+            $uploadResult = $this->handleImageUpload($_FILES['gambar_aset'], $aset->gambar_aset);
+            if (is_array($uploadResult)) {
+                $errors = array_merge($errors, $uploadResult);
+            } else {
+                $formData['gambar_aset'] = $uploadResult;
+            }
+        }
 
         if (!empty($errors)) {
             $data['judul'] = 'Edit Aset - MedTrack IPSRS';
@@ -393,5 +454,33 @@ class Aset extends Controller {
             'Berhasil generate QR untuk ' . $totalGenerated . ' aset.',
             'success'
         );
+    }
+
+    // 🗑 CLEAR CALIBRATION SCHEDULE
+    public function clearCalibration($id) {
+        $this->guard();
+
+        // Validasi CSRF token
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            setFlashMessage('CSRF token tidak valid', 'error');
+            header('Location: ' . BASEURL . '/dashboard');
+            exit;
+        }
+
+        $asetModel = $this->model('Aset_model');
+
+        // Clear calibration date
+        $updateData = [
+            'tgl_kadaluarsa_sertif' => null
+        ];
+
+        if ($asetModel->updateAset($id, $updateData)) {
+            setFlashMessage('Jadwal kalibrasi berhasil dihapus', 'success');
+        } else {
+            setFlashMessage('Gagal menghapus jadwal kalibrasi', 'error');
+        }
+
+        header('Location: ' . BASEURL . '/dashboard');
+        exit;
     }
 }

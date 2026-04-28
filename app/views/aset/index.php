@@ -48,8 +48,8 @@
         <select name="kondisi" style="padding:10px; border-radius:8px;">
             <option value="">Semua Kondisi</option>
             <option value="Baik" <?= ($data['filter']['kondisi'] ?? '')=='Baik' ? 'selected' : '' ?>>Baik</option>
-            <option value="Rusak Ringan" <?= ($data['filter']['kondisi'] ?? '')=='Rusak Ringan' ? 'selected' : '' ?>>Rusak Ringan</option>
-            <option value="Rusak Berat" <?= ($data['filter']['kondisi'] ?? '')=='Rusak Berat' ? 'selected' : '' ?>>Rusak Berat</option>
+            <option value="Rusak_Ringan" <?= ($data['filter']['kondisi'] ?? '')=='Rusak_Ringan' ? 'selected' : '' ?>>Rusak Ringan</option>
+            <option value="Rusak_Berat" <?= ($data['filter']['kondisi'] ?? '')=='Rusak_Berat' ? 'selected' : '' ?>>Rusak Berat</option>
             <option value="Maintenance" <?= ($data['filter']['kondisi'] ?? '')=='Maintenance' ? 'selected' : '' ?>>Maintenance</option>
             <option value="Gudang" <?= ($data['filter']['kondisi'] ?? '')=='Gudang' ? 'selected' : '' ?>>Gudang</option>
         </select>
@@ -101,12 +101,12 @@
                             <td style="padding:12px;">
                                 <?php
                                 $kondisi = $aset->status_kondisi ?? '';
-                                $kondisiDisplay = $kondisi;
+                                $kondisiDisplay = str_replace('_', ' ', $kondisi);
                                 $color = '#f3f4f6';
 
                                 if ($kondisi == 'Baik') $color = '#d1fae5';
-                                elseif ($kondisi == 'Rusak Ringan') $color = '#fef3c7';
-                                elseif ($kondisi == 'Rusak Berat') $color = '#fee2e2';
+                                elseif ($kondisi == 'Rusak_Ringan') $color = '#fef3c7';
+                                elseif ($kondisi == 'Rusak_Berat') $color = '#fee2e2';
                                 elseif ($kondisi == 'Maintenance') $color = '#e0f2fe';
                                 elseif ($kondisi == 'Gudang') $color = '#f1f5f9';
                                 else $color = '#f3f4f6';

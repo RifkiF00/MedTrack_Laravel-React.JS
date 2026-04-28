@@ -408,7 +408,7 @@ class Aset_model {
         $query = "SELECT a.id_aset, a.kode_label, a.nama_alat, a.status_kondisi, r.nama_ruang
                   FROM m_aset a
                   LEFT JOIN m_ruangan r ON a.id_ruang_saat_ini = r.id_ruang
-                  WHERE a.status_kondisi IN ('Rusak_Ringan', 'Rusak_Berat', 'Maintenance')
+                  WHERE a.status_kondisi IN ('Rusak_Ringan', 'Rusak_Berat')
                   ORDER BY a.status_kondisi DESC, a.kode_label ASC";
         $stmt = $this->db->prepare($query);
         $stmt->execute();

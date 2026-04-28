@@ -70,6 +70,9 @@
                      style="margin-top:12px; font-size:13px; color:#8e9bb0; font-family:'Nunito',sans-serif;">
                     Belum ada file dipilih.
                 </div>
+
+                <!-- Hidden element untuk file scanner -->
+                <div id="qr-reader-file-temp" style="display:none;"></div>
             </div>
 
         </div>
@@ -133,21 +136,34 @@
     }
 
     function isValidInternalUrl(decodedText) {
-        try {
-            const url = new URL(decodedText, window.location.origin);
-            return url.origin === window.location.origin;
-        } catch (e) {
-            return false;
+        console.log("Validating URL:", decodedText);
+
+        // Check for /aset/detail/ pattern
+        if (decodedText.includes('/aset/detail/')) {
+            console.log("✓ Valid aset detail URL");
+            return true;
         }
+
+        // Also accept numeric ID only (fallback)
+        if (/^\d+$/.test(decodedText.trim())) {
+            console.log("✓ Valid numeric ID");
+            return true;
+        }
+
+        console.log("✗ Invalid QR content");
+        return false;
     }
 
     function handleDecoded(decodedText) {
         if (isRedirecting) return;
 
-        setResult(decodedText);
+        const trimmedText = decodedText.trim();
+        setResult(trimmedText);
+        console.log("QR Decoded:", trimmedText);
 
-        if (!isValidInternalUrl(decodedText)) {
-            setStatus("QR terbaca, tetapi URL tidak valid untuk sistem ini.", "#dc2626");
+        if (!isValidInternalUrl(trimmedText)) {
+            console.log("Invalid QR content");
+            setStatus("QR tidak valid: " + trimmedText.substring(0, 50), "#dc2626");
             return;
         }
 
@@ -155,7 +171,25 @@
         setStatus("QR valid. Membuka detail aset...", "#198754");
 
         setTimeout(() => {
-            window.location.href = decodedText;
+            try {
+                let redirectUrl = null;
+
+                // If it's just a numeric ID
+                if (/^\d+$/.test(trimmedText)) {
+                    redirectUrl = window.location.origin + '/Medtrack-IPSRS/public/aset/detail/' + trimmedText;
+                } else {
+                    // If it's a full URL
+                    const url = new URL(trimmedText);
+                    redirectUrl = url.href;
+                }
+
+                console.log("Redirecting to:", redirectUrl);
+                window.location.href = redirectUrl;
+            } catch (e) {
+                console.log("Error:", e);
+                setStatus("Error membuka detail aset", "#dc2626");
+                isRedirecting = false;
+            }
         }, 300);
     }
 
@@ -165,20 +199,24 @@
             {
                 fps: 10,
                 qrbox: { width: 230, height: 230 },
-                rememberLastUsedCamera: true,
-                supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+                rememberLastUsedCamera: true
             },
             false
         );
 
         scanner.render(
             (decodedText) => {
+                console.log("Scanner detected QR:", decodedText);
                 handleDecoded(decodedText);
             },
-            () => {}
+            (error) => {
+                // Suppress error output
+                console.log("Scanner error (normal):", error);
+            }
         );
 
         setStatus("Kamera aktif. Silakan scan QR.", "#2563eb");
+        console.log("Scanner initialized");
     }
 
     renderScanner();
@@ -210,17 +248,22 @@
         setStatus("Memproses gambar QR...", "#2563eb");
         isRedirecting = false;
 
+        console.log("Processing file:", file.name, file.size, file.type);
+
         const fileScanner = new Html5Qrcode(readerId + "-file-temp");
 
         fileScanner.scanFile(file, true)
             .then(decodedText => {
+                console.log("File scan success:", decodedText);
                 uploadStatus.textContent = "QR dari gambar berhasil dibaca.";
                 handleDecoded(decodedText);
             })
-            .catch(() => {
+            .catch((error) => {
+                console.log("File scan error:", error);
                 uploadStatus.textContent = "QR pada gambar tidak terbaca.";
-                setStatus("QR pada gambar tidak terbaca.", "#dc3545");
-                setResult("Gagal membaca QR dari file.");
+                setStatus("QR pada gambar tidak terbaca: " + error, "#dc3545");
+                setResult("Gagal membaca QR dari file. Error: " + error);
+                isRedirecting = false;
             });
     });
 })();

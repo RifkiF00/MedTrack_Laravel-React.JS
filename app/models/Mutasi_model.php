@@ -8,6 +8,28 @@ class Mutasi_model {
         $this->db = $database->connect();
     }
 
+    // Get mutasi by reporter/requester (Unit RS)
+    public function getMutasiByUser($user_id) {
+        $query = "
+            SELECT m.*,
+                   a.kode_label, a.nama_alat,
+                   r1.nama_ruang as ruang_asal_nama,
+                   r2.nama_ruang as ruang_tujuan_nama,
+                   u.nama_lengkap
+            FROM t_mutasi m
+            JOIN m_aset a ON m.id_aset = a.id_aset
+            JOIN m_ruangan r1 ON m.ruang_asal = r1.id_ruang
+            JOIN m_ruangan r2 ON m.ruang_tujuan = r2.id_ruang
+            LEFT JOIN m_user u ON m.id_user_pencatat = u.id_user
+            WHERE m.id_user_pencatat = :user_id
+            ORDER BY m.tgl_mutasi DESC
+            LIMIT 100";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute(['user_id' => $user_id]);
+        return $stmt->fetchAll();
+    }
+
     // Ambil semua mutasi dengan filter
     public function getAllMutasi($status = null) {
         $query = "

@@ -15,10 +15,10 @@
             <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #1a2b56; font-size: 14px; font-family: 'Nunito', sans-serif;">
                 Pilih Aset <span style="color: #cd1601;">*</span>
             </label>
-            <select name="id_aset" required style="width: 100%; padding: 11px 12px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; font-family: 'Nunito', sans-serif; color: #1a2b56; background: #ffffff; transition: all 0.2s;" onfocus="this.style.borderColor='#3d6aff'; this.style.boxShadow='0 0 0 3px rgba(61, 106, 255, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+            <select name="id_aset" id="id_aset" required style="width: 100%; padding: 11px 12px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; font-family: 'Nunito', sans-serif; color: #1a2b56; background: #ffffff; transition: all 0.2s;" onfocus="this.style.borderColor='#3d6aff'; this.style.boxShadow='0 0 0 3px rgba(61, 106, 255, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
                 <option value="">-- Pilih Aset --</option>
                 <?php foreach ($data['aset_list'] as $aset): ?>
-                    <option value="<?= $aset->id_aset; ?>">
+                    <option value="<?= $aset->id_aset; ?>" data-ruang-id="<?= $aset->id_ruang_saat_ini ?? ''; ?>" data-ruang-nama="<?= escape($aset->nama_ruang ?? ''); ?>">
                         <?= escape($aset->kode_label); ?> - <?= escape($aset->nama_alat); ?> (Ruangan: <?= escape($aset->nama_ruang); ?>)
                     </option>
                 <?php endforeach; ?>
@@ -80,15 +80,14 @@
 <script>
 document.getElementById('id_aset').addEventListener('change', function() {
     const selectedOption = this.options[this.selectedIndex];
-    const asetText = selectedOption.text;
+    const ruangId = selectedOption.getAttribute('data-ruang-id');
+    const ruangNama = selectedOption.getAttribute('data-ruang-nama');
 
-    // Extract ruangan from text (Format: KODE - NAMA (Ruangan: NAMA_RUANG))
-    const ruanganMatch = asetText.match(/Ruangan: ([^)]+)/);
-
-    if (ruanganMatch) {
-        document.getElementById('ruang_asal_display').value = ruanganMatch[1];
-        // You can add logic to get the ruang_asal ID here if needed
+    if (ruangId) {
+        document.getElementById('ruang_asal').value = ruangId;
+        document.getElementById('ruang_asal_display').value = ruangNama;
     } else {
+        document.getElementById('ruang_asal').value = '';
         document.getElementById('ruang_asal_display').value = '';
     }
 });
