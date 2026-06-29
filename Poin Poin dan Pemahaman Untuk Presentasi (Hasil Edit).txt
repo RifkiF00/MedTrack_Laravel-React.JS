@@ -1,0 +1,104 @@
+🏥 PANDUAN PENDALAMAN TEKNIS PROJEK MEDTRACK
+Materi Pendalaman Struktur Kode, Alur Data, Otorisasi Peran, dan Integrasi Laravel + React Inertia Khusus untuk Menjawab Pertanyaan Dosen Penguji
+
+========================================================================
+BAB I: Bedah Struktur Direktori Proyek (Laravel + React Inertia)
+========================================================================
+
+Proyek MedTrack ini menggunakan arsitektur Hybrid Monolith dengan Inertia.js sebagai jembatan. Logika bisnis backend menggunakan PHP (Laravel 10) dan tampilan frontend menggunakan Javascript/React.js.
+
+Sisi Backend (Laravel 10)
+-------------------------
+* app/Http/Controllers/Web/
+  - Tempat menyimpan kelas logika kontroler web. Menghubungkan Model ke React Page via Inertia rendering.
+* app/Models/
+  - Berisi file model Eloquent (User.php, Aset.php, Ruangan.php, Troubleshoot.php, TroubleshootLog.php, Mutasi.php, Pemeliharaan.php, PemeliharaanLog.php, DokumenMutu.php) yang memetakan tabel MySQL secara relasional.
+* app/Http/Middleware/HandleInertiaRequests.php
+  - Berkas konfigurasi shared props global, digunakan untuk mengirim data dinamis (seperti data notifikasi header dan upcoming agenda) agar terakses di seluruh halaman.
+* routes/web.php
+  - Rute akses web terproteksi authentication session.
+* routes/api.php
+  - Rute REST API terproteksi token Laravel Sanctum untuk integrasi aplikasi GPS tracker Android.
+
+Sisi Frontend (React.js + Tailwind CSS)
+---------------------------------------
+* resources/js/Pages/
+  - Folder halaman tampilan utama. Setiap file (seperti Aset/Index.jsx, WorkOrder/Index.jsx, Mutasi/Index.jsx) merender antarmuka halaman web secara dinamis.
+* resources/js/Layouts/AuthenticatedLayout.jsx
+  - Komponen Layout utama pembungkus seluruh halaman setelah login. Mengatur sidebar, header, lonceng notifikasi dinamis, modal scan QR Code, dan kalender harian.
+* resources/js/Components/
+  - Folder komponen UI kecil yang dapat dipanggil berulang (reusable components) seperti Dropdown.jsx, Modal.jsx, TextInput.jsx.
+
+
+========================================================================
+BAB II: Alur Pertukaran Data dan Siklus Request-Response
+========================================================================
+
+Siklus Web Request (Inertia.js)
+-------------------------------
+Inertia meniadakan kebutuhan REST API internal untuk web client. Alur kerjanya:
+1. Pengguna mengklik tombol menu 'Aset Medis' di sidebar.
+2. Inertia mengirimkan request XHR/AJAX di latar belakang ke URL /aset.
+3. Laravel memproses di AsetController@index, melakukan query database via Eloquent model, lalu mengembalikan Inertia rendering:
+   return Inertia::render('Aset/Index', ['asets' => $asets]);
+4. Inertia menangkap data payload JSON tersebut, lalu me-render komponen React terkait (Aset/Index.jsx) secara dinamis tanpa refresh halaman penuh (Single Page Application experience).
+
+Siklus REST API Mobile (Laravel Sanctum)
+----------------------------------------
+Digunakan khusus untuk mengintegrasikan database server web dengan aplikasi pelacak lokasi Android:
+1. Aplikasi Android mengirim request POST ke /api/login dengan parameter email dan password.
+2. Laravel mencocokkan kredensial. Jika sukses, Sanctum mengembalikan token string acak.
+3. Android menyimpan token secara lokal. Setiap kali mengirim koordinat GPS baru ke server, Android menyertakan header 'Authorization: Bearer <token>' untuk divalidasi oleh Sanctum.
+
+
+========================================================================
+BAB III: Kebijakan Otorisasi Peran (Role-Based Access Control)
+========================================================================
+
+MedTrack membagi kewenangan pengguna ke dalam 3 role utama demi menjaga integritas data rumah sakit:
+
+1. IPSRS (Admin_IPSRS / Staf_IPSRS):
+   - Memiliki wewenang penuh atas kelayakan aset, kalender reschedule, alur verifikasi mutasi, dan penunjukan teknisi perbaikan.
+   - Khusus Teknisi Lapangan (Budi, Hendra, Agus): Username budi_ipsrs, hendra_ipsrs, dan agus_ipsrs otomatis dibatasi di controller. Mereka tidak boleh melakukan CRUD aset/ruangan/SDM dan tidak bisa assign teknisi. Mereka hanya diperbolehkan meng-update status progres Work Order (seperti mengubah Open -> Dikerjakan -> Selesai).
+
+2. Staf_Logistik:
+   - Membantu mencatat pengadaan aset baru dan dokumen mutu. Staf Logistik tidak diizinkan mengedit atau menghapus aset, serta tidak berwenang menyetujui mutasi.
+
+3. Unit_RS (Kepala/Staf Ruangan Medis):
+   - Halaman dasbor dan aset terfilter otomatis hanya menampilkan data di unit/ruangan tempat mereka bertugas (misal staf ICU hanya melihat alat ICU). Staf Unit dapat membuat laporan kerusakan (Work Order) dan mengajukan mutasi alat keluar ruangan.
+   - Pengecualian Scan QR Global: Saat melakukan pencarian atau pemindaian QR Code label, filter ruangan dimatikan sementara agar staf unit tetap dapat melihat informasi detail alat milik unit lainnya.
+
+
+========================================================================
+BAB IV: Bedah Logika Kodingan Kritis
+========================================================================
+
+Notifikasi Lonceng Dinamis di Layout Header
+-------------------------------------------
+Notifikasi dikumpulkan secara global di HandleInertiaRequests.php berdasarkan role pengguna:
+* IPSRS: Notifikasi permohonan mutasi pending, laporan kerusakan baru (Open WO), dan PM terjadwal.
+* Logistik: Notifikasi alat medis yang masa sertifikat kalibrasinya sudah kadaluarsa (expired).
+* Unit_RS: Notifikasi tiket laporan kerusakan aktif di ruangan unitnya yang sedang diproses.
+* Fungsi Dismiss (Klik Hilang): Di frontend AuthenticatedLayout.jsx, saat notifikasi diklik, ID item disimpan ke localStorage. Notifikasi tersebut langsung hilang dari lonceng secara real-time dan browser mengarahkan pengguna ke halaman form tujuan.
+
+Reschedule & Sinkronisasi Kalibrasi Aset
+-----------------------------------------
+Saat admin mengubah tanggal kalibrasi melalui widget kalender agenda harian di sidebar, controller otomatis menyinkronkan tanggal kadaluarsa sertifikat kalibrasi (tgl_kadaluarsa_sertif) agar bernilai sama dengan tgl_kalibrasi_terakhir.
+
+Mutasi Lintas Ruangan yang Fleksibel
+-------------------------------------
+Di MutasiController, filter ruangan asal Unit_RS dilepas, memungkinkan unit medis untuk memilih dan mengajukan mutasi/pemindahan bagi seluruh aset medis di rumah sakit (tidak dibatasi di ruangannya saja).
+
+
+========================================================================
+BAB V: Strategi Sidang & Menjawab Pertanyaan Dosen Penguji
+========================================================================
+
+* Tanya: 'Apakah integrasi dengan aplikasi mobile Android menggunakan Session?'
+  - Jawab: 'Tidak, Pak. Untuk integrasi web kami memakai Session Stateful, sedangkan untuk integrasi mobile Android kami menggunakan REST API Stateless yang diamankan oleh Laravel Sanctum Token demi fleksibilitas dan keamanan.'
+
+* Tanya: 'Mengapa teknisi lapangan tidak bisa mengedit data aset?'
+  - Jawab: 'Hak akses CRUD data master aset dibatasi hanya untuk admin atau logistik demi keamanan data aset. Teknisi lapangan (Budi, Hendra, Agus) dibatasi hak aksesnya agar fokus pada tugas perbaikan di lapangan dan pengisian progres status perbaikan saja.'
+
+* Tanya: 'Bagaimana Anda mengirim data notifikasi lonceng ke seluruh halaman?'
+  - Jawab: 'Di middleware HandleInertiaRequests.php, Pak. Data notifikasi di-query secara real-time dari database lalu didistribusikan secara global ke komponen AuthenticatedLayout.jsx menggunakan shared props Inertia.'
