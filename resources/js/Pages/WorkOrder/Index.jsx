@@ -5,6 +5,7 @@ import { useState } from 'react';
 export default function Index({ auth, workorders, teknisiList, role, flash }) {
     const isIPSRS = ['Admin_IPSRS', 'Staf_IPSRS'].includes(role);
     const isUnit = role === 'Unit_RS';
+    const canAssignTeknisi = isIPSRS && !['budi_ipsrs', 'hendra_ipsrs', 'agus_ipsrs'].includes(auth.user.username);
 
     // State mappings for row-specific inline inputs
     const [selectedTeknisi, setSelectedTeknisi] = useState({});
@@ -165,32 +166,34 @@ export default function Index({ auth, workorders, teknisiList, role, flash }) {
                                                      {isIPSRS && (
                                                          <div className="flex flex-col space-y-3 w-[260px] text-left ml-auto">
                                                              {/* Assign Form */}
-                                                             <div className="border border-slate-150 bg-slate-50/70 p-2.5 rounded-xl space-y-2">
-                                                                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tugaskan Teknisi</label>
-                                                                 <div className="flex gap-2">
-                                                                     <select
-                                                                         value={selectedTeknisi[wo.id_ticket] !== undefined ? selectedTeknisi[wo.id_ticket] : (wo.id_teknisi_penanggungjawab || '')}
-                                                                         onChange={(e) => setSelectedTeknisi({
-                                                                             ...selectedTeknisi,
-                                                                             [wo.id_ticket]: e.target.value
-                                                                         })}
-                                                                         className="flex-1 border border-slate-250 bg-white rounded-lg px-2.5 py-1 text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-                                                                     >
-                                                                         <option value="">-- Pilih Teknisi --</option>
-                                                                         {teknisiList.map((t) => (
-                                                                             <option key={t.id_user} value={t.id_user}>
-                                                                                 {t.nama_lengkap}
-                                                                             </option>
-                                                                         ))}
-                                                                     </select>
-                                                                     <button
-                                                                         onClick={() => handleAssign(wo.id_ticket, wo.id_teknisi_penanggungjawab)}
-                                                                         className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-lg text-xs font-semibold transition shadow-sm"
-                                                                     >
-                                                                         Assign
-                                                                     </button>
+                                                             {canAssignTeknisi && (
+                                                                 <div className="border border-slate-150 bg-slate-50/70 p-2.5 rounded-xl space-y-2">
+                                                                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tugaskan Teknisi</label>
+                                                                     <div className="flex gap-2">
+                                                                         <select
+                                                                             value={selectedTeknisi[wo.id_ticket] !== undefined ? selectedTeknisi[wo.id_ticket] : (wo.id_teknisi_penanggungjawab || '')}
+                                                                             onChange={(e) => setSelectedTeknisi({
+                                                                                 ...selectedTeknisi,
+                                                                                 [wo.id_ticket]: e.target.value
+                                                                             })}
+                                                                             className="flex-1 border border-slate-250 bg-white rounded-lg px-2.5 py-1 text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                                                                         >
+                                                                             <option value="">-- Pilih Teknisi --</option>
+                                                                             {teknisiList.map((t) => (
+                                                                                 <option key={t.id_user} value={t.id_user}>
+                                                                                     {t.nama_lengkap}
+                                                                                 </option>
+                                                                             ))}
+                                                                         </select>
+                                                                         <button
+                                                                             onClick={() => handleAssign(wo.id_ticket, wo.id_teknisi_penanggungjawab)}
+                                                                             className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-lg text-xs font-semibold transition shadow-sm"
+                                                                         >
+                                                                             Assign
+                                                                         </button>
+                                                                     </div>
                                                                  </div>
-                                                             </div>
+                                                             )}
 
                                                              {/* Status Form */}
                                                              <div className="border border-slate-150 bg-slate-50/70 p-2.5 rounded-xl space-y-2">

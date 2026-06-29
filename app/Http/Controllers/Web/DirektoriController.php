@@ -16,8 +16,9 @@ class DirektoriController extends Controller
 {
     private function checkAccess()
     {
-        // CRUD only allowed for Admin_IPSRS or Staf_IPSRS
-        return in_array(Auth::user()->role, ['Admin_IPSRS', 'Staf_IPSRS']);
+        $user = Auth::user();
+        // Exclude budi, hendra, and agus from CRUD actions on rooms/sdm
+        return (in_array($user->role, ['Admin_IPSRS', 'Staf_IPSRS']) && !in_array($user->username, ['budi_ipsrs', 'hendra_ipsrs', 'agus_ipsrs']));
     }
 
     public function index()

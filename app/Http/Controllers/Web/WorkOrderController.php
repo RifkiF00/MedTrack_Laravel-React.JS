@@ -228,6 +228,10 @@ class WorkOrderController extends Controller
             abort(403, 'Hanya Staf IPSRS yang dapat meng-assign teknisi.');
         }
 
+        if (in_array($user->username, ['budi_ipsrs', 'hendra_ipsrs', 'agus_ipsrs'])) {
+            abort(403, 'Akses ditolak. Teknisi lapangan tidak memiliki wewenang menugaskan teknisi.');
+        }
+
         $request->validate([
             'id_teknisi_penanggungjawab' => 'required|integer|exists:m_user,id_user',
         ]);

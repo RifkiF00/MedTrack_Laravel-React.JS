@@ -15,18 +15,20 @@ class AsetController extends Controller
 {
     private function checkCanCreate()
     {
-        $role = Auth::user()->role;
-        if (!in_array($role, ['Admin_IPSRS', 'Staf_IPSRS', 'Staf_Logistik'])) {
-            abort(403, 'Akses ditolak. Peran Anda tidak memiliki hak untuk menambah aset.');
+        $user = Auth::user();
+        if ($user->role === 'Admin_IPSRS' || $user->role === 'Staf_Logistik' || ($user->role === 'Staf_IPSRS' && !in_array($user->username, ['budi_ipsrs', 'hendra_ipsrs', 'agus_ipsrs']))) {
+            return;
         }
+        abort(403, 'Akses ditolak. Peran Anda tidak memiliki hak untuk menambah aset.');
     }
 
     private function checkCanEditOrDelete()
     {
-        $role = Auth::user()->role;
-        if (!in_array($role, ['Admin_IPSRS', 'Staf_IPSRS'])) {
-            abort(403, 'Akses ditolak. Peran Anda tidak memiliki hak untuk mengedit atau menghapus aset.');
+        $user = Auth::user();
+        if ($user->role === 'Admin_IPSRS' || ($user->role === 'Staf_IPSRS' && !in_array($user->username, ['budi_ipsrs', 'hendra_ipsrs', 'agus_ipsrs']))) {
+            return;
         }
+        abort(403, 'Akses ditolak. Peran Anda tidak memiliki hak untuk mengedit atau menghapus aset.');
     }
     /**
      * Tampilkan Daftar Aset (dengan Filter Pencarian & Kategori)

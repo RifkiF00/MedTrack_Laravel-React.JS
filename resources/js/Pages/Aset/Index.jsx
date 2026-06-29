@@ -41,7 +41,7 @@ export default function Index({ auth, asets, filters }) {
                         >
                             Peta Tracking Aset
                         </Link>
-                        {['Admin_IPSRS', 'Staf_IPSRS', 'Staf_Logistik'].includes(auth.user.role) && (
+                        {(['Admin_IPSRS', 'Staf_Logistik'].includes(auth.user.role) || (auth.user.role === 'Staf_IPSRS' && !['budi_ipsrs', 'hendra_ipsrs', 'agus_ipsrs'].includes(auth.user.username))) && (
                             <Link
                                 href={route('aset.create')}
                                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition shadow-sm"
@@ -169,7 +169,7 @@ export default function Index({ auth, asets, filters }) {
                                                     >
                                                         Detail
                                                     </Link>
-                                                    {['Admin_IPSRS', 'Staf_IPSRS'].includes(auth.user.role) && (
+                                                    {(auth.user.role === 'Admin_IPSRS' || (auth.user.role === 'Staf_IPSRS' && !['budi_ipsrs', 'hendra_ipsrs', 'agus_ipsrs'].includes(auth.user.username))) && (
                                                         <>
                                                             <Link
                                                                 href={route('aset.edit', aset.id_aset)}
