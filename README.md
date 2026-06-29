@@ -1,66 +1,63 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏥 MedTrack - Sistem Informasi Pemeliharaan Alat Medis (IPSRS)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+MedTrack adalah platform sistem informasi manajemen aset medis dan pemeliharaan alat kesehatan berbasis web untuk instalasi IPSRS (Instalasi Pemeliharaan Sarana Rumah Sakit). Aplikasi ini dibangun dengan arsitektur modern menggunakan **Laravel 10 + Inertia.js (React.js)** pada sisi web, serta mendukung integrasi pelacakan lokasi berbasis API untuk aplikasi mobile Android.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 👥 Hak Akses & Peran Pengguna (Role-Based Access Control)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Sistem MedTrack membagi kewenangan pengguna ke dalam beberapa peran (*role*) yang spesifik untuk menjaga integritas data dan keamanan operasional rumah sakit:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. 🛠️ **Admin_IPSRS** & **Staf_IPSRS** (Tim Teknis / Teknisi)
+Merupakan peran pelaksana teknis harian yang memiliki wewenang paling luas terhadap pemeliharaan alat.
+*   **Manajemen Aset:** Memiliki hak penuh untuk menambah, memperbarui, dan menghapus data aset medis serta mengunduh QR Code.
+*   **Kalender Agenda:** Memantau semua jadwal pemeliharaan berkala, serta melakukan perubahan jadwal (**Reschedule**) kalibrasi/pemeliharaan langsung di kalender sidebar.
+*   **Kerusakan & Work Order:** 
+    *   Menerima tiket laporan kerusakan alat medis dari seluruh ruangan rumah sakit.
+    *   Menunjuk dan menugaskan teknisi pelaksana perbaikan.
+    *   Memperbarui perkembangan status perbaikan (*Sedang Dikerjakan*, *Selesai*).
+*   **Mutasi Aset:** Memiliki wewenang mutlak untuk **menyetujui (Approve)** atau **menolak (Reject)** permohonan pemindahan alat medis antar-ruangan.
 
-## Learning Laravel
+### 2. 🏥 **Unit_RS** (Kepala Ruangan / Staf Ruangan Medis seperti ICU, IGD, OK)
+Merupakan peran operasional di lapangan yang menggunakan alat medis sehari-hari.
+*   **Dashboard Terbatas:** Angka statistik dashboard, data aset medis, dan status laporan **dibatasi secara otomatis hanya untuk ruangan di mana staf tersebut ditugaskan** (misalnya, staf ICU hanya bisa melihat alat dan laporan di ruang ICU).
+*   **Pelaporan Kerusakan:** Mengajukan laporan kerusakan alat medis yang berada di ruangannya dengan membuat tiket *Work Order* baru.
+*   **Permohonan Mutasi:** Mengajukan perpindahan aset medis keluar dari ruangannya ke ruangan lain (status awal akan bernilai *Pending* menunggu persetujuan tim IPSRS).
+*   **Pembatasan:** Tidak diperbolehkan mengedit data master aset medis, melakukan reschedule kalender kalibrasi, maupun menyetujui mutasi.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 3. 📦 **Staf_Logistik** (Administrasi Inventaris)
+Merupakan peran pendukung yang fokus pada administrasi inventaris aset dan dokumentasi.
+*   **Pencatatan Aset:** Membantu menginput data pengadaan aset medis baru serta spesifikasi detailnya.
+*   **Manajemen Direktori & Staf:** Mengelola direktori profil staf dan pengguna sistem di halaman direktori.
+*   **Dokumen & Laporan:** Mengelola dan mengunduh berkas laporan bulanan IPSRS.
+*   **Mutasi:** Dapat melihat log riwayat perpindahan aset medis secara keseluruhan untuk sinkronisasi inventaris, namun tidak memiliki hak melakukan *Approval*.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 4. 👔 **Kepala_IPSRS** (Kepala Bagian IPSRS)
+Merupakan peran struktural untuk fungsi monitoring dan evaluasi.
+*   Memantau statistik keseluruhan aset medis di rumah sakit.
+*   Melihat dokumen laporan performa pemeliharaan sarana prasarana.
+*   Melihat daftar direktori staf IPSRS.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🔑 Akun Uji Coba Default
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Untuk mempermudah pengujian, gunakan akun di bawah ini. Semua akun menggunakan kata sandi default: **`hasna123`**
 
-### Premium Partners
+| Peran (Role) | Username (Email) | Otoritas Utama |
+| :--- | :--- | :--- |
+| **Admin_IPSRS** | `admin_ipsrs@medtrack.com` | Full Akses, Reschedule Kalender, Approve/Reject Mutasi |
+| **Staf_IPSRS** | `staf_ipsrs@medtrack.com` | Manajemen Work Order, Penugasan Teknisi |
+| **Staf_Logistik** | `logistik@medtrack.com` | Edit Data Aset, Cetak Dokumen, Direktori Staf |
+| **Unit_RS (ICU)** | `unit_icu@medtrack.com` | Lapor Kerusakan ICU, Ajukan Mutasi Aset ICU |
+| **Kepala_IPSRS** | `kepala_ipsrs@medtrack.com` | Monitoring Laporan Bulanan & Direktori Staf |
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+---
 
-## Contributing
+## ✨ Fitur Utama MedTrack (Laravel-React)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1.  **Scanner QR Code Terintegrasi:** Scan label QR Code aset medis secara langsung menggunakan webcam/kamera laptop atau mengunggah gambar QR Code untuk pencarian aset instan.
+2.  **Kalender Agenda Interaktif:** Kalender strip harian yang dilengkapi dot merah otomatis untuk tanggal yang memiliki agenda kalibrasi/pemeliharaan.
+3.  **Reschedule Cepat:** Fitur penjadwalan ulang agenda pemeliharaan dengan sinkronisasi otomatis ke widget hitung mundur sisa hari.
+4.  **Alur Mutasi Aset Premium:** Pengajuan mutasi yang rapi dengan status pill badge modern dan alur approve/reject sekali klik oleh admin.
+5.  **Sanctum API Integrasi:** Dukungan endpoint REST API terproteksi token untuk integrasi dengan aplikasi pelacak lokasi Android.
