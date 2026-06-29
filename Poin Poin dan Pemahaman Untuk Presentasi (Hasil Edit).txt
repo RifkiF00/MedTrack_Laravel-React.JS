@@ -11,7 +11,7 @@ Dosen sering menanyakan di mana letak logika bisnis, di mana letak rute, dan bag
 1.1 Sisi Backend (Laravel 10)
 -----------------------------
 * app/Http/Controllers/Web/: Tempat menyimpan logika kontroler web. Controller bertugas mengambil data dari Model, memproses otorisasi peran pengguna (role checking), melakukan manipulasi data, dan meneruskan data tersebut ke tampilan frontend menggunakan Inertia rendering.
-* app/Http/Controllers/Api/: Berisi file ApiAuthController and ApiAsetController untuk melayani request mobile tracker Android Kotlin dalam format JSON.
+* app/Http/Controllers/Api/: Berisi file ApiAuthController dan ApiAsetController untuk melayani request mobile tracker Android Kotlin dalam format JSON.
 * app/Models/: Berisi Model Eloquent (User.php, Aset.php, Ruangan.php, Mutasi.php, Troubleshoot.php, TroubleshootLog.php, Pemeliharaan.php, PemeliharaanLog.php, DokumenMutu.php) yang memetakan tabel database MySQL secara objek ORM. Model mendefinisikan relasi (seperti Aset milik Ruangan melalui belongsTo).
 * database/migrations/: Skema pembuatan tabel database. Skema migrations dipisahkan agar pembuatan constraint foreign key dan indexing berjalan runtut tanpa error.
 * database/seeders/DatabaseSeeder.php: Menyimpan data awal bawaan (akun user dengan role berbeda seperti Admin_IPSRS, Staf_Logistik, dan Unit_RS, ruangan medis, serta data aset medis dummy).
@@ -139,7 +139,7 @@ Bab ini berisi materi pemahaman fundamental secara konseptual. Dosen penguji ser
 
 5.1 Laravel: Framework Backend PHP Modern
 -----------------------------------------
-Laravel adalah framework PHP MVC (Model-View-Controller) yang dirancang untuk mempermudah pengembangan aplikasi web yang aman, terstruktur, dan mudah dirawat. Konsep penting yang harus dipahami:
+Laravel adalah framework PHP MVC (Model-View-Controller) yang dirancang untuk mempermudah pengembangan aplikasi web yang aman, terstruktur, dan mudah dirawat. Concept penting yang harus dipahami:
 * Model-View-Controller (MVC): Pola arsitektur yang memisahkan data (Model), tampilan antarmuka (View), dan logika kontrol (Controller). Dalam arsitektur hybrid kita, React bertindak sebagai View, Laravel Model sebagai Model, dan Laravel Controller sebagai Controller.
 * Eloquent ORM (Object-Relational Mapping): Teknik pemrograman untuk memetakan tabel database ke dalam bentuk objek bahasa pemrograman PHP. Kita tidak menulis query SQL manual (seperti SELECT * FROM aset), melainkan menggunakan sintaks objek seperti Aset::all() atau Aset::find(1).
 * Middleware: Lapisan filter keamanan yang memeriksa setiap request HTTP sebelum masuk ke Controller. Contoh: Middleware auth memastikan pengguna sudah login session, dan middleware auth:sanctum memeriksa validitas token API Android.
@@ -183,7 +183,7 @@ Bab ini memuat daftar berkas konfigurasi di root direktori proyek, yang sering d
 * phpunit.xml: Konfigurasi bawaan untuk framework pengujian otomatis PHPUnit (untuk menjalankan tes fungsional/unit di Laravel).
 * postcss.config.js: Berkas konfigurasi PostCSS yang digunakan oleh compiler aset (Vite) untuk memproses sintaks CSS modern agar kompatibel dengan seluruh web browser.
 * tailwind.config.js: Berkas konfigurasi utama framework Tailwind CSS. Digunakan untuk mengatur tema warna kustom, font, path pencarian kelas CSS di dalam file React, dan responsivitas layout.
-* vite.config.js: Berkas konfigurasi utama untuk bundler Vite. Vite bertugas mengompilasi dan menggabungkan semua file React JSX dan Tailwind CSS Anda secara real-time saat server pengembangan aktif.
+* vite.config.js: Berkas konfigurasi utama untuk bundler Vite. Vite bertugas mengompilasi dan menggabungkan semua file React JSX and Tailwind CSS Anda secara real-time saat server pengembangan aktif.
 
 
 ========================================================================
@@ -269,3 +269,28 @@ Dosen penguji hampir pasti menanyakan tentang struktur tabel, primary key, forei
 * One-to-Many (Aset ke Troubleshoot): Satu alat medis dapat memiliki banyak catatan aduan kerusakan sepanjang masa pakainya. Direlasikan via foreign key id_aset di tabel t_troubleshoot.
 * Many-to-One (Troubleshoot ke User): Banyak tiket kerusakan dapat dilaporkan oleh satu user pelapor (Unit_RS) atau ditangani oleh satu user teknisi (Staf_IPSRS).
 * One-to-Many (Troubleshoot ke TroubleshootLog): Satu tiket kerusakan memiliki banyak log progres penanganan dari awal tiket dibuka hingga ditutup.
+
+
+========================================================================
+BAB IX: SIRKULASI ALIRAN DATA ANTARA BERKAS KODE (FILE) DAN TABEL DATABASE
+========================================================================
+
+Untuk memahami cara kerja framework secara utuh, berikut adalah sirkulasi/siklus aliran data yang menggambarkan bagaimana berkas kode program (View, Controller, Model) berinteraksi dengan database MySQL:
+
+9.1 Sirkulasi Aliran Data pada Fitur Pelaporan Kerusakan (Work Order)
+--------------------------------------------------------------------
+* Frontend (View): Staf medis (Unit_RS) mengisi formulir laporan kerusakan di berkas resources/js/Pages/WorkOrder/Create.jsx, mengunggah foto bukti kerusakan, dan menekan tombol 'Kirim'. Request dikirim melalui Inertia.post('/workorder').
+* Routing: Rute URL /workorder ditangkap oleh berkas routes/web.php dan diteruskan ke method store() pada berkas app/Http/Controllers/Web/WorkOrderController.php.
+* Controller (Logika Backend): WorkOrderController memvalidasi data masukan (id_aset, deskripsi_kerusakan). Kemudian, Controller memanggil model Troubleshoot.php untuk menyimpan data.
+* Model & Database: Berkas app/Models/Troubleshoot.php melakukan kueri INSERT ke tabel t_troubleshoot di MySQL untuk mencatat baris data baru dengan status_ticket = 'Open'.
+* Umpan Balik (Response): Controller mengembalikan rute redirect kembali ke halaman index Work Order dengan menyertakan flash message sukses. Berkas resources/js/Pages/WorkOrder/Index.jsx menerima shared props, me-reload tabel secara reaktif, dan menampilkan tiket baru tersebut di daftar.
+
+9.2 Sirkulasi Aliran Data pada Fitur Pengajuan Mutasi Aset
+---------------------------------------------------------
+* Frontend (View): Pengguna Unit_RS membuka berkas resources/js/Pages/Mutasi/Create.jsx, memilih alat medis yang ingin dimutasi, memilih unit ruangan tujuan, dan mengklik tombol 'Ajukan Mutasi'.
+* Routing & Controller: Request POST dikirim ke rute /mutasi dan diolah oleh MutasiController@store. Berkas ini berinteraksi dengan model Mutasi.php untuk membuat record log baru dengan status 'Menunggu_Verifikasi' pada tabel t_mutasi.
+* IPSRS Verifikasi (Approval): Admin IPSRS membuka halaman resources/js/Pages/Mutasi/Index.jsx, melihat status pending, dan menekan tombol 'Approve'.
+* Database Transaction: Request persetujuan dikirim ke MutasiController@verify. Di dalam blok DB::transaction():
+  1. Model Aset.php diinstruksikan untuk memperbarui kolom id_ruang_saat_ini pada tabel t_aset (mengubah lokasi fisik alat medis).
+  2. Model Mutasi.php memperbarui status_mutasi di tabel t_mutasi menjadi 'Disetujui'.
+* Selesai & Render: DB::commit() menyimpan perubahan secara permanen, dan Inertia memicu re-render halaman sehingga status di layar berubah menjadi Approved dan lokasi aset terbarui secara real-time.
