@@ -4,8 +4,8 @@
 -- ============================================================================
 
 -- Buat database
-CREATE DATABASE IF NOT EXISTS medtrack_ipsrs_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE medtrack_ipsrs_db;
+-- CREATE DATABASE IF NOT EXISTS medtrack_ipsrs_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- USE medtrack_ipsrs_db;
 
 -- ============================================================================
 -- 1. MASTER DATA TABLES

@@ -1,49 +1,18 @@
-# Environment variables
+/.phpunit.cache
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
 .env
-.env.local
-.env.*.local
-
-# IDE & Editor
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-.gitkeep
-
-# PHP
-vendor/
-composer.lock
-*.log
-
-# Database
-*.sql.bak
-database/backups/*.sql
-
-# Uploads & Temporary
-public/uploads/*
-!public/uploads/.gitkeep
-!public/uploads/qr/.gitkeep
-!public/uploads/documents/.gitkeep
-
-# Config (sensitive data)
-config/.env
-config/database.php (jika berisi password real)
-
-# Cache
-/tmp/*
-/cache/*
-
-# Node (jika pakai npm)
-node_modules/
-package-lock.json
-
-# Testing
-/tests/coverage/
-.phpunit.result.cache
+.env.backup
+.env.production
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+/.fleet
+/.idea
+/.vscode
