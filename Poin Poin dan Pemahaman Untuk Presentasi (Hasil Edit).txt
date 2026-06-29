@@ -1,5 +1,5 @@
 PANDUAN DETAIL PEMAHAMAN TEKNIS PROJEK AKHIR
-Materi Pendalaman Struktur Kode, Alur Data, dan Integrasi Laravel + React Inertia
+Materi Pendalaman Struktur Kode, Alur Data, dan Integrasi Laravel 10 + React Inertia
 Khusus untuk Menjawab Pertanyaan Dosen Penguji secara Rinci
 
 ========================================================================
@@ -11,7 +11,7 @@ Dosen sering menanyakan di mana letak logika bisnis, di mana letak rute, dan bag
 1.1 Sisi Backend (Laravel 10)
 -----------------------------
 * app/Http/Controllers/Web/: Tempat menyimpan logika kontroler web. Controller bertugas mengambil data dari Model, memproses otorisasi peran pengguna (role checking), melakukan manipulasi data, dan meneruskan data tersebut ke tampilan frontend menggunakan Inertia rendering.
-* app/Http/Controllers/Api/: Berisi file ApiAuthController dan ApiAsetController untuk melayani request mobile tracker Android Kotlin dalam format JSON.
+* app/Http/Controllers/Api/: Berisi file ApiAuthController and ApiAsetController untuk melayani request mobile tracker Android Kotlin dalam format JSON.
 * app/Models/: Berisi Model Eloquent (User.php, Aset.php, Ruangan.php, Mutasi.php, Troubleshoot.php, TroubleshootLog.php, Pemeliharaan.php, PemeliharaanLog.php, DokumenMutu.php) yang memetakan tabel database MySQL secara objek ORM. Model mendefinisikan relasi (seperti Aset milik Ruangan melalui belongsTo).
 * database/migrations/: Skema pembuatan tabel database. Skema migrations dipisahkan agar pembuatan constraint foreign key dan indexing berjalan runtut tanpa error.
 * database/seeders/DatabaseSeeder.php: Menyimpan data awal bawaan (akun user dengan role berbeda seperti Admin_IPSRS, Staf_Logistik, dan Unit_RS, ruangan medis, serta data aset medis dummy).
@@ -216,3 +216,56 @@ Migrasi adalah fitur Laravel yang berfungsi sebagai sistem pengontrol versi (sep
 * 1. php artisan migrate: Menjalankan semua berkas migrasi baru yang belum pernah dijalankan sebelumnya di database.
 * 2. php artisan migrate:rollback: Membatalkan atau memundurkan migrasi yang terakhir kali dijalankan (menghapus tabel/kolom yang baru dibuat). Ini berguna untuk membatalkan kesalahan skema.
 * 3. php artisan migrate:fresh: Menghapus seluruh tabel di database (drop all tables) lalu menjalankan ulang seluruh berkas migrasi dari awal. Ini digunakan untuk mereset database ke keadaan kosong bersih.
+
+
+========================================================================
+BAB VIII: PEMAHAMAN STRUKTUR & DETAIL DATABASE (SCHEMAS & RELATIONSHIPS)
+========================================================================
+
+Dosen penguji hampir pasti menanyakan tentang struktur tabel, primary key, foreign key, dan hubungan relasional di dalam database MySQL projek MedTrack. Berikut adalah rincian fungsionalnya:
+
+8.1 Penjelasan Detail 8 Tabel Inti MedTrack
+-------------------------------------------
+* 1. Tabel m_user (Data Pengguna / Staff):
+  - Menyimpan data pengguna sistem yang terbagi menjadi role Admin_IPSRS, Staf_IPSRS, Staf_Logistik, dan Unit_RS. Menyimpan ID ruangan (id_ruang) sebagai foreign key yang merelasikan user ke unit kerjanya.
+  - Primary Key: id_user
+  - Foreign Key: id_ruang -> m_ruangan(id_ruang) untuk relasi penugasan ruangan staff.
+* 2. Tabel m_ruangan (Data Unit Ruangan):
+  - Menyimpan daftar unit kerja (IGD, ICU, OK, Poli, Logistik, IPSRS).
+  - Primary Key: id_ruang
+  - Unique Key: nama_ruang (untuk mencegah duplikasi nama ruangan).
+* 3. Tabel t_aset (Data Alat Medis):
+  - Menyimpan katalog inventaris alat medis beserta detail kelaikan operasional, nomor seri, dan koordinat tracking posisi GPS.
+  - Primary Key: id_aset
+  - Unique Key: kode_label (contoh: MED-001, MED-002)
+  - Foreign Key: id_ruang_saat_ini -> m_ruangan(id_ruang) untuk melacak lokasi terkini alat.
+  - Kolom Tracking: latitude, longitude (menyimpan koordinat GPS dari sensor mobile).
+  - Kolom Kalibrasi: tgl_kalibrasi_terakhir, tgl_kalibrasi_berikutnya, tgl_kadaluarsa_sertif.
+* 4. Tabel t_mutasi (Log Perpindahan Aset):
+  - Mencatat riwayat pemindahan alat medis antar-ruangan untuk kebutuhan inventaris.
+  - Primary Key: id_mutasi
+  - Foreign Keys: id_aset -> t_aset(id_aset), id_ruang_asal -> m_ruangan(id_ruang), id_ruang_tujuan -> m_ruangan(id_ruang), user_id -> m_user(id_user).
+  - Status: status_mutasi (Menunggu_Verifikasi, Disetujui, Ditolak).
+* 5. Tabel t_troubleshoot (Tiket Laporan Kerusakan):
+  - Menyimpan tiket aduan kerusakan alat medis (Work Order) yang diajukan oleh unit medis.
+  - Primary Key: id_ticket
+  - Foreign Keys: id_aset -> t_aset(id_aset), id_user_pelapor -> m_user(id_user), id_teknisi_penanggungjawab -> m_user(id_user).
+  - Status: status_ticket (Open, Pengecekan, Dikerjakan, Menunggu Sign-Off, Closed).
+* 6. Tabel t_troubleshoot_log (Riwayat Progress Tiket):
+  - Mencatat kronologis perubahan status pengerjaan tiket kerusakan secara transaksional untuk audit trail log.
+  - Primary Key: id_log
+  - Foreign Keys: id_ticket -> t_troubleshoot(id_ticket), diubah_oleh -> m_user(id_user).
+* 7. Tabel m_pemeliharaan & t_pemeliharaan_log (Penjadwalan PM):
+  - Menyimpan jadwal pemeliharaan preventif (Preventative Maintenance) berkala untuk masing-masing aset.
+  - Primary Key: id_pemeliharaan & id_log_pemeliharaan
+  - Foreign Keys: id_aset -> t_aset(id_aset).
+* 8. Tabel m_dokumen_mutu (Arsip Laporan & PDF):
+  - Menyimpan berkas laporan bulanan mutu dan performa sarana prasarana yang diunggah dalam format PDF.
+  - Primary Key: id_dokumen
+
+8.2 Hubungan Relasional Antar-Tabel (Database Relationships)
+------------------------------------------------------------
+* One-to-Many (Ruangan ke Aset): Satu ruangan dapat memiliki banyak alat medis. Direlasikan melalui foreign key id_ruang_saat_ini di tabel t_aset.
+* One-to-Many (Aset ke Troubleshoot): Satu alat medis dapat memiliki banyak catatan aduan kerusakan sepanjang masa pakainya. Direlasikan via foreign key id_aset di tabel t_troubleshoot.
+* Many-to-One (Troubleshoot ke User): Banyak tiket kerusakan dapat dilaporkan oleh satu user pelapor (Unit_RS) atau ditangani oleh satu user teknisi (Staf_IPSRS).
+* One-to-Many (Troubleshoot ke TroubleshootLog): Satu tiket kerusakan memiliki banyak log progres penanganan dari awal tiket dibuka hingga ditutup.
