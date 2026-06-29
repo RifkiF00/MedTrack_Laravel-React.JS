@@ -139,11 +139,11 @@ Bab ini berisi materi pemahaman fundamental secara konseptual. Dosen penguji ser
 
 5.1 Laravel: Framework Backend PHP Modern
 -----------------------------------------
-Laravel adalah framework PHP MVC (Model-View-Controller) yang dirancang untuk mempermudah pengembangan aplikasi web yang aman, terstruktur, dan mudah dirawat. Concept penting yang harus dipahami:
+Laravel adalah framework PHP MVC (Model-View-Controller) yang dirancang untuk mempermudah pengembangan aplikasi web yang aman, terstruktur, dan mudah dirawat. Konsep penting yang harus dipahami:
 * Model-View-Controller (MVC): Pola arsitektur yang memisahkan data (Model), tampilan antarmuka (View), dan logika kontrol (Controller). Dalam arsitektur hybrid kita, React bertindak sebagai View, Laravel Model sebagai Model, dan Laravel Controller sebagai Controller.
 * Eloquent ORM (Object-Relational Mapping): Teknik pemrograman untuk memetakan tabel database ke dalam bentuk objek bahasa pemrograman PHP. Kita tidak menulis query SQL manual (seperti SELECT * FROM aset), melainkan menggunakan sintaks objek seperti Aset::all() atau Aset::find(1).
 * Middleware: Lapisan filter keamanan yang memeriksa setiap request HTTP sebelum masuk ke Controller. Contoh: Middleware auth memastikan pengguna sudah login session, dan middleware auth:sanctum memeriksa validitas token API Android.
-* Database Transactions: Mekanisme pengelompokan beberapa perintah database (insert/update/delete) menjadi satu kesatuan (unit of work). Jika salah satu perintah gagal, semua perintah dibatalkan secara otomatis (rollback) menggunakan DB::rollBack(). Jika semuanya sukses, data disimpan permanen menggunakan DB::commit(). Ini menjaga integritas data.
+* Database Transactions: Pengelompokan beberapa perintah database (insert/update/delete) menjadi satu kesatuan (unit of work). Jika salah satu perintah gagal, semua perintah dibatalkan secara otomatis (rollback) menggunakan DB::rollBack(). Jika semuanya sukses, data disimpan permanen menggunakan DB::commit(). Ini menjaga integritas data.
 
 5.2 React.js: Library Frontend Berbasis Komponen
 ------------------------------------------------
@@ -163,7 +163,7 @@ REST (Representational State Transfer) API adalah standar arsitektur komunikasi 
 
 
 ========================================================================
-BAB VI: FUNGSI DAN PENJELASAN BERKAS KONFIGURASI PROJEK (FILES EXPLANATION)
+BAB VI: FUNGSI DAN PENANAMPILAN BERKAS KONFIGURASI PROJEK (FILES EXPLANATION)
 ========================================================================
 
 Bab ini memuat daftar berkas konfigurasi di root direktori proyek, yang sering ditanyakan dosen untuk memastikan Anda memahami komponen arsitektur proyek secara utuh:
@@ -183,7 +183,7 @@ Bab ini memuat daftar berkas konfigurasi di root direktori proyek, yang sering d
 * phpunit.xml: Konfigurasi bawaan untuk framework pengujian otomatis PHPUnit (untuk menjalankan tes fungsional/unit di Laravel).
 * postcss.config.js: Berkas konfigurasi PostCSS yang digunakan oleh compiler aset (Vite) untuk memproses sintaks CSS modern agar kompatibel dengan seluruh web browser.
 * tailwind.config.js: Berkas konfigurasi utama framework Tailwind CSS. Digunakan untuk mengatur tema warna kustom, font, path pencarian kelas CSS di dalam file React, dan responsivitas layout.
-* vite.config.js: Berkas konfigurasi utama untuk bundler Vite. Vite bertugas mengompilasi dan menggabungkan semua file React JSX and Tailwind CSS Anda secara real-time saat server pengembangan aktif.
+* vite.config.js: Berkas konfigurasi utama untuk bundler Vite. Vite bertugas mengompilasi dan menggabungkan semua file React JSX dan Tailwind CSS Anda secara real-time saat server pengembangan aktif.
 
 
 ========================================================================
@@ -294,3 +294,26 @@ Untuk memahami cara kerja framework secara utuh, berikut adalah sirkulasi/siklus
   1. Model Aset.php diinstruksikan untuk memperbarui kolom id_ruang_saat_ini pada tabel t_aset (mengubah lokasi fisik alat medis).
   2. Model Mutasi.php memperbarui status_mutasi di tabel t_mutasi menjadi 'Disetujui'.
 * Selesai & Render: DB::commit() menyimpan perubahan secara permanen, dan Inertia memicu re-render halaman sehingga status di layar berubah menjadi Approved dan lokasi aset terbarui secara real-time.
+
+
+========================================================================
+BAB X: BEDAH DETAIL KONSEPTUAL DAN PROTOKOL KUNCI FRAMEWORK
+========================================================================
+
+10.1 Protokol Komunikasi Inertia.js (Bridges Between Backend and Frontend)
+--------------------------------------------------------------------------
+Inertia.js menghilangkan kebutuhan pembuatan endpoint API JSON manual untuk klien web. Protokol ini bekerja dengan mengirimkan header request khusus:
+* X-Inertia: true -> Header HTTP yang dikirimkan oleh browser untuk memberi tahu backend Laravel bahwa ini adalah request dinamis dari React, bukan request halaman biasa.
+* Jika header X-Inertia bernilai true, Laravel melalui middleware Inertia akan membatalkan rendering file view Blade HTML mentah, dan sebaliknya mengembalikan representasi payload JSON murni yang berisi nama komponen Page React dan array props data.
+* Jika pengguna memasukkan URL secara manual di browser (request biasa pertama kali), Laravel akan menyajikan halaman Blade utama (app.blade.php) yang memuat file bundler JavaScript (vite/app.jsx), lalu Inertia akan me-mount halaman React yang sesuai di dalam elemen div root.
+
+10.2 Keamanan Otorisasi Berbasis Peran (Role-Based Access Control / RBAC) di Laravel
+------------------------------------------------------------------------------------
+Sistem keamanan MedTrack memadukan pengamanan berlapis:
+* Middleware 'auth' Session -> Memastikan pengguna sudah login di level web browser sebelum rute routes/web.php diproses.
+* Logic-Level Authorization -> Di dalam controller, hak akses CRUD diuji ketat menggunakan fungsi abort(403) jika user tidak memiliki role yang diizinkan, sehingga mencegah eksploitasi URL (seperti memanggil edit aset menggunakan URL POST manual).
+
+10.3 State Synchronization dan React Reactivity
+-----------------------------------------------
+Saat form disubmit menggunakan Inertia (misalnya router.post('/aset', data)), Inertia secara otomatis mengelola siklus state React:
+* Inertia mengirim request POST -> Laravel memproses dan melakukan redirect kembali -> Inertia di sisi frontend menangkap redirect tersebut, memperbarui properti props komponen secara dinamis di memori, dan memicu Virtual DOM React untuk me-render ulang elemen-elemen UI yang berubah saja tanpa melakukan full page refresh.
