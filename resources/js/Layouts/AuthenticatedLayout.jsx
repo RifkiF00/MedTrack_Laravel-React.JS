@@ -313,16 +313,18 @@ export default function Authenticated({ user, header, children }) {
                         </Link>
 
                         {/* 6. Maintenance */}
-                        <Link
-                            href={route('maintenance.index')}
-                            className={`flex items-center px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition ${
-                                isRouteActive('maintenance.*')
-                                    ? 'bg-white text-[#0a3a60] shadow-sm'
-                                    : 'text-slate-100 hover:bg-white/10'
-                            }`}
-                        >
-                            Preventive Maintenance
-                        </Link>
+                        {['Admin_IPSRS', 'Staf_IPSRS'].includes(user.role) && (
+                            <Link
+                                href={route('maintenance.index')}
+                                className={`flex items-center px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition ${
+                                    isRouteActive('maintenance.*')
+                                        ? 'bg-white text-[#0a3a60] shadow-sm'
+                                        : 'text-slate-100 hover:bg-white/10'
+                                }`}
+                            >
+                                Preventive Maintenance
+                            </Link>
+                        )}
 
                         {/* 7. Work Order */}
                         <Link
@@ -337,16 +339,18 @@ export default function Authenticated({ user, header, children }) {
                         </Link>
 
                         {/* 8. Dokumen Mutu */}
-                        <Link
-                            href={route('dokumen.index')}
-                            className={`flex items-center px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition ${
-                                isRouteActive('dokumen.index')
-                                    ? 'bg-white text-[#0a3a60] shadow-sm'
-                                    : 'text-slate-100 hover:bg-white/10'
-                            }`}
-                        >
-                            Dokumen Mutu
-                        </Link>
+                        {['Admin_IPSRS', 'Staf_IPSRS', 'Staf_Logistik'].includes(user.role) && (
+                            <Link
+                                href={route('dokumen.index')}
+                                className={`flex items-center px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition ${
+                                    isRouteActive('dokumen.index')
+                                        ? 'bg-white text-[#0a3a60] shadow-sm'
+                                        : 'text-slate-100 hover:bg-white/10'
+                                }`}
+                            >
+                                Dokumen Mutu
+                            </Link>
+                        )}
                     </nav>
                 </div>
 
@@ -384,9 +388,13 @@ export default function Authenticated({ user, header, children }) {
                         <Link href={route('direktori.index')} className="block py-2">Ruangan & SDM</Link>
                         <Link href={route('aset.index')} className="block py-2">Aset Medis</Link>
                         <Link href={route('mutasi.index')} className="block py-2">Mutasi Aset</Link>
-                        <Link href={route('maintenance.index')} className="block py-2">Preventive Maintenance</Link>
+                        {['Admin_IPSRS', 'Staf_IPSRS'].includes(user.role) && (
+                            <Link href={route('maintenance.index')} className="block py-2">Preventive Maintenance</Link>
+                        )}
                         <Link href={route('workorder.index')} className="block py-2">Work Orders</Link>
-                        <Link href={route('dokumen.index')} className="block py-2">Dokumen Mutu</Link>
+                        {['Admin_IPSRS', 'Staf_IPSRS', 'Staf_Logistik'].includes(user.role) && (
+                            <Link href={route('dokumen.index')} className="block py-2">Dokumen Mutu</Link>
+                        )}
                         <Link href={route('logout')} method="post" as="button" className="block py-2 text-rose-300">Log Out</Link>
                     </nav>
                 )}
