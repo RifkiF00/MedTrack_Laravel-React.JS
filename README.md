@@ -32,14 +32,6 @@ Merupakan peran pendukung yang fokus pada administrasi inventaris aset dan dokum
 *   **Dokumen & Laporan:** Mengelola dan mengunduh berkas laporan bulanan IPSRS.
 *   **Mutasi:** Dapat melihat log riwayat perpindahan aset medis secara keseluruhan untuk sinkronisasi inventaris, namun tidak memiliki hak melakukan *Approval*.
 
-### 4. 👔 **Kepala_IPSRS** (Kepala Bagian IPSRS)
-Merupakan peran struktural untuk fungsi monitoring dan evaluasi.
-*   Memantau statistik keseluruhan aset medis di rumah sakit.
-*   Melihat dokumen laporan performa pemeliharaan sarana prasarana.
-*   Melihat daftar direktori staf IPSRS.
-
----
-
 ## 🔑 Akun Uji Coba Default
 
 Untuk mempermudah pengujian, gunakan akun di bawah ini. Semua akun menggunakan kata sandi default: **`hasna123`**
@@ -50,7 +42,6 @@ Untuk mempermudah pengujian, gunakan akun di bawah ini. Semua akun menggunakan k
 | **Staf_IPSRS** | `staf_ipsrs@medtrack.com` | Manajemen Work Order, Penugasan Teknisi |
 | **Staf_Logistik** | `logistik@medtrack.com` | Edit Data Aset, Cetak Dokumen, Direktori Staf |
 | **Unit_RS (ICU)** | `unit_icu@medtrack.com` | Lapor Kerusakan ICU, Ajukan Mutasi Aset ICU |
-| **Kepala_IPSRS** | `kepala_ipsrs@medtrack.com` | Monitoring Laporan Bulanan & Direktori Staf |
 
 ---
 
