@@ -124,7 +124,7 @@ class HandleInertiaRequests extends Middleware
                     }
                     
                     // 3. Open WO
-                    $openWOCount = \App\Models\TroubleshootLog::where('status_pelaksanaan', 'Terbuka')->count();
+                    $openWOCount = \App\Models\Troubleshoot::where('status_ticket', 'Terbuka')->count();
                     if ($openWOCount > 0) {
                         $notifications[] = [
                             'id' => 'wo_open',
@@ -148,12 +148,9 @@ class HandleInertiaRequests extends Middleware
                     }
                 } elseif ($role === 'Unit_RS') {
                     // Open WO in my room
-                    $myOpenWO = \App\Models\TroubleshootLog::where('status_pelaksanaan', '!=', 'Selesai')
-                        ->whereHas('troubleshoot', function ($q) use ($user) {
-                            $q->whereHas('aset', function ($qa) use ($user) {
-                                $qa->where('id_ruang_saat_ini', $user->id_ruang);
-                            });
-                        })->count();
+                    $myOpenWO = \App\Models\Troubleshoot::where('status_ticket', '!=', 'Closed')
+                        ->where('id_user_pelapor', $user->id_user)
+                        ->count();
                     if ($myOpenWO > 0) {
                         $notifications[] = [
                             'id' => 'my_wo_open',
