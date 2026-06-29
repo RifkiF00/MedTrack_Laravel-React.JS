@@ -8,10 +8,18 @@ use App\Models\Ruangan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class AsetController extends Controller
 {
+    private function checkIpsrs()
+    {
+        $role = Auth::user()->role;
+        if (!in_array($role, ['Admin_IPSRS', 'Staf_IPSRS'])) {
+            abort(403, 'Akses ditolak. Fitur ini hanya untuk Staf IPSRS.');
+        }
+    }
     /**
      * Tampilkan Daftar Aset (dengan Filter Pencarian & Kategori)
      */
@@ -22,6 +30,11 @@ class AsetController extends Controller
         $kondisi = $request->input('kondisi');
 
         $query = Aset::with(['ruangan']);
+
+        $user = Auth::user();
+        if ($user && $user->role === 'Unit_RS' && $user->id_ruang) {
+            $query->where('id_ruang_saat_ini', $user->id_ruang);
+        }
 
         if ($search) {
             // Jika pencarian cocok persis dengan kode_label (hasil scan QR Code)
@@ -62,6 +75,7 @@ class AsetController extends Controller
      */
     public function create()
     {
+        $this->checkIpsrs();
         $ruangans = Ruangan::all();
 
         return Inertia::render('Aset/Create', [
@@ -74,6 +88,7 @@ class AsetController extends Controller
      */
     public function store(Request $request)
     {
+        $this->checkIpsrs();
         $request->validate([
             'kode_label' => 'required|string|unique:m_aset,kode_label',
             'nama_alat' => 'required|string|max:150',
@@ -195,6 +210,7 @@ class AsetController extends Controller
      */
     public function edit($id)
     {
+        $this->checkIpsrs();
         $aset = Aset::findOrFail($id);
         $ruangans = Ruangan::all();
 
@@ -230,6 +246,7 @@ class AsetController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->checkIpsrs();
         $aset = Aset::findOrFail($id);
 
         $request->validate([
@@ -310,6 +327,7 @@ class AsetController extends Controller
      */
     public function destroy($id)
     {
+        $this->checkIpsrs();
         $aset = Aset::findOrFail($id);
 
         // Delete files

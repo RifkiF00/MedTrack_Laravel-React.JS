@@ -41,12 +41,14 @@ export default function Index({ auth, asets, filters }) {
                         >
                             Peta Tracking Aset
                         </Link>
-                        <Link
-                            href={route('aset.create')}
-                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition shadow-sm"
-                        >
-                            + Tambah Aset Baru
-                        </Link>
+                        {['Admin_IPSRS', 'Staf_IPSRS'].includes(auth.user.role) && (
+                            <Link
+                                href={route('aset.create')}
+                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition shadow-sm"
+                            >
+                                + Tambah Aset Baru
+                            </Link>
+                        )}
                     </div>
                 </div>
             }
@@ -167,18 +169,22 @@ export default function Index({ auth, asets, filters }) {
                                                     >
                                                         Detail
                                                     </Link>
-                                                    <Link
-                                                        href={route('aset.edit', aset.id_aset)}
-                                                        className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold transition shadow-sm"
-                                                    >
-                                                        Edit
-                                                    </Link>
-                                                    <button
-                                                        onClick={() => handleDelete(aset.id_aset)}
-                                                        className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-rose-50 hover:border-rose-200 text-rose-600 rounded-lg text-xs font-semibold transition shadow-sm"
-                                                    >
-                                                        Hapus
-                                                    </button>
+                                                    {['Admin_IPSRS', 'Staf_IPSRS'].includes(auth.user.role) && (
+                                                        <>
+                                                            <Link
+                                                                href={route('aset.edit', aset.id_aset)}
+                                                                className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold transition shadow-sm"
+                                                            >
+                                                                Edit
+                                                            </Link>
+                                                            <button
+                                                                onClick={() => handleDelete(aset.id_aset)}
+                                                                className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-rose-50 hover:border-rose-200 text-rose-600 rounded-lg text-xs font-semibold transition shadow-sm"
+                                                            >
+                                                                Hapus
+                                                            </button>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>

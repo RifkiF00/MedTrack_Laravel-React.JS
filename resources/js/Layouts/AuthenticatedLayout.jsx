@@ -4,7 +4,7 @@ import { Link, usePage, router } from '@inertiajs/react';
 
 export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
-    const { upcomingEvents, upcomingCalibrations } = usePage().props;
+    const { upcomingEvents, upcomingCalibrations, notifications } = usePage().props;
 
     // States for search and calendar
     const [searchText, setSearchText] = useState('');
@@ -431,9 +431,49 @@ export default function Authenticated({ user, header, children }) {
                         {/* Right: Actions, Notification, Sidebar Toggle, Profile */}
                         <div className="flex items-center space-x-3">
                             {/* Notification Bell */}
-                            <button className="h-9 w-9 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-full flex items-center justify-center text-sm shadow-sm transition">
-                                🔔
-                            </button>
+                            <Dropdown>
+                                <Dropdown.Trigger>
+                                    <button className="h-9 w-9 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-full flex items-center justify-center text-sm shadow-sm transition relative cursor-pointer">
+                                        🔔
+                                        {notifications && notifications.length > 0 && (
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center px-1 animate-pulse border border-white">
+                                                {notifications.length}
+                                            </span>
+                                        )}
+                                    </button>
+                                </Dropdown.Trigger>
+
+                                <Dropdown.Content align="right" width="80" contentClasses="py-1 bg-white rounded-2xl shadow-xl border border-slate-100 max-h-96 overflow-y-auto w-80">
+                                    <div className="px-4 py-2.5 border-b border-slate-100">
+                                        <span className="font-extrabold text-xs text-[#0a3a60]">Pemberitahuan</span>
+                                    </div>
+                                    {notifications && notifications.length > 0 ? (
+                                        notifications.map((notif, index) => (
+                                            <Dropdown.Link
+                                                key={notif.id || index}
+                                                href={notif.link}
+                                                className="block px-4 py-3 hover:bg-slate-50 border-b border-slate-50 last:border-b-0"
+                                            >
+                                                <div className="flex flex-col space-y-1">
+                                                    <span className="text-xs text-slate-700 font-semibold leading-relaxed">
+                                                        {notif.text}
+                                                    </span>
+                                                    <span className={`text-[9px] font-bold uppercase tracking-wider ${
+                                                        notif.type === 'danger' ? 'text-rose-600' :
+                                                        notif.type === 'warning' ? 'text-amber-600' : 'text-sky-600'
+                                                    }`}>
+                                                        {notif.type}
+                                                    </span>
+                                                </div>
+                                            </Dropdown.Link>
+                                        ))
+                                    ) : (
+                                        <div className="px-4 py-6 text-center">
+                                            <span className="text-xs text-slate-400 font-bold block">Tidak ada pemberitahuan baru</span>
+                                        </div>
+                                    )}
+                                </Dropdown.Content>
+                            </Dropdown>
 
                             {/* Toggle Sidebar Button */}
                             <button 
