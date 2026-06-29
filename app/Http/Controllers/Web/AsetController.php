@@ -13,11 +13,19 @@ use Inertia\Inertia;
 
 class AsetController extends Controller
 {
-    private function checkIpsrs()
+    private function checkCanCreate()
+    {
+        $role = Auth::user()->role;
+        if (!in_array($role, ['Admin_IPSRS', 'Staf_IPSRS', 'Staf_Logistik'])) {
+            abort(403, 'Akses ditolak. Peran Anda tidak memiliki hak untuk menambah aset.');
+        }
+    }
+
+    private function checkCanEditOrDelete()
     {
         $role = Auth::user()->role;
         if (!in_array($role, ['Admin_IPSRS', 'Staf_IPSRS'])) {
-            abort(403, 'Akses ditolak. Fitur ini hanya untuk Staf IPSRS.');
+            abort(403, 'Akses ditolak. Peran Anda tidak memiliki hak untuk mengedit atau menghapus aset.');
         }
     }
     /**
@@ -75,7 +83,7 @@ class AsetController extends Controller
      */
     public function create()
     {
-        $this->checkIpsrs();
+        $this->checkCanCreate();
         $ruangans = Ruangan::all();
 
         return Inertia::render('Aset/Create', [
@@ -88,7 +96,7 @@ class AsetController extends Controller
      */
     public function store(Request $request)
     {
-        $this->checkIpsrs();
+        $this->checkCanCreate();
         $request->validate([
             'kode_label' => 'required|string|unique:m_aset,kode_label',
             'nama_alat' => 'required|string|max:150',
@@ -210,7 +218,7 @@ class AsetController extends Controller
      */
     public function edit($id)
     {
-        $this->checkIpsrs();
+        $this->checkCanEditOrDelete();
         $aset = Aset::findOrFail($id);
         $ruangans = Ruangan::all();
 
@@ -246,7 +254,7 @@ class AsetController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->checkIpsrs();
+        $this->checkCanEditOrDelete();
         $aset = Aset::findOrFail($id);
 
         $request->validate([
@@ -327,7 +335,7 @@ class AsetController extends Controller
      */
     public function destroy($id)
     {
-        $this->checkIpsrs();
+        $this->checkCanEditOrDelete();
         $aset = Aset::findOrFail($id);
 
         // Delete files

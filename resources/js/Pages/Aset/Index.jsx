@@ -41,7 +41,7 @@ export default function Index({ auth, asets, filters }) {
                         >
                             Peta Tracking Aset
                         </Link>
-                        {['Admin_IPSRS', 'Staf_IPSRS'].includes(auth.user.role) && (
+                        {['Admin_IPSRS', 'Staf_IPSRS', 'Staf_Logistik'].includes(auth.user.role) && (
                             <Link
                                 href={route('aset.create')}
                                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition shadow-sm"
