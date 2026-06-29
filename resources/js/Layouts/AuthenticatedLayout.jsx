@@ -6,6 +6,27 @@ export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const { upcomingEvents, upcomingCalibrations, notifications } = usePage().props;
 
+    // Dismissed notifications state (saved in localStorage)
+    const [dismissedNotifs, setDismissedNotifs] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem('dismissed_notifs') || '[]');
+        } catch (e) {
+            return [];
+        }
+    });
+
+    const handleNotifClick = (notifId, notifText) => {
+        const key = notifId + '_' + notifText;
+        const updated = [...dismissedNotifs, key];
+        setDismissedNotifs(updated);
+        localStorage.setItem('dismissed_notifs', JSON.stringify(updated));
+    };
+
+    const activeNotifications = notifications?.filter(notif => {
+        const key = notif.id + '_' + notif.text;
+        return !dismissedNotifs.includes(key);
+    }) || [];
+
     // States for search and calendar
     const [searchText, setSearchText] = useState('');
     const [startDate, setStartDate] = useState(new Date());
@@ -435,9 +456,9 @@ export default function Authenticated({ user, header, children }) {
                                 <Dropdown.Trigger>
                                     <button className="h-9 w-9 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-full flex items-center justify-center text-sm shadow-sm transition relative cursor-pointer">
                                         🔔
-                                        {notifications && notifications.length > 0 && (
+                                        {activeNotifications && activeNotifications.length > 0 && (
                                             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center px-1 animate-pulse border border-white">
-                                                {notifications.length}
+                                                {activeNotifications.length}
                                             </span>
                                         )}
                                     </button>
@@ -447,11 +468,12 @@ export default function Authenticated({ user, header, children }) {
                                     <div className="px-4 py-2.5 border-b border-slate-100">
                                         <span className="font-extrabold text-xs text-[#0a3a60]">Pemberitahuan</span>
                                     </div>
-                                    {notifications && notifications.length > 0 ? (
-                                        notifications.map((notif, index) => (
+                                    {activeNotifications && activeNotifications.length > 0 ? (
+                                        activeNotifications.map((notif, index) => (
                                             <Dropdown.Link
                                                 key={notif.id || index}
                                                 href={notif.link}
+                                                onClick={() => handleNotifClick(notif.id, notif.text)}
                                                 className="block px-4 py-3 hover:bg-slate-50 border-b border-slate-50 last:border-b-0"
                                             >
                                                 <div className="flex flex-col space-y-1">

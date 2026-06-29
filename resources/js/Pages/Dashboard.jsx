@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { useEffect, useRef } from 'react';
 
-export default function Dashboard({ auth, role, nama, stats, chart, notifications, notification_count }) {
+export default function Dashboard({ auth, role, nama, stats, chart, dashboardNotifications = [], dashboardNotificationCount = 0 }) {
     const isUnit = role === 'Unit_RS';
     const perluPenanganan = (stats.rusak_ringan || 0) + (stats.rusak_berat || 0) + (stats.maintenance || 0);
     const persenBaik = stats.total_aset > 0 ? Math.round(((stats.baik || 0) / stats.total_aset) * 100) : 0;
@@ -409,13 +409,13 @@ export default function Dashboard({ auth, role, nama, stats, chart, notification
                     <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
                         <h4 className="font-semibold text-lg text-gray-900">Notifikasi Sistem</h4>
                         <span className="px-2.5 py-0.5 bg-rose-100 text-rose-700 text-xs font-bold rounded-full">
-                            {notification_count} Notifikasi
+                            {dashboardNotificationCount} Notifikasi
                         </span>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {notifications.length > 0 ? (
-                            notifications.map((notif) => (
+                        {dashboardNotifications.length > 0 ? (
+                            dashboardNotifications.map((notif) => (
                                 <div 
                                     key={notif.id}
                                     className="flex items-start space-x-3.5 p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition duration-150 border border-slate-100"

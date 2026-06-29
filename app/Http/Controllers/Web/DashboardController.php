@@ -156,8 +156,8 @@ class DashboardController extends Controller
                     ]
                 ]
             ],
-            'notifications' => $notifications,
-            'notification_count' => count($notifications),
+            'dashboardNotifications' => $notifications,
+            'dashboardNotificationCount' => count($notifications),
         ]);
     }
 
