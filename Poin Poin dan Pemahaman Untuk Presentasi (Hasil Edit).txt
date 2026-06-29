@@ -1,229 +1,218 @@
-🏥 PANDUAN DETAIL PEMAHAMAN TEKNIS PROJEK AKHIR (MEDTRACK)
-Materi Pendalaman Struktur Kode, Alur Data, Otorisasi Peran, dan Integrasi Laravel + React Inertia Khusus untuk Menjawab Pertanyaan Dosen Penguji secara Rinci
+PANDUAN DETAIL PEMAHAMAN TEKNIS PROJEK AKHIR
+Materi Pendalaman Struktur Kode, Alur Data, dan Integrasi Laravel + React Inertia
+Khusus untuk Menjawab Pertanyaan Dosen Penguji secara Rinci
 
 ========================================================================
 BAB I: BEDAH STRUKTUR DIREKTORI PROYEK (LARAVEL + REACT INERTIA)
 ========================================================================
 
-Arsitektur Hybrid Monolith memadukan keunggulan Laravel sebagai backend tangguh dan React.js sebagai frontend reaktif di dalam satu repositori terpadu. Jembatan komunikasi data dikelola sepenuhnya oleh Inertia.js, yang meniadakan kebutuhan REST API internal untuk klien web. Berikut adalah pembagian tugas setiap folder:
+Dosen sering menanyakan di mana letak logika bisnis, di mana letak rute, dan bagaimana kode frontend bisa menyatu dengan backend. Berikut adalah rincian fungsional struktur folder proyek:
 
-Sisi Backend (Laravel 10)
--------------------------
-* app/Http/Controllers/Web/
-  - Folder ini menyimpan seluruh logika bisnis web. Controller bertugas memproses data masukan, berinteraksi dengan database melalui Model Eloquent, dan meneruskan data tersebut ke frontend React via properti Inertia rendering.
-* app/Http/Controllers/Api/
-  - Berisi berkas-berkas kontroler API untuk melayani pertukaran data koordinat GPS pelacak lokasi aset medis dari aplikasi mobile Android dalam bentuk JSON.
-* app/Models/
-  - Folder representasi tabel database. Menggunakan ORM Eloquent sehingga kueri database direpresentasikan sebagai objek PHP. Di dalamnya terdapat file Aset.php, User.php, Ruangan.php, Troubleshoot.php (Work Order), TroubleshootLog.php, Mutasi.php, Pemeliharaan.php, PemeliharaanLog.php, dan DokumenMutu.php.
-* database/migrations/
-  - Menyimpan skema pembentukan tabel database beserta constraint relasi foreign key.
-* database/seeders/
-  - Menyimpan seeder data bawaan untuk keperluan demonstrasi akun pengujian default.
-* routes/web.php
-  - Tempat mendaftarkan rute akses web client yang dilindungi middleware 'auth' session.
-* routes/api.php
-  - Tempat mendaftarkan rute REST API untuk Android yang diamankan oleh middleware token 'auth:sanctum'.
+1.1 Sisi Backend (Laravel 10)
+-----------------------------
+* app/Http/Controllers/Web/: Tempat menyimpan logika kontroler web. Controller bertugas mengambil data dari Model, memproses otorisasi peran pengguna (role checking), melakukan manipulasi data, dan meneruskan data tersebut ke tampilan frontend menggunakan Inertia rendering.
+* app/Http/Controllers/Api/: Berisi file ApiAuthController dan ApiAsetController untuk melayani request mobile tracker Android Kotlin dalam format JSON.
+* app/Models/: Berisi Model Eloquent (User.php, Aset.php, Ruangan.php, Mutasi.php, Troubleshoot.php, TroubleshootLog.php, Pemeliharaan.php, PemeliharaanLog.php, DokumenMutu.php) yang memetakan tabel database MySQL secara objek ORM. Model mendefinisikan relasi (seperti Aset milik Ruangan melalui belongsTo).
+* database/migrations/: Skema pembuatan tabel database. Skema migrations dipisahkan agar pembuatan constraint foreign key dan indexing berjalan runtut tanpa error.
+* database/seeders/DatabaseSeeder.php: Menyimpan data awal bawaan (akun user dengan role berbeda seperti Admin_IPSRS, Staf_Logistik, dan Unit_RS, ruangan medis, serta data aset medis dummy).
+* routes/web.php: Menyimpan rute akses web client yang dilindungi oleh middleware 'auth' (mengharuskan login session). Rute mengarah ke controller Inertia.
+* routes/api.php: Menyimpan rute REST API untuk Android. Rute login bersifat publik, sedangkan rute lainnya dilindungi middleware 'auth:sanctum' (wajib menyertakan token).
 
-Sisi Frontend (React.js + Tailwind CSS)
+1.2 Sisi Frontend (React.js + Tailwind)
 ---------------------------------------
-* resources/js/Pages/
-  - Menyimpan file komponen halaman web. Setiap file React JSX di sini (seperti Dashboard.jsx, Aset/Index.jsx, WorkOrder/Index.jsx, Mutasi/Index.jsx) merender antarmuka pengguna halaman web secara dinamis.
-* resources/js/Layouts/AuthenticatedLayout.jsx
-  - Kerangka tata letak halaman dashboard (sidebar, header notifikasi, scanner QR code).
-* resources/js/Components/
-  - Menyimpan komponen UI kecil reusable (seperti Modal, Dropdown, Button).
+* resources/js/Pages/: Halaman antarmuka pengguna (Views). Setiap berkas disini (seperti Dashboard.jsx, Aset/Index.jsx, WorkOrder/Index.jsx, Mutasi/Index.jsx, Direktori/Index.jsx, Dokumen/Index.jsx) adalah komponen React utuh yang merender UI halaman web secara dinamis.
+* resources/js/Layouts/AuthenticatedLayout.jsx: Kerangka halaman utama (Sidebar, Topbar/Header, Profil Info, Lonceng Notifikasi Dinamis, Kamera Web Scanner QR Code) yang membungkus semua halaman setelah pengguna berhasil login. Menghindari penulisan sidebar berulang di setiap file Page.
+* resources/js/app.jsx: Entri utama JavaScript. Di sini Inertia dikonfigurasi untuk memuat komponen React dari folder Pages secara dinamis.
 
 
 ========================================================================
-BAB II: PENJELASAN DETIL SETIAP FILE KODE PROGRAM
+BAB II: ALUR DATA DAN REQUEST-RESPONSE LIFECYCLE (BAGAIMANA APLIKASI BEKERJA)
 ========================================================================
 
-Di bawah ini adalah rincian detail fungsi dan metode kunci untuk setiap file kode program di dalam proyek MedTrack:
-
-1. Model Eloquent (app/Models/)
--------------------------------
-* User.php
-  - Memetakan tabel m_user. Menyimpan informasi profil staff, peran (role), password (terenkripsi bcrypt), status keaktifan, dan relasi unit kerja.
-  - Relasi ruangan(): belongsTo(Ruangan::class, 'id_ruang') untuk mendapatkan unit kerja user.
-* Aset.php
-  - Memetakan tabel t_aset. Menyimpan data inventaris alat medis, serial number, status operasional, koordinat lokasi GPS tracking, tanggal kalibrasi terakhir, tanggal kalibrasi berikutnya, dan nama file QR Code.
-  - Relasi ruangan(): belongsTo(Ruangan::class, 'id_ruang_saat_ini') untuk melacak lokasi ruang terkini alat.
-  - Relasi troubleshoot(): hasMany(Troubleshoot::class, 'id_aset') untuk mendapatkan riwayat kerusakan alat.
-* Ruangan.php
-  - Memetakan tabel m_ruangan. Menyimpan data ruangan di rumah sakit (ICU, IGD, OK, ICCU, dll.).
-  - Relasi asets(): hasMany(Aset::class, 'id_ruang_saat_ini') untuk mendapatkan semua inventaris di ruangan tersebut.
-* Mutasi.php
-  - Memetakan tabel t_mutasi. Menyimpan riwayat pengajuan pemindahan alat medis antar-ruangan.
-  - Relasi aset(): belongsTo(Aset::class, 'id_aset')
-  - Relasi ruanganAsal(): belongsTo(Ruangan::class, 'id_ruang_asal')
-  - Relasi ruanganTujuan(): belongsTo(Ruangan::class, 'id_ruang_tujuan')
-* Troubleshoot.php
-  - Memetakan tabel t_troubleshoot. Menyimpan tiket laporan kerusakan alat medis (Work Order).
-  - Relasi pelapor(): belongsTo(User.class, 'id_user_pelapor')
-  - Relasi teknisi(): belongsTo(User.class, 'id_teknisi_penanggungjawab')
-  - Relasi aset(): belongsTo(Aset::class, 'id_aset')
-  - Relasi ticketLogs(): hasMany(TroubleshootLog::class, 'id_ticket')
-
-2. Web Controllers (app/Http/Controllers/Web/)
-----------------------------------------------
-* DashboardController.php
-  - Menyajikan dasbor utama. Menghitung ringkasan statistik (jumlah aset, total kerusakan, mutasi pending) dan memuat agenda kalibrasi harian.
-  - index(): Mengambil data statistik kartu ringkasan dan kalender pemeliharaan.
-  - reschedule(): Logika pembaruan tanggal kalibrasi alat secara interaktif dari kalender sidebar.
-* AsetController.php
-  - Menangani manajemen inventaris alat medis.
-  - index(): Menampilkan katalog aset. Menyaring data otomatis per unit untuk Unit_RS, dan menonaktifkan filter jika ada parameter pencarian (scan QR).
-  - checkCanCreate() & checkCanEditOrDelete(): Membatasi hak akses CRUD aset agar tidak dapat diakses oleh Unit_RS, Staf_Logistik (hanya bisa create), serta teknisi budi_ipsrs, hendra_ipsrs, dan agus_ipsrs.
-  - store() & update(): Melakukan validasi pengisian data aset medis dan meng-generate file gambar QR Code secara dinamis.
-* WorkOrderController.php
-  - Menangani alur pelaporan kerusakan alat medis.
-  - store(): Menyimpan tiket kerusakan baru dari Unit_RS dengan status default 'Open'.
-  - assignTeknisi(): Meng-assign teknisi penanggungjawab (budi_ipsrs, hendra_ipsrs, atau agus_ipsrs) ke dalam tiket. Diblokir jika diakses oleh teknisi lapangan itu sendiri.
-  - updateStatus(): Mengubah status progres perbaikan alat (Open -> Pengecekan -> Dikerjakan -> Menunggu Sign-Off) oleh teknisi penanggungjawab.
-* MutasiController.php
-  - Mengelola alur pemindahan/mutasi alat medis antar ruangan.
-  - store(): Mengajukan pemindahan alat medis dengan status 'Menunggu_Verifikasi'.
-  - verify(): Logika verifikasi persetujuan (Approve/Reject) mutasi oleh IPSRS yang menggunakan DB::transaction() untuk memperbarui kolom id_ruang_saat_ini pada aset sekaligus mencatat log mutasi.
-* DirektoriController.php
-  - Mengelola master data ruangan rumah sakit dan direktori staff/SDM.
-  - checkAccess(): Memproteksi CRUD ruangan dan profil staff agar menolak role Unit_RS, Staf_Logistik, dan teknisi lapangan (Budi/Hendra/Agus).
-
-3. API Controllers (app/Http/Controllers/Api/)
-----------------------------------------------
-* ApiAuthController.php
-  - Melayani proses autentikasi (login/logout) aplikasi mobile tracker Android Kotlin dan menghasilkan string plainTextToken Sanctum.
-* ApiAsetController.php
-  - Melayani kueri data inventaris aset dan menerima update data posisi koordinat GPS tracker dari aplikasi Android untuk disimpan ke tabel t_aset.
-
-4. Halaman React Pages (resources/js/Pages/)
---------------------------------------------
-* Dashboard.jsx
-  - Dashboard visual ringkasan data statistik card counter, list notifikasi lonceng terbaru, chart grafik tingkat kerusakan alat, dan widget kalender harian agenda pemeliharaan.
-* Aset/Index.jsx
-  - Katalog data inventaris aset medis lengkap dengan kartu informasi, filter pencarian, list kartu, tombol tambah/edit/hapus (sesuai otorisasi), dan integrasi scan QR Code.
-* Aset/Create.jsx & Aset/Edit.jsx
-  - Form pembuatan dan pengubahan data aset medis, lengkap dengan penanganan upload file gambar foto alat medis.
-* Aset/Detail.jsx
-  - Menampilkan detail spesifikasi teknis aset medis secara lengkap serta visualisasi peta pelacakan posisi GPS real-time.
-* WorkOrder/Index.jsx
-  - Tiket pelaporan kerusakan, dilengkapi dropdown inline untuk mengubah status perbaikan (bagi teknisi) dan assign teknisi (bagi admin).
-* WorkOrder/Create.jsx
-  - Form pelaporan kerusakan alat medis oleh Unit_RS, lengkap dengan upload foto bukti kerusakan.
-* Mutasi/Index.jsx
-  - Daftar riwayat mutasi alat dilengkapi pill badge status verifikasi (Pending, Approved, Rejected).
-* Mutasi/Create.jsx
-  - Form pengajuan mutasi/pemindahan aset medis keluar ruangan oleh Unit_RS.
-* Maintenance/Index.jsx
-  - Kalender pemeliharaan berkala untuk menjadwalkan agenda pemeliharaan preventif.
-* Dokumen/Index.jsx
-  - Manajemen berkas dokumen mutu laporan bulanan IPSRS.
-* Direktori/Index.jsx
-  - Grid data ruangan dan direktori staff rumah sakit.
-* Tracking/Map.jsx
-  - Visualisasi peta real-time posisi koordinat GPS seluruh aset rumah sakit secara global.
-* Layouts/AuthenticatedLayout.jsx
-  - Layout utama pembungkus halaman. Di sini diletakkan menu navigasi sidebar, bell notifikasi dengan filter role, dan modal kamera scanner QR.
-
-
-========================================================================
-BAB III: ALUR DATA DAN REQUEST-RESPONSE LIFECYCLE (BAGAIMANA APLIKASI BEKERJA)
-========================================================================
-
-Siklus Request Web (Menggunakan Protokol Inertia.js)
-----------------------------------------------------
+2.1 Siklus Request Web (Menggunakan Protokol Inertia.js)
+--------------------------------------------------------
 Inertia bertindak sebagai jembatan. Alur kerja ketika pengguna mengakses halaman Aset Medis adalah sebagai berikut:
-1. Pengguna mengklik menu 'Aset Medis' di Sidebar.
-2. Browser mengirimkan request internal (Inertia request XHR/AJAX) ke rute /aset.
-3. Laravel mencocokkan rute di web.php dan memanggil AsetController@index.
-4. AsetController melakukan query database melalui Eloquent: Aset::with('ruangan')->get.
-5. Controller mengembalikan respon: return Inertia::render('Aset/Index', ['asets' => $asets]);
-6. Inertia menangkap kembalian tersebut, lalu mengirimkan payload berupa data JSON (bukan HTML mentah) ke frontend.
-7. Komponen React di resources/js/Pages/Aset/Index.jsx menerima data tersebut melalui props (asets) lalu merendernya secara dinamis di browser tanpa refresh halaman penuh.
+* 1. Pengguna mengklik menu 'Aset Medis' di Sidebar.
+* 2. Browser mengirimkan request internal (Inertia request XHR/AJAX) ke rute /aset.
+* 3. Laravel mencocokkan rute di web.php dan memanggil AsetController@index.
+* 4. AsetController melakukan query database melalui Eloquent: Aset::with('ruangan')->get() untuk memuat aset medis beserta nama ruangan tempat alat itu ditempatkan.
+* 5. Controller mengembalikan respon: return Inertia::render('Aset/Index', ['asets' => $asets]);
+* 6. Inertia menangkap kembalian tersebut, lalu mengirimkan payload berupa data JSON (bukan HTML mentah) ke frontend.
+* 7. Komponen React di resources/js/Pages/Aset/Index.jsx menerima data tersebut melalui props (asets) lalu merendernya secara dinamis di browser tanpa refresh halaman penuh.
 
-Siklus Request API Mobile (Laravel Sanctum)
--------------------------------------------
-Alur kerja ketika aplikasi Android pelacak lokasi mengirim data ke server:
-1. Aplikasi Android mengirim HTTP POST request ke http://alamat-server/api/tracking.
-2. Android menyertakan header Authorization: Bearer {token} yang diperoleh saat login.
-3. Laravel mencocokkan rute di routes/api.php dan memprosesnya melalui middleware auth:sanctum.
-4. Middleware memverifikasi keaslian token pada tabel personal_access_tokens di database.
-5. Jika valid, request diteruskan ke Api\AsetController@updateTracking yang menyimpan koordinat GPS terbaru ke database.
+2.2 Siklus Request API Mobile (Laravel Sanctum)
+-----------------------------------------------
+Alur kerja ketika aplikasi Android pelacak lokasi meminta daftar barang atau mengirimkan koordinat GPS ke server:
+* 1. Aplikasi Android mengirim HTTP POST request ke http://alamat-server/api/tracking.
+* 2. Android menyertakan header Authorization: Bearer {token} yang diperoleh saat login.
+* 3. Laravel mencocokkan rute di routes/api.php dan memprosesnya melalui middleware auth:sanctum.
+* 4. Middleware memverifikasi keaslian token pada tabel personal_access_tokens di database.
+* 5. Jika valid, request diteruskan ke Api\ApiAsetController@updateTracking yang mengambil data koordinat GPS terbaru dan menyimpannya ke tabel t_aset.
 
 
 ========================================================================
-BAB IV: BEDAH LOGIKA DAN KODE CRITICAL (PERTANYAAN KHUSUS DOSEN)
+BAB III: BEDAH LOGIKA DAN KODE CRITICAL (PERTANYAAN KHUSUS DOSEN)
 ========================================================================
 
-Logika Mutasi Aset & Keamanan Database Transactions
----------------------------------------------------
-Fokus Pembahasan: Pertanyaan Dosen: 'Bagaimana logika mutasi alat medis dan bagaimana Anda menjamin konsistensi?'
-Di dalam file MutasiController.php, transaksi dilakukan di dalam blok DB::transaction(). Hal ini penting untuk memastikan sifat Atomicity (semua berhasil atau tidak sama sekali):
-* Sistem memverifikasi status aset dan ruangan tujuan.
-* Jika validasi lolos, jalankan DB::transaction(function() { ... })
-* Sistem memperbarui kolom id_ruang_saat_ini pada tabel t_aset.
-* Sistem mencatat riwayat log mutasi ke tabel t_mutasi.
-* Jika terjadi error di tengah proses (misalnya koneksi putus saat menyimpan log mutasi), Laravel otomatis membatalkan pembaruan ruangan pada aset (Rollback) agar data tetap konsisten.
+3.1 Logika Mutasi Aset & Keamanan Database Transactions
+-------------------------------------------------------
+Fokus Pembahasan: Pertanyaan Dosen: 'Bagaimana logika mutasi alat medis dan bagaimana Anda menjamin konsistensi lokasi?'
+Di dalam file MutasiController.php, transaksi dilakukan di dalam blok DB::transaction(). Hal ini penting untuk memastikan sifat Atomicity (semua berhasil atau tidak sama sekali). Logikanya:
+1. Validasi input: memastikan aset yang akan dimutasi saat ini memiliki data asal unit ruangan yang terdaftar di database.
+2. Jika validasi lolos, jalankan DB::transaction(function() { ... })
+3. Sistem memperbarui kolom id_ruang_saat_ini pada tabel t_aset menjadi ID ruangan tujuan mutasi.
+4. Sistem mencatat log riwayat pemindahan ke dalam tabel t_mutasi.
+5. Jika terjadi error di tengah proses (misalnya database down saat mencatat log mutasi), Laravel otomatis membatalkan pembaruan ruangan pada aset (Rollback) agar lokasi aset tidak bergeser secara tidak konsisten.
 
-Logika Work Order (Alur Pelaporan Kerusakan)
---------------------------------------------
-Fokus Pembahasan: Pertanyaan Dosen: 'Bagaimana alur pelaporan kerusakan dan penugasan teknisi?'
-* Pengguna dengan peran 'Unit_RS' mengirimkan laporan kerusakan alat dari unitnya. Status awal diset default ke 'Open'.
-* Pengguna dengan peran 'Admin_IPSRS' masuk ke menu Work Order, melihat tiket 'Open' tersebut, lalu menunjuk teknisi penanggungjawab.
-* Teknisi lapangan (Budi, Hendra, Agus) masuk dengan akun mereka. Mereka hanya bisa melihat daftar tugas mereka dan memperbarui progres status (Open -> Dikerjakan -> Menunggu Sign-Off).
-* Setelah selesai, status diset menjadi 'Closed' setelah divalidasi.
+3.2 Logika Pelaporan Kerusakan & Penugasan Teknisi (Work Order)
+---------------------------------------------------------------
+Fokus Pembahasan: Pertanyaan Dosen: 'Bagaimana alur pelaporan kerusakan alat medis dan penugasan teknisi?'
+Tiket troubleshoot/kerusakan dikelola melalui tabel t_troubleshoot. Kolom penting di sini adalah status (status_ticket dengan opsi Open, Pengecekan, Dikerjakan, Menunggu Sign-Off, Closed), id_user_pelapor, dan id_teknisi_penanggungjawab.
+1. Pengguna dengan peran 'Unit_RS' mengirim form laporan kerusakan alat dari unitnya. Status awal diset default ke 'Open'.
+2. Pengguna dengan peran 'Admin_IPSRS' masuk ke menu Work Order, melihat tiket 'Open' tersebut, lalu menugaskan teknisi penanggungjawab dengan memilih dari daftar user yang memiliki kompetensi teknis.
+3. Teknisi lapangan (seperti Budi, Hendra, Agus) masuk ke sistem. Mereka hanya melihat tiket pengerjaan yang ditugaskan kepada mereka dan dapat memperbarui status pengerjaan secara bertahap (misal dari Open ke Dikerjakan).
+4. Setelah selesai dikerjakan, status tiket diperbarui menjadi 'Menunggu Sign-Off' untuk divalidasi oleh admin atau unit sebelum tiket ditutup secara permanen ('Closed').
 
-Pengelolaan Laporan Cetak PDF (Print-Friendly CSS)
---------------------------------------------------
+3.3 Pengelolaan Laporan Cetak PDF (Print-Friendly CSS)
+------------------------------------------------------
 Fokus Pembahasan: Pertanyaan Dosen: 'Bagaimana laporan dicetak menjadi PDF?'
-Di halaman resources/js/Pages/Aset/Index.jsx, tombol 'Cetak' memicu window.print(). Kita menggunakan utility class Tailwind CSS khusus cetak:
-* print:hidden -> Menyembunyikan sidebar, topbar, dan tombol aksi cetak saat proses print PDF berlangsung.
-* print:block -> Memunculkan Kop Laporan resmi yang disembunyikan di layar monitor biasa.
-* print:shadow-none & print:border-none -> Menghilangkan bayangan dan border dekoratif agar hasil cetak PDF bersih.
+Di halaman resources/js/Pages/Aset/Index.jsx, tombol 'Cetak Laporan' memicu fungsi window.print(). Untuk menghasilkan PDF yang rapi tanpa elemen navigasi web, kita menggunakan utility class Tailwind CSS khusus cetak:
+* print:hidden -> Menyembunyikan sidebar, topbar, dan tombol cetak saat proses print PDF berlangsung.
+* print:block -> Memunculkan Kop Laporan resmi yang disembunyikan di layar monitor.
+* print:shadow-none & print:border-none -> Menghilangkan bayangan dan border dekoratif agar PDF bersih layaknya dokumen kertas resmi.
+* print:text-black & print:divide-slate-350 -> Mengubah teks menjadi hitam pekat agar hasil cetakan jelas dibaca.
+
+
+========================================================================
+BAB IV: BEDAH DETAIL FILE KODE PROGRAM (FUNGSI DAN PENJELASAN KODE)
+========================================================================
+
+4.1 File Migrasi Database
+-------------------------
+Berkas ini berfungsi untuk mendefinisikan skema tabel database MySQL. Di dalamnya terdapat fungsi up() yang dijalankan saat php artisan migrate dipanggil. Dosen akan menyorot relasi foreign key di sini:
+* Tabel Ruangan: Dibuat dengan id_ruang sebagai primary key dan nama_ruang ber-constraint unique() agar tidak ada ruangan ganda.
+* Tabel Aset: Memiliki kolom id_ruang_saat_ini yang dihubungkan sebagai foreign key menggunakan constrained('m_ruangan')->nullOnDelete(). Artinya, jika sebuah ruangan dihapus, kolom lokasi aset diisi NULL tanpa menghapus data aset.
+* Tabel Mutasi: Melacak log perpindahan aset (id_aset, id_ruang_asal, id_ruang_tujuan).
+* Tabel Troubleshoot: Melacak tiket kerusakan (id_aset, id_user_pelapor, id_teknisi_penanggungjawab, status_ticket).
+
+4.2 File Model (app/Models/Aset.php)
+------------------------------------
+Model Eloquent bertindak sebagai perwakilan tabel database di pemrograman PHP berbasis objek. Di dalamnya, relasi didefinisikan secara eksplisit untuk mempermudah query data:
+* protected $fillable: Daftar kolom yang diizinkan untuk diisi secara massal (mass assignment) saat proses insert/update data di controller.
+* public function ruangan(): Mendefinisikan relasi belongsTo(Ruangan::class, 'id_ruang_saat_ini'). Relasi ini memberitahu Laravel bahwa satu aset berada di satu ruangan (One-to-One/Many-to-One).
+* public function troubleshoot(): Mendefinisikan relasi hasMany(Troubleshoot::class, 'id_aset'). Berarti satu aset bisa memiliki banyak catatan riwayat kerusakan/Work Order (One-to-Many).
+
+4.3 File Controller Aset (app/Http/Controllers/Web/AsetController.php)
+----------------------------------------------------------------------
+Controller ini melayani rute halaman Aset web. Dosen biasanya menanyakan bagaimana validasi peran dan query databasenya bekerja di sini:
+* Proteksi Peran (Role Checking): Di awal metode CRUD, terdapat pengecekan menggunakan helper checkCanCreate dan checkCanEditOrDelete untuk membatasi Unit_RS, Staf_Logistik (hanya diizinkan tambah/create, dilarang edit/hapus), serta teknisi budi_ipsrs, hendra_ipsrs, dan agus_ipsrs agar tidak bisa memanipulasi data aset master.
+* Eager Loading (with): Mengambil data aset menggunakan Aset::with('ruangan')->get(). Penggunaan 'with' bertujuan mengoptimalkan database dengan teknik Eager Loading untuk mencegah masalah N+1 Query.
+* Inertia::render(): Mengirimkan data $asets ke frontend React Page Aset/Index.jsx.
+
+4.4 File Controller Mutasi (app/Http/Controllers/Web/MutasiController.php)
+--------------------------------------------------------------------------
+Menangani transaksi mutasi aset medis. Di dalamnya terdapat fungsi kritis DB::transaction() untuk mengubah kolom id_ruang_saat_ini di tabel t_aset dan membuat record baru di tabel t_mutasi secara transaksional.
+
+4.5 File Controller Work Order (app/Http/Controllers/Web/WorkOrderController.php)
+----------------------------------------------------------------------------------
+Menangani pembuatan tiket laporan kerusakan oleh Unit_RS, penunjukan teknisi oleh Admin IPSRS, dan pembaruan status pengerjaan oleh teknisi lapangan.
+
+4.6 File Page Aset (resources/js/Pages/Aset/Index.jsx)
+------------------------------------------------------
+Komponen React utama untuk menampilkan katalog aset medis:
+* Props (asets, ruangans): Menerima kiriman data array aset dan ruangan dari controller Laravel.
+* Integrated QR Code Scanner: Webcam scanner terintegrasi yang memproses kode QR dan mengarahkan langsung ke halaman detail aset terkait secara instan.
+
+4.7 File Layout (resources/js/Layouts/AuthenticatedLayout.jsx)
+--------------------------------------------------------------
+Menyediakan kerangka tampilan konsisten (sidebar dan header). Semua halaman dibungkus di dalam layout ini:
+* Fungsi Layout: Menyediakan kerangka tampilan konsisten (sidebar dan header). Semua halaman dibungkus di dalam layout ini.
+* Lonceng Notifikasi Dinamis: Menampilkan notifikasi lonceng dinamis yang secara real-time diperoleh dari shared props notifications di HandleInertiaRequests.php berdasarkan role user yang aktif.
+* Children Prop: Tag {children} bertindak sebagai placeholder dinamis di mana konten halaman aktif akan dirender di dalam kerangka layout.
 
 
 ========================================================================
 BAB V: PEMAHAMAN MENDALAM KONSEP TEKNOLOGI (LARAVEL, REACT, & REST API)
 ========================================================================
 
-Laravel: Framework Backend PHP Modern
--------------------------------------
-* Model-View-Controller (MVC): Pola arsitektur yang memisahkan data (Model), tampilan antarmuka (View/React), dan logika kontrol (Controller).
-* Eloquent ORM: Teknik pemrograman untuk memetakan tabel database ke objek PHP (misal Aset::all()).
-* Middleware: Lapisan filter keamanan HTTP request (seperti mengecek login session atau token API).
-* Database Transactions: Pengelompokan beberapa perintah query (commit dan rollback) untuk menjamin integritas data.
+Bab ini berisi materi pemahaman fundamental secara konseptual. Dosen penguji sering kali menanyakan teori dasar di balik teknologi yang digunakan untuk menguji pemahaman mendalam Anda.
 
-React.js: Library Frontend Berbasis Komponen
---------------------------------------------
-* Component-based Architecture: UI dipecah menjadi bagian mandiri yang reusable.
-* Virtual DOM: Salinan DOM asli di memori. React hanya meng-update elemen HTML yang berubah saja (Diffing Algorithm) sehingga performa web sangat cepat.
-* State vs Props: State adalah variabel lokal internal komponen (dapat diubah), sedangkan Props adalah data kiriman dari parent/controller (read-only).
-* React Hooks: Fungsi bawaan React seperti useState() untuk state lokal dan useEffect() untuk lifecycle side-effects.
+5.1 Laravel: Framework Backend PHP Modern
+-----------------------------------------
+Laravel adalah framework PHP MVC (Model-View-Controller) yang dirancang untuk mempermudah pengembangan aplikasi web yang aman, terstruktur, dan mudah dirawat. Konsep penting yang harus dipahami:
+* Model-View-Controller (MVC): Pola arsitektur yang memisahkan data (Model), tampilan antarmuka (View), dan logika kontrol (Controller). Dalam arsitektur hybrid kita, React bertindak sebagai View, Laravel Model sebagai Model, dan Laravel Controller sebagai Controller.
+* Eloquent ORM (Object-Relational Mapping): Teknik pemrograman untuk memetakan tabel database ke dalam bentuk objek bahasa pemrograman PHP. Kita tidak menulis query SQL manual (seperti SELECT * FROM aset), melainkan menggunakan sintaks objek seperti Aset::all() atau Aset::find(1).
+* Middleware: Lapisan filter keamanan yang memeriksa setiap request HTTP sebelum masuk ke Controller. Contoh: Middleware auth memastikan pengguna sudah login session, dan middleware auth:sanctum memeriksa validitas token API Android.
+* Database Transactions: Mekanisme pengelompokan beberapa perintah database (insert/update/delete) menjadi satu kesatuan (unit of work). Jika salah satu perintah gagal, semua perintah dibatalkan secara otomatis (rollback) menggunakan DB::rollBack(). Jika semuanya sukses, data disimpan permanen menggunakan DB::commit(). Ini menjaga integritas data.
 
-REST API & Laravel Sanctum
---------------------------
-* Statelessness: Server tidak menyimpan status session klien. Setiap HTTP request Android membawa token autentikasi.
-* HTTP Methods: Aksi standar komunikasi: GET (ambil), POST (buat baru), PUT/PATCH (update), DELETE (hapus).
-* Laravel Sanctum: Sistem autentikasi token ringan untuk mengamankan endpoint REST API.
+5.2 React.js: Library Frontend Berbasis Komponen
+------------------------------------------------
+React.js adalah library JavaScript yang dikembangkan oleh Meta untuk membangun antarmuka pengguna (UI) yang dinamis, cepat, dan interaktif. Konsep penting yang harus dipahami:
+* Component-based Architecture: Aplikasi dipecah menjadi bagian-bagian kecil yang mandiri (reusable components). Contoh: Navbar, Sidebar, dan FormModal dibuat sekali dan dipanggil berulang-ulang di halaman yang berbeda.
+* Virtual DOM (Document Object Model): React membuat salinan DOM asli browser di memori (Virtual DOM). Ketika data berubah, React membandingkan Virtual DOM dengan DOM asli dan hanya memperbarui elemen HTML yang berubah saja (Diffing Algorithm), bukan me-render ulang seluruh halaman. Ini membuat web berjalan sangat cepat.
+* State vs Props: State adalah data internal yang dikelola dan diubah oleh komponen itu sendiri (lokal). Props adalah data eksternal yang dikirimkan oleh komponen induk ke komponen anak dan bersifat read-only (tidak bisa diubah langsung oleh komponen anak).
+* React Hooks: Fungsi bawaan React untuk menggunakan fitur state dan lifecycle di function component. Contoh: useState() untuk membuat state lokal, dan useEffect() untuk menjalankan efek samping seperti mengambil data saat komponen pertama kali dirender.
+
+5.3 REST API & Laravel Sanctum
+------------------------------
+REST (Representational State Transfer) API adalah standar arsitektur komunikasi data antara sistem yang berbeda (dalam proyek ini antara backend Laravel dengan klien mobile Android Kotlin) dengan menggunakan protokol HTTP. Konsep penting yang harus dipahami:
+* Statelessness: Sifat utama REST API di mana server tidak menyimpan status session klien. Setiap HTTP request dari klien Android harus membawa informasi lengkap (token autentikasi) secara mandiri untuk diproses oleh server.
+* HTTP Methods (Verbs): Standar komunikasi aksi: GET (mengambil data), POST (mengirim/membuat data baru), PUT/PATCH (memperbarui data), dan DELETE (menghapus data).
+* Format Data JSON: Komunikasi data dilakukan menggunakan format JSON (JavaScript Object Notation), yaitu format teks ringan yang mudah dibaca oleh manusia dan mudah diparse oleh bahasa pemrograman apa pun (PHP di backend dan Kotlin di Android).
+* Laravel Sanctum: Sistem autentikasi token bawaan Laravel yang sangat ringan. Sanctum menghasilkan string token acak (plainTextToken) yang disimpan di Android. Setiap request Android menyertakan token ini di header Authorization (Bearer Token) untuk diuji kecocokannya dengan token terenkripsi SHA-256 yang tersimpan di tabel database personal_access_tokens.
 
 
 ========================================================================
-BAB VI: FUNGSI DAN PENJELASAN BERKAS KONFIGURASI PROJEK
+BAB VI: FUNGSI DAN PENJELASAN BERKAS KONFIGURASI PROJEK (FILES EXPLANATION)
 ========================================================================
 
-Dosen sering menanyakan kegunaan berkas konfigurasi di root direktori proyek:
-* .env & .env.example: Menyimpan kredensial database lokal, app key, dan variabel lingkungan sensitif.
-* .editorconfig & .eslintrc.json: Menstandarkan gaya penulisan kode JavaScript dan deteksi error sintaks.
-* .gitignore: Berkas instruksi agar Git mengabaikan folder dependensi vendor/ atau node_modules/ saat push ke GitHub.
-* composer.json & composer.lock: Package manager PHP untuk mendefinisikan library dependensi backend (Laravel, Sanctum, Inertia).
-* package.json & package-lock.json: Package manager Node.js untuk mendefinisikan library frontend (React, Axios, ChartJS).
-* tailwind.config.js: Mengatur tema warna kustom, responsivitas, dan kelas CSS Tailwind.
-* vite.config.js: Konfigurasi bundler Vite untuk kompilasi real-time aset React JSX dan Tailwind CSS.
+Bab ini memuat daftar berkas konfigurasi di root direktori proyek, yang sering ditanyakan dosen untuk memastikan Anda memahami komponen arsitektur proyek secara utuh:
+* .editorconfig: Berkas konfigurasi editor (seperti VS Code) untuk menstandarkan gaya penulisan kode antar pengembang (misalnya ukuran indentasi spasi/tab secara seragam).
+* .env: Berkas konfigurasi lingkungan (environment variables) lokal yang menyimpan data sensitif seperti kredensial database (host, port, DB name, username, password) dan kunci keamanan aplikasi (App Key). Berkas ini tidak di-upload ke GitHub demi keamanan.
+* .env.example: Salinan template berkas .env tanpa isi data sensitif. Berfungsi sebagai panduan bagi developer lain untuk meniru konfigurasi lingkungan ketika baru pertama kali mengkloning proyek.
+* .eslintrc.json: Berkas konfigurasi ESLint (linter Javascript) untuk mendeteksi penulisan kode Javascript/React yang salah secara otomatis di editor agar kode bersih dan minim bug.
+* .gitattributes: Mengatur atribut berkas di dalam sistem Git, seperti konversi baris akhir otomatis (CRLF ke LF) saat file dibagikan antar sistem operasi (Windows dan Linux/Mac).
+* .gitignore: Berkas instruksi untuk Git untuk mengabaikan (tidak melacak/mengunggah) folder dan berkas tertentu seperti folder dependensi vendor/, node_modules/, atau berkas konfigurasi lokal .env ke GitHub.
+* .prettierrc: Konfigurasi format otomatis kode untuk library Prettier di editor (misalnya memaksa tanda titik koma, spasi, dan gaya penulisan React JSX seragam).
+* artisan: Aplikasi Command Line Interface (CLI) bawaan Laravel. Digunakan untuk menjalankan perintah-perintah framework Laravel di terminal, seperti php artisan serve, php artisan migrate, dll.
+* composer.json: Berkas utama package manager Composer. Menyimpan data metadata proyek, versi PHP yang dibutuhkan, dan daftar pustaka dependensi PHP backend (seperti Laravel core, Sanctum, Inertia) yang harus diinstal.
+* composer.lock: Mengunci versi spesifik dari library Composer yang telah terinstal agar ketika orang lain menjalankan composer install, mereka akan mengunduh versi library yang sama persis.
+* jsconfig.json: Konfigurasi compiler Javascript di editor. Digunakan untuk mendefinisikan alias path impor, sehingga kita bisa mengimpor file di React dengan path pendek seperti @/Components/Button alih-alih path panjang seperti ../../../Components/Button.
+* package.json: Berkas utama package manager NPM (Node.js). Menyimpan metadata proyek frontend serta daftar library Javascript/React yang dibutuhkan (seperti React, Axios, Tailwind CSS, Inertia).
+* package-lock.json: Mengunci versi library NPM yang terinstal agar tetap sama persis di komputer developer lain ketika mereka menjalankan npm install.
+* phpunit.xml: Konfigurasi bawaan untuk framework pengujian otomatis PHPUnit (untuk menjalankan tes fungsional/unit di Laravel).
+* postcss.config.js: Berkas konfigurasi PostCSS yang digunakan oleh compiler aset (Vite) untuk memproses sintaks CSS modern agar kompatibel dengan seluruh web browser.
+* tailwind.config.js: Berkas konfigurasi utama framework Tailwind CSS. Digunakan untuk mengatur tema warna kustom, font, path pencarian kelas CSS di dalam file React, dan responsivitas layout.
+* vite.config.js: Berkas konfigurasi utama untuk bundler Vite. Vite bertugas mengompilasi dan menggabungkan semua file React JSX dan Tailwind CSS Anda secara real-time saat server pengembangan aktif.
 
 
 ========================================================================
 BAB VII: DEEP DIVE: KONSEP SESSIONS, TOKENS, DAN DATABASE MIGRATIONS
 ========================================================================
 
-* Web Sessions (Autentikasi Stateful): Browser menyimpan Session ID di Cookie (laravel_session) yang dilampirkan otomatis pada setiap request HTTP. Server melacak status login di memori.
-* API Tokens (Autentikasi Stateless): Android menyimpan token secara mandiri dan mengirimkannya di header Authorization. Server hanya memeriksa apakah token valid tanpa menyimpan status session.
-* Database Migrations: Version control untuk skema database. php artisan migrate digunakan untuk memperbarui tabel database secara otomatis tanpa impor file SQL manual.
+Tiga konsep ini adalah fondasi penting dalam pemrograman backend Laravel. Dosen penguji hampir pasti menanyakan perbedaan cara kerja autentikasi web (session) dengan Android (token), serta bagaimana migrasi bekerja.
+
+7.1 Web Sessions (Autentikasi Stateful)
+--------------------------------------
+Session adalah mekanisme penyimpanan informasi sementara di sisi server untuk melacak status login pengguna di web browser. Cara kerjanya:
+* Proses Autentikasi: Pengguna memasukkan email/password di browser -> Laravel mencocokkannya -> jika cocok, Laravel membuat file session unik di server (storage/framework/sessions/) dan mengirimkan Session ID ke browser dalam bentuk Cookie (bernama laravel_session).
+* Pengiriman Cookie Otomatis: Web browser menyimpan cookie tersebut secara otomatis. Setiap kali pengguna berpindah halaman di web Anda, browser akan melampirkan cookie Session ID tersebut secara otomatis dalam request HTTP.
+* Stateful: Disebut Stateful karena server secara aktif melacak dan menyimpan status login pengguna di memori/file server selama browser belum ditutup atau waktu session belum habis (expire).
+
+7.2 API Tokens (Autentikasi Stateless)
+--------------------------------------
+Token adalah string acak unik yang digunakan untuk mengautentikasi pengguna pada REST API (mobile Android Kotlin). Cara kerjanya:
+* Proses Autentikasi: Aplikasi Android mengirim email/password ke API login -> Laravel memverifikasi -> jika cocok, Laravel Sanctum membuat baris token acak baru di tabel database personal_access_tokens dan mengembalikan token string mentah tersebut ke aplikasi Android.
+* Penyimpanan Manual: Aplikasi Android menyimpan token tersebut secara mandiri di memori lokal perangkat (SharedPreferences atau Datastore).
+* Pengiriman Header Manual: Setiap kali Android mengirim request ke server (misal meminta data barang), Android harus melampirkan token tersebut secara manual di dalam header HTTP: Authorization: Bearer {token}.
+* Stateless: Disebut Stateless karena server tidak menyimpan status session aktif untuk klien. Server hanya memeriksa apakah token yang dibawa di header HTTP cocok dengan yang ada di database. Jika cocok, data dikirim. Ini lebih hemat sumber daya server dan sangat fleksibel untuk integrasi multi-platform.
+* Mengapa Android memakai Token bukan Session?: Karena aplikasi mobile (Android/iOS) tidak memiliki mekanisme bawaan untuk mengelola cookie session secara otomatis seperti web browser. Selain itu, token lebih aman dan kompatibel untuk komunikasi lintas platform berbasis API.
+
+7.3 Database Migrations (Version Control untuk Database)
+--------------------------------------------------------
+Migrasi adalah fitur Laravel yang berfungsi sebagai sistem pengontrol versi (seperti Git) tetapi khusus untuk skema database. Dengan migrasi, struktur tabel didefinisikan menggunakan kode PHP, bukan query SQL manual.
+* Manfaat Utama: Mempermudah kolaborasi tim developer atau proses penilaian oleh dosen. Cukup dengan menjalankan satu baris perintah di terminal baru, seluruh struktur database beserta relasi foreign key akan dibuat secara otomatis dengan tingkat akurasi 100% tanpa perlu ekspor-impor file SQL manual.
+* Perintah Artisan Utama: Berikut adalah 3 perintah migrasi yang wajib dihafalkan fungsinya:
+* 1. php artisan migrate: Menjalankan semua berkas migrasi baru yang belum pernah dijalankan sebelumnya di database.
+* 2. php artisan migrate:rollback: Membatalkan atau memundurkan migrasi yang terakhir kali dijalankan (menghapus tabel/kolom yang baru dibuat). Ini berguna untuk membatalkan kesalahan skema.
+* 3. php artisan migrate:fresh: Menghapus seluruh tabel di database (drop all tables) lalu menjalankan ulang seluruh berkas migrasi dari awal. Ini digunakan untuk mereset database ke keadaan kosong bersih.
