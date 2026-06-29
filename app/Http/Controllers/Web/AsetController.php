@@ -32,7 +32,7 @@ class AsetController extends Controller
         $query = Aset::with(['ruangan']);
 
         $user = Auth::user();
-        if ($user && $user->role === 'Unit_RS' && $user->id_ruang) {
+        if ($user && $user->role === 'Unit_RS' && $user->id_ruang && !$search) {
             $query->where('id_ruang_saat_ini', $user->id_ruang);
         }
 

@@ -98,13 +98,8 @@ class MutasiController extends Controller
         $idRuang = $user->id_ruang;
 
         $asetQuery = Aset::query();
-        if ($role === 'Unit_RS' && $idRuang) {
-            // Unit hanya bisa memutasi aset yang saat ini ada di ruangan mereka
-            $asetQuery->where('id_ruang_saat_ini', $idRuang);
-        } else {
-            // Filter hanya aset yang sudah memiliki penempatan ruangan saat ini
-            $asetQuery->whereNotNull('id_ruang_saat_ini');
-        }
+        // Allow all users to request mutation for any pen-placed asset
+        $asetQuery->whereNotNull('id_ruang_saat_ini');
 
         $asets = $asetQuery->with('ruangan')->get()->map(function ($a) {
             return [
@@ -140,11 +135,6 @@ class MutasiController extends Controller
         ]);
 
         $user = Auth::user();
-
-        // Validasi Unit_RS: Pastikan hanya memutasi aset di ruangan mereka sendiri
-        if ($user->role === 'Unit_RS' && $request->ruang_asal != $user->id_ruang) {
-            return Redirect::back()->withErrors(['id_aset' => 'Anda hanya bisa memutasi aset dari ruangan unit Anda.']);
-        }
 
         Mutasi::create([
             'id_aset' => $request->id_aset,
