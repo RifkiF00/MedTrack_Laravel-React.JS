@@ -124,7 +124,7 @@ class HandleInertiaRequests extends Middleware
                     }
                     
                     // 3. Open WO
-                    $openWOCount = \App\Models\Troubleshoot::where('status_ticket', 'Terbuka')->count();
+                    $openWOCount = \App\Models\Troubleshoot::where('status_ticket', 'Open')->count();
                     if ($openWOCount > 0) {
                         $notifications[] = [
                             'id' => 'wo_open',
