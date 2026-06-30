@@ -147,14 +147,40 @@ class HandleInertiaRequests extends Middleware
                         ];
                     }
                 } elseif ($role === 'Unit_RS') {
-                    // Open WO in my room
-                    $myOpenWO = \App\Models\Troubleshoot::where('status_ticket', '!=', 'Closed')
+                    // 1. Tickets waiting for Sign-Off (Action needed from Unit)
+                    $signOffCount = \App\Models\Troubleshoot::where('status_ticket', 'Menunggu Sign-Off')
                         ->where('id_user_pelapor', $user->id_user)
                         ->count();
-                    if ($myOpenWO > 0) {
+                    if ($signOffCount > 0) {
                         $notifications[] = [
-                            'id' => 'my_wo_open',
-                            'text' => "Ada {$myOpenWO} laporan kerusakan di ruangan Anda yang sedang diproses.",
+                            'id' => 'wo_sign_off_pending',
+                            'text' => "Ada {$signOffCount} laporan kerusakan selesai diperbaiki & menunggu persetujuan (Sign-Off) Anda.",
+                            'link' => route('workorder.index'),
+                            'type' => 'danger'
+                        ];
+                    }
+
+                    // 2. Active tickets in-progress (Pengecekan or Dikerjakan)
+                    $inProgressCount = \App\Models\Troubleshoot::whereIn('status_ticket', ['Pengecekan', 'Dikerjakan'])
+                        ->where('id_user_pelapor', $user->id_user)
+                        ->count();
+                    if ($inProgressCount > 0) {
+                        $notifications[] = [
+                            'id' => 'wo_in_progress',
+                            'text' => "Ada {$inProgressCount} laporan kerusakan sedang diproses/diperbaiki oleh teknisi.",
+                            'link' => route('workorder.index'),
+                            'type' => 'info'
+                        ];
+                    }
+
+                    // 3. New tickets pending assignment (Open)
+                    $openCount = \App\Models\Troubleshoot::where('status_ticket', 'Open')
+                        ->where('id_user_pelapor', $user->id_user)
+                        ->count();
+                    if ($openCount > 0) {
+                        $notifications[] = [
+                            'id' => 'wo_new_open',
+                            'text' => "Ada {$openCount} laporan kerusakan baru Anda belum ditugaskan ke teknisi.",
                             'link' => route('workorder.index'),
                             'type' => 'warning'
                         ];
