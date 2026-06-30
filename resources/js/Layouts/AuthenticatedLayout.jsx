@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Dropdown from '@/Components/Dropdown';
 import { Link, usePage, router } from '@inertiajs/react';
 
@@ -72,56 +72,77 @@ export default function Authenticated({ user, header, children }) {
         router.get(route('aset.index'), { search: query });
     };
 
+    // Ref to store the active scanner instance
+    const scannerRef = useRef(null);
+
     // Camera scanner start/stop logic
     useEffect(() => {
-        let scanner = null;
-        if (isScanModalOpen && scannerLibLoaded && activeScanTab === 'camera' && window.Html5Qrcode) {
-            const Html5Qrcode = window.Html5Qrcode;
-            scanner = new Html5Qrcode("qr-camera-reader");
+        const startScanner = async () => {
+            if (isScanModalOpen && scannerLibLoaded && activeScanTab === 'camera' && window.Html5Qrcode) {
+                const Html5Qrcode = window.Html5Qrcode;
+                const scanner = new Html5Qrcode("qr-camera-reader");
+                scannerRef.current = scanner;
 
-            const handleScanSuccess = (decodedText) => {
-                scanner.stop().then(() => {
+                const handleScanSuccess = async (decodedText) => {
+                    if (scannerRef.current) {
+                        try {
+                            await scannerRef.current.stop();
+                        } catch (err) {
+                            console.error("Error stopping scanner:", err);
+                        }
+                        scannerRef.current = null;
+                    }
                     setIsScanModalOpen(false);
                     handleDecodedQR(decodedText);
-                }).catch(err => console.error("Error stopping scanner:", err));
-            };
+                };
 
-            const handleScanFailure = (err) => {
-                // silent failure
-            };
+                const handleScanFailure = (err) => {
+                    // silent failure
+                };
 
-            Html5Qrcode.getCameras().then(devices => {
-                if (devices && devices.length > 0) {
-                    setCameras(devices);
-                    const defaultCam = devices[0].id;
-                    setSelectedCameraId(prev => prev || defaultCam);
-                    
-                    const activeCamId = selectedCameraId || defaultCam;
-                    scanner.start(
-                        activeCamId,
-                        {
-                            fps: 10,
-                            qrbox: (width, height) => {
-                                const size = Math.min(width, height) * 0.7;
-                                return { width: size, height: size };
-                            }
-                        },
-                        handleScanSuccess,
-                        handleScanFailure
-                    ).catch(err => {
-                        setScanError("Gagal membuka kamera: " + err);
-                    });
-                } else {
-                    setScanError("Kamera tidak ditemukan.");
+                try {
+                    const devices = await Html5Qrcode.getCameras();
+                    if (devices && devices.length > 0) {
+                        setCameras(devices);
+                        const defaultCam = devices[0].id;
+                        setSelectedCameraId(prev => prev || defaultCam);
+                        
+                        const activeCamId = selectedCameraId || defaultCam;
+                        
+                        // Check if the modal wasn't closed while getting cameras
+                        if (isScanModalOpen && activeScanTab === 'camera') {
+                            await scanner.start(
+                                activeCamId,
+                                {
+                                    fps: 10,
+                                    qrbox: (width, height) => {
+                                        const size = Math.min(width, height) * 0.7;
+                                        return { width: size, height: size };
+                                    }
+                                },
+                                handleScanSuccess,
+                                handleScanFailure
+                            );
+                        }
+                    } else {
+                        setScanError("Kamera tidak ditemukan.");
+                    }
+                } catch (err) {
+                    setScanError("Gagal membuka kamera: " + err);
                 }
-            }).catch(err => {
-                setScanError("Error mendeteksi kamera: " + err);
-            });
-        }
+            }
+        };
+
+        startScanner();
 
         return () => {
-            if (scanner && scanner.isScanning) {
-                scanner.stop().catch(err => console.error("Cleanup error:", err));
+            if (scannerRef.current) {
+                const currentScanner = scannerRef.current;
+                scannerRef.current = null;
+                
+                if (currentScanner.isScanning) {
+                    currentScanner.stop().catch(err => console.error("Cleanup error stopping camera:", err));
+                }
             }
         };
     }, [isScanModalOpen, scannerLibLoaded, activeScanTab, selectedCameraId]);
