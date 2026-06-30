@@ -164,6 +164,10 @@ class WorkOrderController extends Controller
                 'diubah_oleh' => Auth::id(),
             ]);
 
+            // Sync asset condition based on urgency
+            $assetCondition = in_array($request->tingkat_urgensi, ['Tinggi', 'Darurat']) ? 'Rusak_Berat' : 'Rusak_Ringan';
+            Aset::where('id_aset', $request->id_aset)->update(['status_kondisi' => $assetCondition]);
+
             DB::commit();
 
             return Redirect::route('workorder.index')->with('success', 'Work Order berhasil dibuat.');
@@ -199,6 +203,13 @@ class WorkOrderController extends Controller
             $ticket->update([
                 'status_ticket' => $statusBaru
             ]);
+
+            // Sync asset condition based on work order status update
+            if ($statusBaru === 'Closed') {
+                Aset::where('id_aset', $ticket->id_aset)->update(['status_kondisi' => 'Baik']);
+            } elseif (in_array($statusBaru, ['Pengecekan', 'Dikerjakan', 'Menunggu Sign-Off'])) {
+                Aset::where('id_aset', $ticket->id_aset)->update(['status_kondisi' => 'Maintenance']);
+            }
 
             TroubleshootLog::create([
                 'id_ticket' => $ticket->id_ticket,
@@ -294,6 +305,9 @@ class WorkOrderController extends Controller
             $ticket->update([
                 'status_ticket' => 'Closed'
             ]);
+
+            // Set asset condition back to 'Baik' upon successful sign-off
+            Aset::where('id_aset', $ticket->id_aset)->update(['status_kondisi' => 'Baik']);
 
             TroubleshootLog::create([
                 'id_ticket' => $ticket->id_ticket,
