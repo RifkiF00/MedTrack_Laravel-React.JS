@@ -62,7 +62,7 @@ class HandleInertiaRequests extends Middleware
                         return [
                             'type' => 'calibration',
                             'id' => $aset->id_aset,
-                            'title' => 'Kalibrasi ' . $aset->nama_alat . ' (' . $aset->kode_label . ')',
+                            'title' => 'Kalibrasi ' . $aset->nama_alat,
                             'date' => $aset->tgl_kalibrasi_terakhir ? $aset->tgl_kalibrasi_terakhir->format('Y-m-d') : null,
                             'location' => $aset->ruangan ? $aset->ruangan->nama_ruang : 'RS Hasna Medika',
                             'kode_label' => $aset->kode_label,

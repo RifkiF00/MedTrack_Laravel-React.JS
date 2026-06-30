@@ -690,6 +690,11 @@ export default function Authenticated({ user, header, children }) {
                                                 <span className="text-[10px] font-bold text-indigo-950 block">
                                                     {activeEvent.title}
                                                 </span>
+                                                {activeEvent.kode_label && (
+                                                    <span className="text-[9px] text-slate-500 font-semibold block mt-1">
+                                                        {activeEvent.kode_label} • {activeEvent.location}
+                                                    </span>
+                                                )}
                                             </div>
                                         ) : (
                                             <div className="text-center py-2 bg-slate-50/80 rounded-xl border border-dashed border-slate-200 p-2">
