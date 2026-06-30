@@ -209,12 +209,21 @@ export default function Authenticated({ user, header, children }) {
         });
     };
 
+    const [activeEventOverride, setActiveEventOverride] = useState(null);
+
     // Find active event on selected date
     const selectedDateStr = selectedDate.getFullYear() + '-' + 
         String(selectedDate.getMonth() + 1).padStart(2, '0') + '-' + 
         String(selectedDate.getDate()).padStart(2, '0');
 
-    const activeEvent = upcomingEvents?.find(event => event.date === selectedDateStr);
+    const eventsOnDate = upcomingEvents?.filter(event => event.date === selectedDateStr) || [];
+
+    // Reset activeEventOverride when selectedDate changes
+    useEffect(() => {
+        setActiveEventOverride(null);
+    }, [selectedDate]);
+
+    const activeEvent = activeEventOverride || (eventsOnDate.length > 0 ? eventsOnDate[0] : null);
 
     // Search redirect logic
     const handleSearch = (e) => {
@@ -641,6 +650,29 @@ export default function Authenticated({ user, header, children }) {
                                             </div>
                                         )}
                                     </div>
+
+                                    {/* Multi-event selector tabs */}
+                                    {eventsOnDate.length > 1 && (
+                                        <div className="flex flex-wrap gap-1 border-b border-slate-100 pb-2">
+                                            {eventsOnDate.map((ev, index) => {
+                                                const isActive = activeEvent && activeEvent.id === ev.id && activeEvent.type === ev.type;
+                                                return (
+                                                    <button
+                                                        key={ev.id + '_' + ev.type + '_' + index}
+                                                        type="button"
+                                                        onClick={() => setActiveEventOverride(ev)}
+                                                        className={`px-2 py-1 text-[9px] font-extrabold rounded-lg border transition ${
+                                                            isActive
+                                                                ? 'bg-[#0a3a60] text-white border-[#0a3a60] shadow-sm'
+                                                                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                                                        }`}
+                                                    >
+                                                        {ev.kode_label || `Agenda ${index + 1}`}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
 
                                     {/* Event specifics */}
                                     <div className="space-y-2">
